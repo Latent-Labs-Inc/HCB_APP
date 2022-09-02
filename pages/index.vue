@@ -1,7 +1,19 @@
 <template>
 	<div>
 		<h3 class="header">Home</h3>
-		<UiTable
+
+		<div class="mx-5 flex flex-col gap-5 p-8">
+			<h3 class="header">Send a Message</h3>
+			<textarea
+				v-model="message"
+				class="dark:bg-darkBg dark:text-darkSecondary p-4 focus:outline-darkSecondary outline-1 focus:border-none rounded trans"
+				rows="5"
+				cols="30"
+			/>
+			<button class="reverse" @click="handleMessage">Send Text</button>
+		</div>
+
+		<!-- <UiTable
 			:cols="cols"
 			:gridCols="gridCols"
 			:tableData="tableData"
@@ -9,14 +21,23 @@
 			:dropdownItems="dropdownItems"
 			@itemClicked="handleItemClick"
 			:pageLength="10"
-		/>
+		/> -->
 	</div>
 </template>
 
 <script setup lang="ts">
-import { EligibilityResponse } from "~~/types/change";
-const eligibility = ref({});
-const benefitsInformation = ref([]);
+const message = ref("");
+
+const handleMessage = async () => {
+	console.log("handleMessage");
+	const res = await $fetch("api/twilio", {
+		method: "POST",
+		body: JSON.stringify({
+			message: message.value,
+		}),
+	});
+	console.log(res);
+};
 
 await useLoadContent();
 
@@ -104,20 +125,6 @@ const dropdownItems = ref([
 const handleItemClick = (item, row) => {
 	console.log(item, row);
 };
-// const searchChangeHealth = async () => {
-// 	// looking for medical service type codes 12 or DM
-// 	const res: EligibilityResponse = await $fetch("/api/changeEligibility", {
-// 		method: "POST",
-// 		body: {
-// 			medicalServiceTypeCodes: ["12", "DM"],
-// 		},
-// 	});
-
-// 	eligibility.value = res;
-// 	benefitsInformation.value = res.benefitsInformation;
-
-// 	console.log(res);
-// };
 </script>
 
 <style scoped>
