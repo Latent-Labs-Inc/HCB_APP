@@ -2,14 +2,7 @@
 	<nav class="w-48 min-h-screen flex flex-col bg-darkBg dark:bg-black">
 		<ul class="">
 			<li class="sidebar-li"><NuxtLink to="/">Home</NuxtLink></li>
-			<li class="sidebar-li"><NuxtLink to="/patients">Patients</NuxtLink></li>
-			<li class="sidebar-li"><NuxtLink to="/orders">Orders</NuxtLink></li>
-			<li class="sidebar-li">
-				<NuxtLink to="/verifications">Verifications</NuxtLink>
-			</li>
-			<li class="sidebar-li"><NuxtLink to="/payments">Payments</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/customers">Customers</NuxtLink></li>
-			<li class="sidebar-li"><NuxtLink to="/profile">Profile</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/help">Help</NuxtLink></li>
 		</ul>
 	</nav>

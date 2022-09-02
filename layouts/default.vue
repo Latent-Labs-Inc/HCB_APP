@@ -1,6 +1,38 @@
 <template>
-	<div></div>
-	<!--  -->
+	<div>
+		<div class="dark:bg-black">
+			<teleport to="body">
+				<transition name="modal-fade">
+					<div v-if="uiStore.functionLoading" class="modal-backdrop">
+						<UiBaseSpinner></UiBaseSpinner>
+					</div>
+				</transition>
+			</teleport>
+			<UiNav class="dark:bg-darkBg dark:text-darkSecondary" />
+			<div class="flex dark:bg-black h-full">
+				<transition name="sidebar" mode="out-in">
+					<UiSideNav v-if="uiStore.sidebar" />
+				</transition>
+				<transition name="fade" mode="out-in">
+					<div
+						v-if="!uiStore.appLoading"
+						class="flex-grow max-w-full max-h-full dark:bg-black trans"
+					>
+						<client-only>
+							<transition name="route-fade" mode="out-in" appear>
+								<div :key="$route.path">
+									<slot />
+								</div>
+							</transition>
+						</client-only>
+					</div>
+					<div v-else class="flex flex-grow mt-40 justify-center trans">
+						<UiBaseSpinner />
+					</div>
+				</transition>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -15,12 +47,6 @@ $supabase.auth.onAuthStateChange(async (event, session) => {
 		useClearState();
 	}
 });
-
-String.prototype.toTitle = function () {
-	return this.replace(/(^|\s)\S/g, function (t) {
-		return t.toUpperCase();
-	});
-};
 </script>
 
 <style scoped>
