@@ -38,8 +38,6 @@ export default defineNuxtConfig({
 			SUPABASE_KEY: process.env.SUPABASE_KEY,
 		},
 		private: {
-			CHANGE_CLIENT_ID: process.env.CHANGE_CLIENT_ID,
-			CHANGE_CLIENT_SECRET: process.env.CHANGE_CLIENT_SECRET,
 			SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 		},
 	},

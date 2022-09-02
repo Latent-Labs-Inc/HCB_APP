@@ -50,9 +50,9 @@ const handleSidebar = () => {
 						/>
 						<icon-sun class="icon" v-else @click="uiStore.toggleTheme" />
 					</transition>
-					<li class="nav-li">
+					<!-- <li class="nav-li">
 						<NuxtLink to="/contact">Contact</NuxtLink>
-					</li>
+					</li> -->
 					<li class="nav-li">
 						<NuxtLink to="/settings">Settings</NuxtLink>
 					</li>
