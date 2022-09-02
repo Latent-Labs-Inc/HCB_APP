@@ -1,11 +1,22 @@
 export default defineEventHandler(async (event) => {
 	// const query = useQuery(event);
-	const subscriber = await useBody(event);
+	const config = useRuntimeConfig();
 
-	const client = require("twilio")(accountSid, authToken);
+	const message = await useBody(event);
+
+	const twilio = require("twilio");
+
+	const accountSid = config.private.TWILIO_ACCOUNT_SID;
+	const authToken = config.private.TWILIO_AUTH_TOKEN;
+
+	const client = new twilio(accountSid, authToken);
 
 	client.messages
-		.create({ body: "Hi there", from: "+15017122661", to: "+15558675310" })
+		.create({
+			body: "Hi there",
+			from: config.private.TWILIO_PHONE_NUMBER,
+			to: "+18134084221",
+		})
 		.then((message) => console.log(message.sid));
 });
 // Download the helper library from https://www.twilio.com/docs/node/install
