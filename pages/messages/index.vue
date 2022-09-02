@@ -3,7 +3,7 @@
 		<h3 class="header">Messages</h3>
 		<div>
 			<div class="flex justify-center">
-				<SearchInline v-model="searchInput" :label="'Contacts'" />
+				<UiSearchInline v-model="searchInput" :label="'Contacts'" />
 			</div>
 			<UiTable
 				:cols="cols"
@@ -18,9 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import SearchInline from "../../components/Ui/SearchInline.vue";
-
 const searchInput = ref("");
 
 const cols = ref(["Name", "Phone Number", "Last Message", "Date"]);
