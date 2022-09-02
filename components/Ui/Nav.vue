@@ -31,12 +31,12 @@ const handleSidebar = () => {
 			<NuxtLink class="logo px-5 text-xl" to="/"
 				><img
 					v-if="uiStore.theme === 'light'"
-					class="h-fit w-28 top-0 trans p-2"
-					src="~/assets/images/light-svg.svg"
+					class="h-fit w-32 top-0 trans p-2"
+					src="~/assets/images/HCB-logo-light.png"
 					alt="" /><img
 					v-else
-					class="h-fit w-28 top-0 trans p-2"
-					src="~/assets/images/dark-svg.svg"
+					class="h-fit w-32 top-0 trans p-2"
+					src="~/assets/images/HCB-logo-dark.png"
 					alt=""
 			/></NuxtLink>
 			<div class="flex flex-auto">

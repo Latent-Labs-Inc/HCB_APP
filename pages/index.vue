@@ -6,7 +6,7 @@
 			<h3 class="header">Send a Message</h3>
 			<textarea
 				v-model="message"
-				class="dark:bg-darkBg dark:text-darkSecondary p-4 focus:outline-darkSecondary outline-1 focus:border-none rounded trans"
+				class="dark:bg-darkBg dark:text-darkSecondary bg-darkSecondary p-4 dark:focus:outline-darkSecondary focus:outline-darkBg outline-1 focus:border-none rounded trans"
 				rows="5"
 				cols="30"
 			/>
