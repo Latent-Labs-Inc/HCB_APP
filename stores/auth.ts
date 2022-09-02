@@ -40,9 +40,8 @@ export const useAuthStore = defineStore("auth", {
 				if (error) {
 					throw error;
 				}
-				if (data[0].admin) {
-					this.isAdmin = true;
-				}
+				console.log(data);
+				this.isAdmin = data[0].admin;
 			} catch (error) {
 				console.log(error);
 			}

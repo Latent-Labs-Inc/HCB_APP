@@ -3,13 +3,12 @@
 		<UiCard class="">
 			<div v-if="authStore.isAdmin">
 				<h3>Signup</h3>
-				<UiRadio :radioTypes="radioTypes" v-model="selectedRadio" :reverse="true" />
 				<div class="form-group">
 					<label for="username">Username</label>
 					<input
 						class="w-sm mx-auto border shadow-sm border-slate-300 placeholder-slate-400 dark:bg-darkBg dark:focus:outline-darkPrimary"
 						:type="'text'"
-						:placeholder="'Sales Rep or Practice Name'"
+						:placeholder="'Username'"
 						v-model="input.username"
 					/>
 				</div>
@@ -62,19 +61,6 @@ const input = reactive({
 	username: "",
 });
 
-const radioTypes = ref([
-	{
-		id: "practice",
-		label: "Practice",
-	},
-	{
-		id: "salesRep",
-		label: "Sales Rep",
-	},
-]);
-
-const selectedRadio = ref("practice");
-
 const clearInput = () => {
 	input.email = "";
 	input.password = "";
@@ -86,7 +72,7 @@ const handleSubmit = async () => {
 		email: input.email,
 		password: input.password,
 		username: input.username,
-		type: selectedRadio.value,
+		type: "user",
 	});
 	clearInput();
 
