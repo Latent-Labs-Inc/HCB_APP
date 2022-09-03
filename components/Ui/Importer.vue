@@ -99,7 +99,7 @@ const dropFile = (e) => {
 			fileName.value = file.name;
 		} else {
 			modalActive.value = true;
-			msg.value = "Please make sure you are submitting an .xlsx file";
+			msg.value = "Please make sure you are submitting an .csv file";
 		}
 	} else {
 		modalActive.value = true;
