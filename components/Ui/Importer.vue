@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { useContactStore } from "~~/stores/contacts";
+import { useContactStore } from "~~/stores/contact";
 import { useUiStore } from "~~/stores/ui";
 
 const contactStore = useContactStore();
