@@ -15,3 +15,24 @@ export interface Profile {
 	created_at: Date;
 	modified_at: Date;
 }
+
+export interface ActionIcon {
+	name: string;
+	render: () => {};
+}
+export interface ActionProps {
+	id: string;
+	name: string;
+	icon: ActionIcon;
+}
+
+export interface Address {
+	address1: string;
+	address2?: string;
+	city: string;
+	state: string;
+	postalCode: string;
+	countryCode?: string;
+	locationIdentifier?: string;
+	countrySubDivisionCode?: string;
+}
