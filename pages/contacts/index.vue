@@ -2,7 +2,7 @@
 	<div class="my-6">
 		<h3 class="header">Contacts</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
-		<UiImporter :label="'Contacts'" @upload="handleUpload" />
+		<UiImporter :label="'Contacts'" @imported="handleUpload" />
 		<!-- <UiModal :show="searching" :title="'Search Patient'" @close="handleClose">
 			<div class="form-group">
 				<label for="">Contact Name</label>
@@ -67,6 +67,7 @@ const handleClose = () => {
 };
 
 const handleUpload = async (data: any[]) => {
+	console.log(data);
 	const formattedContacts = await useFormattedContacts(data);
 };
 </script>
