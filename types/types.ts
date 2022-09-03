@@ -36,3 +36,25 @@ export interface Address {
 	locationIdentifier?: string;
 	countrySubDivisionCode?: string;
 }
+export interface Contact {
+	contact_id: string;
+	propertyAddress: Address;
+	sqFt: number;
+	yearBuilt: string;
+	ownerFirstName: string;
+	ownerLastName: string;
+	ownerAddress: Address;
+	wireless: string[];
+	landline: string[];
+	email: string[];
+	lastSaleDate: Date;
+	lastSalePrice: number;
+	estimatedValue: number;
+	isForeclosure?: boolean;
+	isHomestead?: boolean;
+	isSenior?: boolean;
+	isVacant?: boolean;
+	alternateContacts?: string;
+	created_at: Date;
+	modified_at: Date;
+}

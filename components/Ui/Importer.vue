@@ -19,7 +19,7 @@
 				@drop.prevent="dropFile"
 				:class="{ 'active-dropzone': dragActive }"
 			>
-				<p>Drag and Drop: Patients File</p>
+				<p>Drag and Drop: {{ label }} File</p>
 				<p>Or</p>
 				<div class="flex">
 					<label for="file" class="btn cursor-pointer">Choose File</label>
@@ -35,7 +35,7 @@
 					<input type="file" @change="handleFile" id="change-file" class="hidden" />
 				</div>
 				<div>
-					<UiButton class="btn" @click="uploadData">Upload Patients </UiButton>
+					<UiButton class="btn" @click="uploadData">Upload {{ label }} </UiButton>
 				</div>
 			</div>
 		</div>
@@ -43,10 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import { useContactStore } from "~~/stores/contact";
 import { useUiStore } from "~~/stores/ui";
 
-const contactStore = useContactStore();
+const emits = defineEmits<{
+	(e: "upload", data: any[]);
+}>();
+
+const props = defineProps<{
+	label: string;
+}>();
+
 const uiStore = useUiStore();
 const selectedFile = ref<any>(null);
 const fileType = ref<"xlsx" | "csv">(null);
@@ -129,8 +135,7 @@ const uploadData = async () => {
 					});
 			};
 			const aoa = CSVToJSON(data);
-			const formattedContacts = await useFormatContacts("csv", aoa);
-			await contactStore.uploadPatients(formattedContacts);
+			emits("upload", aoa);
 			uiStore.toggleAppLoading(false);
 		};
 		reader.readAsText(selectedFile.value);

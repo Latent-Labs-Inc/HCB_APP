@@ -2,7 +2,7 @@
 	<div class="my-6">
 		<h3 class="header">Contacts</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
-		<UiImporter />
+		<UiImporter :label="'Contacts'" @upload="handleUpload" />
 		<!-- <UiModal :show="searching" :title="'Search Patient'" @close="handleClose">
 			<div class="form-group">
 				<label for="">Contact Name</label>
@@ -48,22 +48,26 @@ const searchInput = ref("");
 const filteredContacts = ref([] as Contact[]);
 
 const handleAction = async (action: string) => {
-	if (action === "addPatient") {
-		router.push("/patients/add");
-	} else if (action === "searchPatient") {
+	if (action === "addContact") {
+		router.push("/contact/add");
+	} else if (action === "searchContact") {
 		searching.value = true;
-	} else if (action === "schedulePatient") {
-		showCalendar.value = true;
-		scheduling.value = true;
 	}
 };
+
 const handleSearch = async () => {};
+
 const handleSelected = (contact: Contact) => {
 	// contactStore.setSelectedContact(contact);
 	// router.push(`/contacts/contact-profile/${contact.contact_id}`);
 };
+
 const handleClose = () => {
 	searching.value = false;
+};
+
+const handleUpload = async (data: any[]) => {
+	const formattedContacts = await useFormattedContacts(data);
 };
 </script>
 
