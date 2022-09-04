@@ -1,10 +1,16 @@
 import { Contact } from "~/types/types";
 import { useAuthStore } from "~~/stores/auth";
+import { useContactStore } from "~~/stores/contact";
 
-export default function useFormattedContacts(data: any[]) {
+export default async function useFormattedContacts(data: any[]) {
 	const formattedContacts: Contact[] = [];
+
 	const authStore = useAuthStore();
-	console.log(data[0]);
+
+	const contactStore = useContactStore();
+
+	let keys = Object.keys(data[0]);
+	console.log(keys);
 	data.forEach((contact) => {
 		let newContact: Contact = {
 			user_id: authStore.user_id,
@@ -37,15 +43,18 @@ export default function useFormattedContacts(data: any[]) {
 			lastSaleDate: null,
 			lastSalePrice: null,
 			estimatedValue: null,
-			isForeclosure: null,
-			isHomestead: null,
-			isSenior: null,
-			isVacant: null,
+			foreclosure: null,
+			homestead: null,
+			senior: null,
+			vacant: null,
 			alternateContacts: null,
 		};
 		for (let key in contact) {
+			contact[key] = contact[key].trim() || null;
 			if (key.includes("e-mail")) {
-				newContact.email.push(contact[key]);
+				if (!!contact[key]) {
+					newContact.email.push(contact[key]);
+				}
 			} else if (key.includes("wireless")) {
 				if (!!contact[key]) {
 					let newPhone = "+1" + contact[key].replace(/[^0-9]/g, "");
@@ -56,32 +65,30 @@ export default function useFormattedContacts(data: any[]) {
 					let newPhone = "+1" + contact[key].replace(/[^0-9]/g, "");
 					newContact.landline.push(newPhone);
 				}
-			} else if (key.includes("property" && "address")) {
+			} else if (key.includes("property address")) {
 				newContact.propertyAddress.address1 = contact[key];
-			} else if (key.includes("property" && "city")) {
-				console.log("includes property and city");
+			} else if (key.includes("property city")) {
 				newContact.propertyAddress.city = contact[key];
-			} else if (key.includes("property" && "state")) {
+			} else if (key.includes("property state")) {
 				newContact.propertyAddress.state = contact[key];
-			} else if (key.includes("property" && "zip")) {
+			} else if (key.includes("property zip")) {
 				newContact.propertyAddress.zip = contact[key];
-			} else if (key.includes("property" && "county")) {
+			} else if (key.includes("property county")) {
 				newContact.propertyAddress.county = contact[key];
-			} else if (key.includes("owner" && "address")) {
+			} else if (key.includes("owner address")) {
+				console.log("owner address", contact[key]);
 				newContact.ownerAddress.address1 = contact[key];
-			} else if (key.includes("owner" && "city")) {
+			} else if (key === "owner city") {
 				newContact.ownerAddress.city = contact[key];
-			} else if (key.includes("owner" && "state")) {
+			} else if (key === "owner state") {
 				newContact.ownerAddress.state = contact[key];
-			} else if (key.includes("owner" && "zip")) {
+			} else if (key === "owner zip") {
 				newContact.ownerAddress.zip = contact[key];
-			} else if (key.includes("owner" && "county")) {
-				newContact.ownerAddress.county = contact[key];
-			} else if (key.includes("owner" && "first" && "name")) {
+			} else if (key === "owner first name") {
 				newContact.ownerFirstName = contact[key];
-			} else if (key.includes("owner" && "last" && "name")) {
+			} else if (key === "owner last name") {
 				newContact.ownerLastName = contact[key];
-			} else if (key.includes("sq" && "ft")) {
+			} else if (key.includes("square")) {
 				newContact.sqFt = contact[key];
 			} else if (key.includes("year" && "built")) {
 				newContact.yearBuilt = contact[key];
@@ -91,37 +98,37 @@ export default function useFormattedContacts(data: any[]) {
 				newContact.lastSalePrice = contact[key];
 			} else if (key.includes("estimated" && "value")) {
 				newContact.estimatedValue = contact[key];
-			} else if (key.includes("is" && "foreclosure")) {
-				if (contact[key].includes("Y")) {
-					newContact.isForeclosure = true;
-				} else if (contact[key].includes("N")) {
-					newContact.isForeclosure = false;
+			} else if (key.includes("foreclosure")) {
+				if (contact[key]?.includes("Y")) {
+					newContact.foreclosure = true;
+				} else if (contact[key]?.includes("N")) {
+					newContact.foreclosure = false;
 				} else {
-					newContact.isForeclosure = null;
+					newContact.foreclosure = null;
 				}
-			} else if (key.includes("is" && "homestead")) {
-				if (contact[key].includes("Y")) {
-					newContact.isHomestead = true;
-				} else if (contact[key].includes("N")) {
-					newContact.isHomestead = false;
+			} else if (key.includes("homestead")) {
+				if (contact[key]?.includes("Y")) {
+					newContact.homestead = true;
+				} else if (contact[key]?.includes("N")) {
+					newContact.homestead = false;
 				} else {
-					newContact.isHomestead = null;
+					newContact.homestead = null;
 				}
-			} else if (key.includes("is" && "senior")) {
-				if (contact[key].includes("Y")) {
-					newContact.isSenior = true;
-				} else if (contact[key].includes("N")) {
-					newContact.isSenior = false;
+			} else if (key.includes("senior")) {
+				if (contact[key]?.includes("Y")) {
+					newContact.senior = true;
+				} else if (contact[key]?.includes("N")) {
+					newContact.senior = false;
 				} else {
-					newContact.isSenior = null;
+					newContact.senior = null;
 				}
-			} else if (key.includes("is" && "vacant")) {
-				if (contact[key].includes("Y")) {
-					newContact.isVacant = true;
-				} else if (contact[key].includes("N")) {
-					newContact.isVacant = false;
+			} else if (key.includes("vacant")) {
+				if (contact[key]?.includes("Y")) {
+					newContact.vacant = true;
+				} else if (contact[key]?.includes("N")) {
+					newContact.vacant = false;
 				} else {
-					newContact.isVacant = null;
+					newContact.vacant = null;
 				}
 			} else if (key.includes("alternate" && "contacts")) {
 				newContact.alternateContacts = contact[key];
@@ -129,5 +136,8 @@ export default function useFormattedContacts(data: any[]) {
 		}
 		formattedContacts.push(newContact);
 	});
-	console.log(formattedContacts);
+
+	await contactStore.uploadContacts(formattedContacts);
+
+	return formattedContacts;
 }

@@ -1,3 +1,5 @@
+import { S } from "unimport/dist/types-0260c723";
+
 export interface FormElement {
 	id: string;
 	title: string;
@@ -41,7 +43,7 @@ export interface Contact {
 	user_id: string;
 	contact_id: string;
 	propertyAddress: Address;
-	sqFt: number;
+	sqFt: string;
 	yearBuilt: string;
 	ownerFirstName: string;
 	ownerLastName: string;
@@ -52,10 +54,10 @@ export interface Contact {
 	lastSaleDate: Date;
 	lastSalePrice: number;
 	estimatedValue: number;
-	isForeclosure?: boolean;
-	isHomestead?: boolean;
-	isSenior?: boolean;
-	isVacant?: boolean;
+	foreclosure?: boolean;
+	homestead?: boolean;
+	senior?: boolean;
+	vacant?: boolean;
 	alternateContacts?: string;
 	created_at: Date;
 	modified_at: Date;
