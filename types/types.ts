@@ -31,12 +31,14 @@ export interface Address {
 	address2?: string;
 	city: string;
 	state: string;
-	postalCode: string;
+	zip: string;
+	county?: string;
 	countryCode?: string;
 	locationIdentifier?: string;
 	countrySubDivisionCode?: string;
 }
 export interface Contact {
+	user_id: string;
 	contact_id: string;
 	propertyAddress: Address;
 	sqFt: number;
