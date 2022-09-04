@@ -45,12 +45,9 @@
 <script setup lang="ts">
 import { useUiStore } from "~~/stores/ui";
 
-const emit = defineEmits<{
-	(e: "imported", data: any[]): void;
-}>();
-
 const props = defineProps<{
 	label: string;
+	composable: (aoa) => void;
 }>();
 
 const uiStore = useUiStore();
@@ -116,11 +113,6 @@ const dropFile = (e) => {
 const uploadData = async () => {
 	uiStore.toggleAppLoading(true);
 	if (fileType.value === "csv") {
-		const handleEmit = (aoa) => {
-			emit("imported", []);
-			console.log("emitted");
-		};
-
 		const reader = new FileReader();
 		reader.onload = async (e) => {
 			const data = e.target.result;
@@ -141,8 +133,7 @@ const uploadData = async () => {
 			};
 
 			const aoa = CSVToJSON(data);
-
-			handleEmit(aoa);
+			await props.composable(aoa);
 			uiStore.toggleAppLoading(false);
 		};
 		reader.readAsText(selectedFile.value);

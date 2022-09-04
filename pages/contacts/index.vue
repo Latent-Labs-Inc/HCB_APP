@@ -2,7 +2,7 @@
 	<div class="my-6">
 		<h3 class="header">Contacts</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
-		<UiImporter :label="'Contacts'" @imported="handleUpload" />
+		<UiImporter :label="'Contacts'" :composable="useFormattedContacts" />
 		<!-- <UiModal :show="searching" :title="'Search Patient'" @close="handleClose">
 			<div class="form-group">
 				<label for="">Contact Name</label>
