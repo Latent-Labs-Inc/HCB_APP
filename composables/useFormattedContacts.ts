@@ -48,11 +48,13 @@ export default function useFormattedContacts(data: any[]) {
 				newContact.email.push(contact[key]);
 			} else if (key.includes("wireless")) {
 				if (!!contact[key]) {
-					newContact.wireless.push(contact[key]);
+					let newPhone = "+1" + contact[key].replace(/[^0-9]/g, "");
+					newContact.wireless.push(newPhone);
 				}
 			} else if (key.includes("landline")) {
 				if (!!contact[key]) {
-					newContact.landline.push(contact[key]);
+					let newPhone = "+1" + contact[key].replace(/[^0-9]/g, "");
+					newContact.landline.push(newPhone);
 				}
 			} else if (key.includes("property" && "address")) {
 				newContact.propertyAddress.address1 = contact[key];
@@ -90,13 +92,37 @@ export default function useFormattedContacts(data: any[]) {
 			} else if (key.includes("estimated" && "value")) {
 				newContact.estimatedValue = contact[key];
 			} else if (key.includes("is" && "foreclosure")) {
-				newContact.isForeclosure = contact[key];
+				if (contact[key].includes("Y")) {
+					newContact.isForeclosure = true;
+				} else if (contact[key].includes("N")) {
+					newContact.isForeclosure = false;
+				} else {
+					newContact.isForeclosure = null;
+				}
 			} else if (key.includes("is" && "homestead")) {
-				newContact.isHomestead = contact[key];
+				if (contact[key].includes("Y")) {
+					newContact.isHomestead = true;
+				} else if (contact[key].includes("N")) {
+					newContact.isHomestead = false;
+				} else {
+					newContact.isHomestead = null;
+				}
 			} else if (key.includes("is" && "senior")) {
-				newContact.isSenior = contact[key];
+				if (contact[key].includes("Y")) {
+					newContact.isSenior = true;
+				} else if (contact[key].includes("N")) {
+					newContact.isSenior = false;
+				} else {
+					newContact.isSenior = null;
+				}
 			} else if (key.includes("is" && "vacant")) {
-				newContact.isVacant = contact[key];
+				if (contact[key].includes("Y")) {
+					newContact.isVacant = true;
+				} else if (contact[key].includes("N")) {
+					newContact.isVacant = false;
+				} else {
+					newContact.isVacant = null;
+				}
 			} else if (key.includes("alternate" && "contacts")) {
 				newContact.alternateContacts = contact[key];
 			}
