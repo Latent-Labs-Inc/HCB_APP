@@ -10,7 +10,7 @@ export default async function useFormattedLeads(data: any[]) {
 	const leadStore = useLeadStore();
 
 	let keys = Object.keys(data[0]);
-	console.log(keys);
+
 	data.forEach((lead) => {
 		let newLead: Lead = {
 			user_id: authStore.user_id,
@@ -47,7 +47,9 @@ export default async function useFormattedLeads(data: any[]) {
 			homestead: null,
 			senior: null,
 			vacant: null,
-			alternateLeads: null,
+			alternateContacts: null,
+			leadProvider: leadStore.leadProvider,
+			leadType: leadStore.leadType,
 		};
 		for (let key in lead) {
 			lead[key] = lead[key].trim() || null;
@@ -75,8 +77,7 @@ export default async function useFormattedLeads(data: any[]) {
 				newLead.propertyAddress.zip = lead[key];
 			} else if (key.includes("property county")) {
 				newLead.propertyAddress.county = lead[key];
-			} else if (key.includes("owner address")) {
-				console.log("owner address", lead[key]);
+			} else if (key.includes("owner address") && !!lead[key]) {
 				newLead.ownerAddress.address1 = lead[key];
 			} else if (key === "owner city") {
 				newLead.ownerAddress.city = lead[key];

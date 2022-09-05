@@ -42,6 +42,8 @@ export interface Address {
 export interface Lead {
 	user_id: string;
 	lead_id: string;
+	leadType: string;
+	leadProvider: string;
 	propertyAddress: Address;
 	sqFt: string;
 	yearBuilt: string;

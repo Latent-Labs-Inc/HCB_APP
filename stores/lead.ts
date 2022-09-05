@@ -26,6 +26,12 @@ export const useLeadStore = defineStore("lead", {
 				console.log(error);
 			}
 		},
+		async setLeadProvider(provider) {
+			this.leadProvider = provider;
+		},
+		async setLeadType(type) {
+			this.leadType = type;
+		},
 		async uploadLeads(leads: Lead[]) {
 			const { $supabase } = useNuxtApp();
 			try {
@@ -33,7 +39,6 @@ export const useLeadStore = defineStore("lead", {
 				if (error) {
 					throw error;
 				}
-				this.leads = data;
 			} catch (error) {
 				console.log(error);
 			}
