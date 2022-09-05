@@ -5,6 +5,8 @@ export const useLeadStore = defineStore("lead", {
 	state: () => ({
 		leads: [],
 		lead: null,
+		leadType: null,
+		leadProvider: null,
 	}),
 	getters: {
 		getLeadById: (state) => (id) => {
