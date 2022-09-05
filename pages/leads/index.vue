@@ -1,11 +1,10 @@
 <template>
 	<div class="my-6">
-		<h3 class="header">Contacts</h3>
+		<h3 class="header">Leads</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
-		<UiImporter :label="'Contacts'" :composable="useFormattedContacts" />
 		<!-- <UiModal :show="searching" :title="'Search Patient'" @close="handleClose">
 			<div class="form-group">
-				<label for="">Contact Name</label>
+				<label for="">lead Name</label>
 				<input type="text" v-model="searchInput" />
 			</div>
 			<div class="flex my-4">
@@ -22,44 +21,51 @@
 <script setup lang="ts">
 import IconUser from "~icons/fa-solid/user";
 import IconSearch from "~icons/fa-solid/search";
+import IconUpload from "~icons/fa-solid/upload";
+
 import { useAuthStore } from "~/stores/auth";
-import { ActionProps, Contact } from "~~/types/types";
+import { ActionProps, Lead } from "~~/types/types";
 
 const router = useRouter();
 const searching = ref(false);
-const scheduling = ref(false);
-const showCalendar = ref(false);
 
 const actionProps: ActionProps[] = [
 	{
-		id: "addContact",
-		name: "Add Contact",
+		id: "addLead",
+		name: "Add lead",
 		icon: IconUser,
 	},
 	{
-		id: "searchContact",
-		name: "Search Contact",
+		id: "searchLead",
+		name: "Search lead",
 		icon: IconSearch,
+	},
+	{
+		id: "uploadLeads",
+		name: "Upload Leads",
+		icon: IconUpload,
 	},
 ];
 
 const authStore = useAuthStore();
 const searchInput = ref("");
-const filteredContacts = ref([] as Contact[]);
+const filteredLeads = ref([] as Lead[]);
 
 const handleAction = async (action: string) => {
-	if (action === "addContact") {
-		router.push("/contact/add");
-	} else if (action === "searchContact") {
+	if (action === "addLead") {
+		router.push("/lead/add");
+	} else if (action === "searchLead") {
 		searching.value = true;
+	} else if (action === "uploadLeads") {
+		router.push("/leads/upload");
 	}
 };
 
 const handleSearch = async () => {};
 
-const handleSelected = (contact: Contact) => {
-	// contactStore.setSelectedContact(contact);
-	// router.push(`/contacts/contact-profile/${contact.contact_id}`);
+const handleSelected = (lead: Lead) => {
+	// leadStore.setSelectedLead(lead);
+	// router.push(`/leads/lead-profile/${lead.lead_id}`);
 };
 
 const handleClose = () => {
@@ -68,7 +74,7 @@ const handleClose = () => {
 
 const handleUpload = async (data: any[]) => {
 	console.log(data);
-	const formattedContacts = await useFormattedContacts(data);
+	const formattedLeads = await useFormattedLeads(data);
 };
 </script>
 

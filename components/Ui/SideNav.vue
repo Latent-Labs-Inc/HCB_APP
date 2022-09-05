@@ -3,7 +3,7 @@
 		<ul class="">
 			<li class="sidebar-li"><NuxtLink to="/">Home</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/messages">Messages</NuxtLink></li>
-			<li class="sidebar-li"><NuxtLink to="/contacts">Contacts</NuxtLink></li>
+			<li class="sidebar-li"><NuxtLink to="/leads">Leads</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/help">Help</NuxtLink></li>
 		</ul>
 	</nav>

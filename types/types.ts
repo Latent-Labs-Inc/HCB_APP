@@ -39,9 +39,9 @@ export interface Address {
 	locationIdentifier?: string;
 	countrySubDivisionCode?: string;
 }
-export interface Contact {
+export interface Lead {
 	user_id: string;
-	contact_id: string;
+	lead_id: string;
 	propertyAddress: Address;
 	sqFt: string;
 	yearBuilt: string;
