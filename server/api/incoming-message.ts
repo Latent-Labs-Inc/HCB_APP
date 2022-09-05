@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
 			.contains("wireless", [body.from]);
 
 		let incoming_message: IncomingMessage = {
-			body: body.body,
+			message: body.body,
 			from: body.from,
 			to: body.to,
 			sid: body.sid,
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
 			direction: body.direction,
 			error_code: body.error_code,
 			error_message: body.error_message,
-			lead_id: lead_id[0],
+			lead_id: lead_id[0].lead_id,
 		};
 
 		const { error } = await supabase

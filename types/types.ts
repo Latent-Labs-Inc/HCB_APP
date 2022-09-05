@@ -64,7 +64,7 @@ export interface Lead {
 }
 
 export interface IncomingMessage {
-	body: string;
+	message: string;
 	from: string;
 	to: string;
 	sid: string;
