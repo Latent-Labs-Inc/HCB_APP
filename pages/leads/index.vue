@@ -2,25 +2,12 @@
 	<div class="my-6">
 		<h3 class="header">Leads</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
-		<!-- <UiModal :show="searching" :title="'Search Patient'" @close="handleClose">
-			<div class="form-group">
-				<label for="">lead Name</label>
-				<input type="text" v-model="searchInput" />
-			</div>
-			<div class="flex my-4">
-				<button class="mx-auto" @click="handleSearch">Search</button>
-			</div>
-			<PatientsList
-				:patients="filteredPatients.length > 0 ? filteredPatients : []"
-				@selected="handleSelected"
-			/>
-		</UiModal> -->
 	</div>
 </template>
 
 <script setup lang="ts">
-import IconUser from "~icons/fa-solid/user";
-import IconSearch from "~icons/fa-solid/search";
+// import IconUser from "~icons/fa-solid/user";
+// import IconSearch from "~icons/fa-solid/search";
 import IconUpload from "~icons/fa-solid/upload";
 
 import { useAuthStore } from "~/stores/auth";
@@ -30,16 +17,16 @@ const router = useRouter();
 const searching = ref(false);
 
 const actionProps: ActionProps[] = [
-	{
-		id: "addLead",
-		name: "Add lead",
-		icon: IconUser,
-	},
-	{
-		id: "searchLead",
-		name: "Search lead",
-		icon: IconSearch,
-	},
+	// {
+	// 	id: "addLead",
+	// 	name: "Add lead",
+	// 	icon: IconUser,
+	// },
+	// {
+	// 	id: "searchLead",
+	// 	name: "Search lead",
+	// 	icon: IconSearch,
+	// },
 	{
 		id: "uploadLeads",
 		name: "Upload Leads",

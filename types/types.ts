@@ -1,5 +1,3 @@
-import { S } from "unimport/dist/types-0260c723";
-
 export interface FormElement {
 	id: string;
 	title: string;
@@ -63,4 +61,44 @@ export interface Lead {
 	alternateContacts?: string;
 	created_at: Date;
 	modified_at: Date;
+}
+
+export interface IncomingMessage {
+	body: string;
+	from: string;
+	to: string;
+	sid: string;
+	created_at: string;
+	sent_at: string;
+	updated_at: string;
+	status: string;
+	direction: string;
+	error_code: string;
+	error_message: string;
+	lead_id: string;
+}
+
+export interface TwilioIncoming {
+	account_sid: string;
+	api_version: string;
+	body: string;
+	date_created: string;
+	date_sent: string;
+	date_updated: string;
+	direction: string;
+	error_code: null;
+	error_message: null;
+	from: string;
+	messaging_service_sid: string;
+	num_media: string;
+	num_segments: string;
+	price: null | string;
+	price_unit: null | string;
+	sid: string;
+	status: string;
+	subresource_uris: {
+		media: string;
+	};
+	to: string;
+	uri: string;
 }
