@@ -12,6 +12,7 @@ export interface Profile {
 	email: string;
 	username: string;
 	admin: boolean;
+	phoneNumbers: string[];
 	created_at: Date;
 	modified_at: Date;
 }
@@ -64,6 +65,7 @@ export interface Lead {
 }
 
 export interface IncomingMessage {
+	user_id: string;
 	message: string;
 	from: string;
 	to: string;

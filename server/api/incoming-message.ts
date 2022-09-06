@@ -13,13 +13,25 @@ export default defineEventHandler(async (event) => {
 	const body: TwilioIncoming = await useBody(event);
 
 	try {
+		let user_id;
+		try {
+			const { data } = await supabase
+				.from("profiles")
+				.select("*")
+				.contains("phoneNumbers", [body.to]);
+			user_id = data[0].user_id;
+		} catch (error) {
+			console.log(error);
+		}
+
 		// will need to clean this up to use user_id's if making public app
-		const { data: lead_id, error: err } = await supabase
+		const { data: lead_ids, error: err } = await supabase
 			.from("leads")
 			.select("lead_id")
 			.contains("wireless", [body.from]);
 
 		let incoming_message: IncomingMessage = {
+			user_id: user_id,
 			message: body.body,
 			from: body.from,
 			to: body.to,
@@ -31,7 +43,7 @@ export default defineEventHandler(async (event) => {
 			direction: body.direction,
 			error_code: body.error_code,
 			error_message: body.error_message,
-			lead_id: lead_id[0].lead_id,
+			lead_id: lead_ids[0].lead_id,
 		};
 
 		const { error } = await supabase
