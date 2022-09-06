@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Lead } from "~/types/types";
 
 export default defineEventHandler(async (event) => {
-	// const query = useQuery(event);
 	const config = useRuntimeConfig();
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
@@ -74,7 +73,9 @@ export default defineEventHandler(async (event) => {
 		} catch (error) {
 			console.log(error);
 		}
+
 		leads.forEach((lead) => {
+			supabase.from("leads").update({ texted: true }).eq("lead_id", lead.lead_id);
 			lead.wireless.forEach(async (phone) => {
 				console.log(phone);
 				// const res = await client.messages.create({
