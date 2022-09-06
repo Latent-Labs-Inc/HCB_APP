@@ -1,33 +1,20 @@
 <template>
-	<div>
-		<h3 class="header">Lead Details</h3>
-		<div class="grid sm:grid-cols-3 lg:grid-cols-4 gap-6 p-10">
-			<p>Property Address: {{ leadDetails.propertyAddress.address1 }}</p>
-			<p>Property City: {{ leadDetails.propertyAddress.city }}</p>
-			<p>Property State: {{ leadDetails.propertyAddress.state }}</p>
-			<p>Property Zip: {{ leadDetails.propertyAddress.zip }}</p>
-			<p>
-				Property County:
-				{{
-					!!leadDetails.propertyAddress.county
-						? leadDetails.propertyAddress.county
-						: "No County Saved"
-				}}
-			</p>
-			<p>Lead Type: {{ leadDetails.leadType }}</p>
-			<p>Lead Provider: {{ leadDetails.leadProvider }}</p>
-			<p>Owner First Name: {{ leadDetails.ownerFirstName }}</p>
-			<p>Owner Last Name: {{ leadDetails.ownerLastName }}</p>
-			<p>Owner Address: {{ leadDetails.ownerAddress.address1 }}</p>
-			<p>Owner City: {{ leadDetails.ownerAddress.city }}</p>
-			<p>Owner State: {{ leadDetails.ownerAddress.state }}</p>
-			<p>Owner Zip: {{ leadDetails.ownerAddress.zip }}</p>
-			<p>Phone Numbers: {{ leadDetails.wireless }}</p>
-			<p>Land Lines: {{ leadDetails.landline }}</p>
-			<p>Emails: {{ leadDetails.email }}</p>
-			<p>Has Texted: {{ leadDetails.texted ? "Yes" : "No" }}</p>
-			<p>Has Mailed: {{ leadDetails.mailed ? "Yes" : "No" }}</p>
-			<p>Has Emailed: {{ leadDetails.emailed ? "Yes" : "No" }}</p>
+	<div class="">
+		<div class="">
+			<h3 class="header">Lead Details</h3>
+			<div
+				class="ml-2 mx-auto grid sm:grid-cols-1 lg:grid-cols-2 gap-y-2"
+				v-if="!!leadDetails"
+			>
+				<div v-for="key in keys">
+					<p v-if="key.split('.').length > 1">
+						{{ key.split(".")[1].toTitle() }} :
+						{{ leadDetails[key.split(".")[0]][key.split(".")[1]] }}
+					</p>
+					<p v-else>{{ key.camel2title() }}: {{ leadDetails[key] }}</p>
+				</div>
+			</div>
+			<div class="grid sm:grid-cols-3 lg:grid-cols-4 gap-6 pl-10" v-else></div>
 		</div>
 	</div>
 </template>
@@ -36,19 +23,52 @@
 import { useLeadStore } from "~/stores/lead";
 import { Lead } from "~/types/types";
 
+String.prototype.toTitle = function () {
+	return this.replace(/(^|\s)\S/g, function (t) {
+		return t.toUpperCase();
+	});
+};
+
+String.prototype.camel2title = function () {
+	return this.replace(/([A-Z])/g, function (t) {
+		return " " + t.toLowerCase();
+	}).toTitle();
+};
+
 const leadStore = useLeadStore();
 
 const route = useRoute();
 
 const leadId = ref(route.params.id as string);
 
-const leadDetails = ref((await leadStore.fetchLeadById(leadId.value)) as Lead);
+const leadDetails = ref(null as Lead);
 
 const keys = ref([
-	"propertyAddress",
+	"propertyAddress.address1",
+	"propertyAddress.city",
+	"propertyAddress.state",
+	"propertyAddress.zip",
+	"propertyAddress.county",
+	"leadType",
+	"leadProvider",
 	"ownerFirstName",
 	"ownerLastName",
-	"email",
+	"ownerAddress.address1",
+	"ownerAddress.city",
+	"ownerAddress.state",
+	"ownerAddress.zip",
 	"wireless",
+	"landline",
+	"email",
+	"texted",
+	"mailed",
+	"emailed",
 ]);
+
+const fetchLeadDetails = async () => {
+	leadDetails.value = await leadStore.fetchLeadById(leadId.value);
+};
+onMounted(async () => {
+	await fetchLeadDetails();
+});
 </script>
