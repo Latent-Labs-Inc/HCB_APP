@@ -50,6 +50,9 @@ export default async function useFormattedLeads(data: any[]) {
 			alternateContacts: null,
 			leadProvider: leadStore.leadProvider,
 			leadType: leadStore.leadType,
+			texted: false,
+			emailed: false,
+			mailed: false,
 		};
 		for (let key in lead) {
 			lead[key] = lead[key].trim() || null;

@@ -62,6 +62,9 @@ export interface Lead {
 	alternateContacts?: string;
 	created_at: Date;
 	modified_at: Date;
+	texted: boolean;
+	emailed: boolean;
+	mailed: boolean;
 }
 
 export interface IncomingMessage {

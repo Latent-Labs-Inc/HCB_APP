@@ -43,5 +43,21 @@ export const useLeadStore = defineStore("lead", {
 				console.log(error);
 			}
 		},
+		async fetchLeadById(id: string) {
+			const { $supabase } = useNuxtApp();
+			try {
+				const { data, error } = await $supabase
+					.from("leads")
+					.select("*")
+					.eq("lead_id", id);
+				if (error) {
+					throw error;
+				}
+				this.leadSelected = data[0];
+				return data[0];
+			} catch (error) {
+				console.log(error);
+			}
+		},
 	},
 });
