@@ -2,17 +2,6 @@
 	<div>
 		<h3 class="header">Home</h3>
 
-		<div class="mx-5 flex flex-col gap-5 p-8">
-			<h3 class="header">Send a Message</h3>
-			<textarea
-				v-model="message"
-				class="dark:bg-darkBg dark:text-darkSecondary bg-darkSecondary p-4 dark:focus:outline-darkSecondary focus:outline-darkBg outline-1 focus:border-none rounded trans"
-				rows="5"
-				cols="30"
-			/>
-			<button class="reverse" @click="handleMessage">Send Text</button>
-		</div>
-
 		<!-- <UiTable
 			:cols="cols"
 			:gridCols="gridCols"
@@ -26,19 +15,6 @@
 </template>
 
 <script setup lang="ts">
-const message = ref("");
-
-const handleMessage = async () => {
-	console.log("handleMessage");
-	const res = await $fetch("api/twilio", {
-		method: "POST",
-		body: JSON.stringify({
-			message: message.value,
-		}),
-	});
-	console.log(res);
-};
-
 await useLoadContent();
 
 const cols = ref(["Name", "Email", "Phone", "Order", "Patient"]);

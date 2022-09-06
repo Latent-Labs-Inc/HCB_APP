@@ -1,24 +1,89 @@
 import twilio from "twilio";
+import { createClient } from "@supabase/supabase-js";
+import { Lead } from "~/types/types";
 
 export default defineEventHandler(async (event) => {
 	// const query = useQuery(event);
 	const config = useRuntimeConfig();
-
-	const { message } = await useBody(event);
-	console.log(message);
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
 
+	const supabase = createClient(
+		config.public.SUPABASE_URL,
+		config.private.SUPABASE_SERVICE_KEY
+	);
 	const client = twilio(accountSid, authToken);
 
-	const res = await client.messages.create({
-		body: !!message ? message : "Hello from Twilio!",
-		from: config.private.TWILIO_PHONE_NUMBER,
-		to: "+18134084221",
-	});
-	console.log(res.sid);
-	return res.sid;
+	const { message, leadProvider, leadType, otherProvider, otherType, user_id } =
+		await useBody(event);
+
+	let leads = [] as Lead[];
+
+	if (!!message) {
+		throw "Message is required";
+	} else {
+		try {
+			if (leadProvider === "all") {
+				if (leadType === "all") {
+					const { data, error } = await supabase
+						.from("leads")
+						.select("*")
+						.eq("user_id", user_id);
+					if (error) {
+						throw error;
+					}
+					leads = data as Lead[];
+				} else {
+					const { data, error } = await supabase
+						.from("leads")
+						.select("*")
+						.eq("user_id", user_id)
+						.eq("leadType", leadType === "other" ? otherType : leadType);
+
+					if (error) {
+						throw error;
+					}
+					leads = data as Lead[];
+				}
+			} else if (leadType === "all") {
+				if (leadProvider === "all") {
+					const { data, error } = await supabase
+						.from("leads")
+						.select("*")
+						.eq("user_id", user_id);
+					if (error) {
+						throw error;
+					}
+					leads = data as Lead[];
+				} else {
+					const { data, error } = await supabase
+						.from("leads")
+						.select("*")
+						.eq("user_id", user_id)
+						.eq(
+							"leadProvider",
+							leadProvider === "other" ? otherProvider : leadProvider
+						);
+
+					if (error) {
+						throw error;
+					}
+					leads = data as Lead[];
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
+		leads.forEach((lead) => {
+			lead.wireless.forEach(async (phone) => {
+				console.log(phone);
+				// const res = await client.messages.create({
+				// 	body: message,
+				// 	from: config.private.TWILIO_PHONE_NUMBER,
+				// 	to: phone,
+				// });
+			});
+		});
+		return leads;
+	}
 });
-// Download the helper library from https://www.twilio.com/docs/node/install
-// Find your Account SID and Auth Token at twilio.com/console
-// and set the environment variables. See http://twil.io/secure

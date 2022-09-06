@@ -20,9 +20,12 @@
 <script setup lang="ts">
 import { useMessageStore } from "~/stores/message";
 import { IncomingMessage } from "~/types/types";
+import { useUiStore } from "~/stores/ui";
+
 const searchInput = ref("");
 const messageStore = useMessageStore();
 const router = useRouter();
+const uiStore = useUiStore();
 
 const cols = ref(["Property Address", "Phone Number", "Last Message", "Date"]);
 
@@ -42,10 +45,18 @@ const dropdownItems = ref([
 
 const tableData = ref([] as IncomingMessage[]);
 
-tableData.value = await messageStore.fetchMessages();
+const setTableData = async () => {
+	uiStore.toggleFunctionLoading(true);
+	tableData.value = await messageStore.fetchMessages();
 
-tableData.value.forEach((msg) => {
-	msg.sent_at = new Date(msg.sent_at).toLocaleString();
+	tableData.value.forEach((msg) => {
+		msg.sent_at = new Date(msg.sent_at).toLocaleString();
+	});
+	uiStore.toggleFunctionLoading(false);
+};
+
+onMounted(async () => {
+	await setTableData();
 });
 
 const forceUpdate = ref(0);

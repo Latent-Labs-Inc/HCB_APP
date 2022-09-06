@@ -29,7 +29,7 @@ const actionProps: ActionProps[] = [
 
 const handleAction = async (action: string) => {
 	if (action === "sendMessage") {
-		router.push("/message/send");
+		router.push("/messages/send");
 	} else if (action === "viewMessages") {
 		router.push("/messages/received");
 	}
