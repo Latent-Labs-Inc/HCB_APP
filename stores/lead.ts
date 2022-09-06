@@ -4,7 +4,7 @@ import { Lead } from "~/types/types";
 export const useLeadStore = defineStore("lead", {
 	state: () => ({
 		leads: [],
-		lead: null,
+		leadSelected: null,
 		leadType: null,
 		leadProvider: null,
 	}),

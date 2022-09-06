@@ -24,6 +24,7 @@ import { IncomingMessage } from "~/types/types";
 
 const searchInput = ref("");
 const messageStore = useMessageStore();
+const router = useRouter();
 
 const cols = ref(["Property Address", "Phone Number", "Last Message", "Date"]);
 
@@ -31,7 +32,7 @@ const properties = ref([
 	"object.propertyAddress.address1",
 	"from",
 	"message",
-	"date",
+	"sent_at",
 	"dropdown",
 ]);
 
@@ -43,17 +44,11 @@ const dropdownItems = ref([
 
 const tableData = ref([] as IncomingMessage[]);
 
-const messages = ref([] as IncomingMessage[]);
+tableData.value = await messageStore.fetchMessages();
 
-messages.value = await messageStore.fetchMessages();
-
-if (messages.value.length > 0) {
-	tableData.value = messages.value.map((message) => {
-		return {
-			...message,
-		};
-	});
-}
+tableData.value.forEach((msg) => {
+	msg.sent_at = new Date(msg.sent_at).toLocaleString();
+});
 
 const forceUpdate = ref(0);
 
@@ -64,5 +59,8 @@ watch(tableData, () => {
 
 const handleItemClick = (item, row) => {
 	console.log(item, row);
+	if (item.id === "view") {
+		router.push(`/leads/details/${row.lead_id}`);
+	}
 };
 </script>

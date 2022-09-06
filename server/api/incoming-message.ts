@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
 				error_code: body.error_code,
 				error_message: body.error_message,
 				lead_id: lead.lead_id,
-				propertyAddress: JSON.parse(lead.propertyAddress),
+				propertyAddress: lead.propertyAddress,
 			};
 
 			counter++;
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
 			error_code: body.error_code,
 			error_message: body.error_message,
 			lead_id: leads[0].lead_id,
-			propertyAddress: JSON.parse(leads[0].propertyAddress),
+			propertyAddress: leads[0].propertyAddress,
 		};
 
 		try {
