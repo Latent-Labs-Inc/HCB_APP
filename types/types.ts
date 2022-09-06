@@ -78,6 +78,7 @@ export interface IncomingMessage {
 	error_code: string;
 	error_message: string;
 	lead_id: string;
+	propertyAddress: Address;
 }
 
 export interface TwilioIncoming {

@@ -23,13 +23,18 @@
 						:key="row.id"
 					>
 						<td v-for="key in properties" :key="key">
-							<div v-if="key !== 'dropdown'">{{ row[key] }}</div>
-							<div v-else>
+							<div v-if="key === 'dropdown'">
 								<UiDropdown
 									:dropdownItems="dropdownItems"
 									@itemClicked="handleItemClick($event, row)"
 								/>
 							</div>
+							<div v-else-if="key.includes('.')">
+								<div>
+									{{ row[key.split(".")[1]][key.split(".")[2]] }}
+								</div>
+							</div>
+							<div v-else>{{ row[key] }}</div>
 						</td>
 					</tr>
 					<div class="flex justify-end">
@@ -80,6 +85,16 @@ const props = defineProps<{
 	properties: string[];
 	dropdownItems: Item[];
 }>();
+
+// const propObjKeys = ref([] as string[]);
+
+// for (let index in props.properties) {
+// 	if (props.properties[index].split(".").length > 1) {
+// 		let propObjStr = props.properties[index];
+// 		let properties = propObjStr.split(".");
+// 		propObjKeys.value = properties.splice(1, properties.length);
+// 	}
+// }
 
 const items = ref(props.tableData);
 

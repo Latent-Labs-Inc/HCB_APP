@@ -3,7 +3,7 @@
 		<h3 class="header">Messages</h3>
 		<div>
 			<div class="flex justify-center">
-				<UiSearchInline v-model="searchInput" :label="'Contacts'" />
+				<UiSearchInline v-model="searchInput" :label="'Leads'" />
 			</div>
 			<UiTable
 				:cols="cols"
@@ -12,23 +12,55 @@
 				:table-data="tableData"
 				:properties="properties"
 				@item-clicked="handleItemClick"
+				:key="forceUpdate"
 			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-const searchInput = ref("");
+import { useMessageStore } from "~/stores/message";
+import { IncomingMessage } from "~/types/types";
 
-const cols = ref(["Name", "Phone Number", "Last Message", "Date"]);
-const properties = ref(["name", "phone", "lastMessage", "date", "dropdown"]);
-const dropdownItems = ref([
-	{ id: "message", label: "Message" },
-	{ id: "view", label: "View Contact Info" },
-	{ id: "delete", label: "Delete Contact" },
+const searchInput = ref("");
+const messageStore = useMessageStore();
+
+const cols = ref(["Property Address", "Phone Number", "Last Message", "Date"]);
+
+const properties = ref([
+	"object.propertyAddress.address1",
+	"from",
+	"message",
+	"date",
+	"dropdown",
 ]);
 
-const tableData = ref([]);
+const dropdownItems = ref([
+	{ id: "message", label: "Message" },
+	{ id: "view", label: "View Lead Info" },
+	{ id: "delete", label: "Delete Message" },
+]);
+
+const tableData = ref([] as IncomingMessage[]);
+
+const messages = ref([] as IncomingMessage[]);
+
+messages.value = await messageStore.fetchMessages();
+
+if (messages.value.length > 0) {
+	tableData.value = messages.value.map((message) => {
+		return {
+			...message,
+		};
+	});
+}
+
+const forceUpdate = ref(0);
+
+watch(tableData, () => {
+	console.log("tableData changed");
+	forceUpdate.value++;
+});
 
 const handleItemClick = (item, row) => {
 	console.log(item, row);

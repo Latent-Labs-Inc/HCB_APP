@@ -24,28 +24,28 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// will need to clean this up to use user_id's if making public app
-	let lead_ids;
+	let leads;
 	try {
 		const { data, error } = await supabase
 			.from("leads")
-			.select("lead_id")
+			.select("*")
 			.eq("user_id", user_id)
 			.contains("wireless", [body.from]);
 
 		if (error) {
 			throw error;
 		}
-		lead_ids = data.map((lead) => lead.lead_id);
+		leads = data.map((lead) => lead);
 	} catch (error) {
 		console.log(error);
 	}
 
-	if (lead_ids.length > 1) {
+	if (leads.length > 1) {
 		console.log("more than one lead found with that number");
 
 		let counter = 0;
 
-		lead_ids.forEach(async (lead_id) => {
+		leads.forEach(async (lead) => {
 			let incoming_message: IncomingMessage = {
 				user_id: user_id,
 				message: body.body,
@@ -59,7 +59,8 @@ export default defineEventHandler(async (event) => {
 				direction: body.direction,
 				error_code: body.error_code,
 				error_message: body.error_message,
-				lead_id: lead_id,
+				lead_id: lead.lead_id,
+				propertyAddress: JSON.parse(lead.propertyAddress),
 			};
 
 			counter++;
@@ -86,7 +87,8 @@ export default defineEventHandler(async (event) => {
 			direction: body.direction,
 			error_code: body.error_code,
 			error_message: body.error_message,
-			lead_id: lead_ids[0],
+			lead_id: leads[0].lead_id,
+			propertyAddress: JSON.parse(leads[0].propertyAddress),
 		};
 
 		try {
