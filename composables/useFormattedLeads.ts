@@ -42,6 +42,13 @@ export default async function useFormattedLeads(data: any[]) {
 				},
 				prFirstName: lead["PR First Name"],
 				prLastName: lead["PR Last Name"],
+				mailingAddress: {
+					address1: lead["Mailing Address"],
+					address2: null,
+					city: lead["Mailing City"],
+					state: lead["Mailing State"],
+					zip: lead["Mailing Zip"],
+				},
 				wireless: [],
 				landline: [],
 				email: [],
@@ -123,7 +130,7 @@ export default async function useFormattedLeads(data: any[]) {
 		});
 	}
 	console.log(formattedLeads);
-	// await leadStore.uploadLeads(formattedLeads);
+	await leadStore.uploadLeads(formattedLeads);
 
 	return formattedLeads;
 }
