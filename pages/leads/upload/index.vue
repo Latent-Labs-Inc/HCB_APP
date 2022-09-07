@@ -82,18 +82,18 @@ const leadTypes = [
 
 const leadStore = useLeadStore();
 
-watch(leadProvider, (newType) => {
-	if (newType === "other") {
-		leadStore.setLeadProvider(otherProviderInput.value);
-	} else {
-		leadStore.setLeadProvider(newType);
-	}
+watch(leadProvider, (newProvider) => {
+	leadStore.setLeadProvider(newProvider);
 });
 watch(leadType, (newType) => {
-	if (newType === "other") {
-		leadStore.setLeadType(otherLeadTypeInput.value);
-	} else {
-		leadStore.setLeadType(newType);
-	}
+	leadStore.setLeadType(newType);
+});
+
+watch(otherProviderInput, (newProvider) => {
+	leadStore.setLeadProvider(newProvider);
+});
+
+watch(otherLeadTypeInput, (newType) => {
+	leadStore.setLeadType(newType);
 });
 </script>

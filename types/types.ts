@@ -44,27 +44,18 @@ export interface Lead {
 	leadType: string;
 	leadProvider: string;
 	propertyAddress: Address;
-	sqFt: string;
-	yearBuilt: string;
 	ownerFirstName: string;
 	ownerLastName: string;
-	ownerAddress: Address;
 	wireless: string[];
 	landline: string[];
 	email: string[];
-	lastSaleDate: Date;
-	lastSalePrice: number;
-	estimatedValue: number;
-	foreclosure?: boolean;
-	homestead?: boolean;
-	senior?: boolean;
-	vacant?: boolean;
-	alternateContacts?: string;
 	created_at: Date;
 	modified_at: Date;
 	texted: boolean;
 	emailed: boolean;
 	mailed: boolean;
+	fileDate: Date;
+	legalDescription?: string;
 }
 
 export interface IncomingMessage {
