@@ -11,6 +11,7 @@ export default async function useFormattedLeads(data: any[]) {
 
 	let keys = Object.keys(data[0]);
 	console.log(data[0]);
+	console.log(keys);
 
 	if (
 		leadStore.leadProvider === "foreclosureDaily" &&
@@ -23,15 +24,24 @@ export default async function useFormattedLeads(data: any[]) {
 				created_at: new Date(),
 				modified_at: new Date(),
 				propertyAddress: {
-					address1: lead["property address"],
+					address1: lead["Property Address"],
 					address2: null,
-					city: lead["property city"],
-					state: lead["property state"],
-					zip: lead["property zip"],
-					county: lead["county"],
+					city: lead["Property City"],
+					state: lead["Property State"],
+					zip: lead["Property Zip"],
+					county: lead["County"],
 				},
-				ownerFirstName: lead["first name"],
-				ownerLastName: lead["last name"],
+				ownerFirstName: lead["First Name"],
+				ownerLastName: lead["Last Name"],
+				prAddress: {
+					address1: lead["PR Address"],
+					address2: null,
+					city: lead["PR City"],
+					state: lead["PR State"],
+					zip: lead["PR Zip"],
+				},
+				prFirstName: lead["PR First Name"],
+				prLastName: lead["PR Last Name"],
 				wireless: [],
 				landline: [],
 				email: [],
@@ -40,8 +50,11 @@ export default async function useFormattedLeads(data: any[]) {
 				texted: false,
 				emailed: false,
 				mailed: false,
-				fileDate: null,
+				fileDate: lead["File Date"],
 			};
+			// if (lead.fileDate) {
+
+			// }
 			formattedLeads.push(newLead);
 		});
 	} else if (
@@ -109,8 +122,8 @@ export default async function useFormattedLeads(data: any[]) {
 			formattedLeads.push(newLead);
 		});
 	}
-
-	await leadStore.uploadLeads(formattedLeads);
+	console.log(formattedLeads);
+	// await leadStore.uploadLeads(formattedLeads);
 
 	return formattedLeads;
 }

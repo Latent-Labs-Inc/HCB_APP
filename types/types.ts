@@ -55,6 +55,10 @@ export interface Lead {
 	emailed: boolean;
 	mailed: boolean;
 	fileDate: Date;
+	prFirstName?: string;
+	prLastName?: string;
+	prAddress?: Address;
+	mailingAddress?: Address;
 	legalDescription?: string;
 }
 

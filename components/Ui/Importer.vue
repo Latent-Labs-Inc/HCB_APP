@@ -44,6 +44,8 @@
 
 <script setup lang="ts">
 import { useUiStore } from "~~/stores/ui";
+import fs from "fs";
+import { json } from "stream/consumers";
 
 const props = defineProps<{
 	label: string;
@@ -114,29 +116,57 @@ const uploadData = async () => {
 	uiStore.toggleAppLoading(true);
 	if (fileType.value === "csv") {
 		const reader = new FileReader();
+		reader.readAsText(selectedFile.value);
 		reader.onload = async (e) => {
 			const data = e.target.result;
 
-			const CSVToJSON = (data, delimiter = ",") => {
-				const titles = data.slice(0, data.indexOf("\n")).split(delimiter);
+			var array = data.toString().split("\r");
 
-				return data
-					.slice(data.indexOf("\n") + 1)
-					.split("\n")
-					.map((v) => {
-						const values = v.split(delimiter);
-						return titles.reduce(
-							(obj, title, index) => ((obj[title.toLowerCase()] = values[index]), obj),
-							{}
-						);
-					});
-			};
+			let result = [];
 
-			const aoa = CSVToJSON(data);
-			await props.composable(aoa);
-			uiStore.toggleAppLoading(false);
+			let headers = array[0].split(",");
+
+			for (let i = 1; i < array.length - 1; i++) {
+				let obj = {};
+
+				let str = array[i];
+				let s = "";
+
+				let flag = 0;
+				for (let ch of str) {
+					if (ch === '"' && flag === 0) {
+						flag = 1;
+					} else if (ch === '"' && flag == 1) flag = 0;
+					if (ch === ", " && flag === 0) ch = "|";
+					if (ch !== '"') s += ch;
+				}
+
+				// Split the string using pipe delimiter |
+				// and store the values in a properties array
+				let properties = s.split("|");
+				let values = properties[0].split(",");
+
+				headers.forEach((header, index) => {
+					if (!!header) {
+						obj[header] = values[index]?.includes("\n")
+							? values[index].replace("\n", "")
+							: values[index];
+					}
+				});
+				// For each header, if the value contains
+				// multiple comma separated data, then we
+				// store it in the form of array otherwise
+				// directly the value is stored
+
+				// Add the generated object to our
+				// result array
+				result.push(obj);
+			}
+
+			await props.composable(result);
 		};
-		reader.readAsText(selectedFile.value);
+
+		uiStore.toggleAppLoading(false);
 	}
 	clearFile();
 };
