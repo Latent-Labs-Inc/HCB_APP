@@ -97,25 +97,30 @@ const leadTypes = [
 	},
 ];
 
+const msgInvalid = ref(false);
+
 const handleMessage = async ($event) => {
-	uiStore.toggleFunctionLoading(true);
 	const message = $event;
-	console.log(message);
-	console.log("sending message");
-	const res = await $fetch("/api/twilio", {
-		method: "POST",
-		body: JSON.stringify({
-			message: message.value,
-			leadProvider: leadProvider.value,
-			otherProvider: otherProviderInput.value,
-			leadType: leadType.value,
-			otherLeadType: otherLeadTypeInput.value,
-			user_id: authStore.user_id,
-		}),
-	});
-	console.log(res);
-	uiStore.toggleFunctionLoading(false);
-	router.push("/messages");
+
+	if (!!message) {
+		uiStore.toggleFunctionLoading(true);
+		const res = await $fetch("/api/twilio", {
+			method: "POST",
+			body: JSON.stringify({
+				message: !!message ? message : null,
+				leadProvider: leadProvider.value,
+				otherProvider: otherProviderInput.value,
+				leadType: leadType.value,
+				otherLeadType: otherLeadTypeInput.value,
+				user_id: authStore.user_id,
+			}),
+		});
+		console.log(res);
+		uiStore.toggleFunctionLoading(false);
+		router.push("/messages");
+	} else {
+		msgInvalid.value = true;
+	}
 };
 
 watch(leadProvider, (newType) => {
