@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 // import IconUser from "~icons/fa-solid/user";
-// import IconSearch from "~icons/fa-solid/search";
+import IconRemove from "~icons/fa-solid/trash";
 import IconUpload from "~icons/fa-solid/file-download";
 
 import { useAuthStore } from "~/stores/auth";
@@ -22,23 +22,24 @@ const actionProps: ActionProps[] = [
 		name: "Upload Leads",
 		icon: IconUpload,
 	},
+	{
+		id: "removeLeads",
+		name: "Remove Leads",
+		icon: IconRemove,
+	},
 ];
 
-const authStore = useAuthStore();
 const searchInput = ref("");
 const filteredLeads = ref([] as Lead[]);
+const list = ref(["Address", "Wireless"]);
 
 const handleAction = async (action: string) => {
-	if (action === "addLead") {
-		router.push("/lead/add");
-	} else if (action === "searchLead") {
-		searching.value = true;
+	if (action === "removeLeads") {
+		router.push("/leads/remove");
 	} else if (action === "uploadLeads") {
 		router.push("/leads/upload");
 	}
 };
-
-const handleSearch = async () => {};
 
 const handleSelected = (lead: Lead) => {
 	// leadStore.setSelectedLead(lead);
