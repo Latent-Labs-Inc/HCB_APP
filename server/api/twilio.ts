@@ -90,27 +90,30 @@ export default defineEventHandler(async (event) => {
 			console.log(error);
 		}
 
-		leads.forEach((lead) => {
-			lead.wireless.forEach(async (phone) => {
-				console.log(phone);
-				await new Promise(async () =>
-					setTimeout(() => {
-						console.log("texted");
-					}, 1000)
-				);
+		leads.forEach(async (lead, index) => {
+			const msgPerMS = (ms) => {
+				return new Promise((resolve) => setTimeout(resolve, ms));
+			};
 
+			const delay = lead.wireless.length;
+
+			await msgPerMS((index + 1) * 4000);
+
+			lead.wireless.forEach(async (phone, indx) => {
+				await msgPerMS((indx + 1) * 1000);
+
+				console.log("texted", phone, indx);
 				// const res = await client.messages.create({
 				// 	body: message,
 				// 	from: config.private.TWILIO_PHONE_NUMBER,
 				// 	to: phone,
 				// });
 				// console.log(res);
-
 				// if (!!res.error_code) {
-				await supabase
-					.from("leads")
-					.update({ texted: false })
-					.eq("lead_id", lead.lead_id);
+				// await supabase
+				// 	.from("leads")
+				// 	.update({ texted: false })
+				// 	.eq("lead_id", lead.lead_id);
 				// }
 			});
 		});

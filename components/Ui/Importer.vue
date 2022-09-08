@@ -44,8 +44,6 @@
 
 <script setup lang="ts">
 import { useUiStore } from "~~/stores/ui";
-import fs from "fs";
-import { json } from "stream/consumers";
 
 const props = defineProps<{
 	label: string;
@@ -114,6 +112,7 @@ const dropFile = (e) => {
 
 const uploadData = async () => {
 	uiStore.toggleAppLoading(true);
+	console.log("running upload data");
 	if (fileType.value === "csv") {
 		const reader = new FileReader();
 		reader.readAsText(selectedFile.value);

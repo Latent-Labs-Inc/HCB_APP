@@ -8,7 +8,7 @@
 <script setup lang="ts">
 // import IconUser from "~icons/fa-solid/user";
 // import IconSearch from "~icons/fa-solid/search";
-import IconUpload from "~icons/fa-solid/upload";
+import IconUpload from "~icons/fa-solid/file-download";
 
 import { useAuthStore } from "~/stores/auth";
 import { ActionProps, Lead } from "~~/types/types";
@@ -17,16 +17,6 @@ const router = useRouter();
 const searching = ref(false);
 
 const actionProps: ActionProps[] = [
-	// {
-	// 	id: "addLead",
-	// 	name: "Add lead",
-	// 	icon: IconUser,
-	// },
-	// {
-	// 	id: "searchLead",
-	// 	name: "Search lead",
-	// 	icon: IconSearch,
-	// },
 	{
 		id: "uploadLeads",
 		name: "Upload Leads",
