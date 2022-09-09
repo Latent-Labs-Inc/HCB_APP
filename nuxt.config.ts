@@ -47,10 +47,6 @@ export default defineNuxtConfig({
 			SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 		},
 	},
-	buildModules: [
-		["@pinia/nuxt", { disableVuex: true }],
-		["pinia"],
-		["@nuxtjs/tailwindcss", { config: "@/tailwind.config.js" }],
-	],
+	buildModules: [["@nuxtjs/tailwindcss", { config: "@/tailwind.config.js" }]],
 	modules: ["@nuxtjs/tailwindcss", "unplugin-icons/nuxt", "@pinia/nuxt"],
 });
