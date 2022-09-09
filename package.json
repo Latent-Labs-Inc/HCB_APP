@@ -21,6 +21,7 @@
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^1.35.3",
+		"@pinia/nuxt": "^0.1.9",
 		"dotenv": "^16.0.1",
 		"pinia": "^2.0.22",
 		"twilio": "^3.81.0",
