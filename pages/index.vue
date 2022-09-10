@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h3 class="header">Home</h3>
-		<!-- <LeadBarChart
+		<LeadBarChart
 			:chart-data="chartData"
 			:chart-options="chartOptions"
 			:chart-id="'Leads'"
 			:dataset-id-key="datasetIdKey"
-		/> -->
+		/>
 		<!-- <UiTable
 			:cols="cols"
 			:gridCols="gridCols"
@@ -27,19 +27,48 @@ const chartOptions = {
 	maintainAspectRatio: false,
 };
 
+const { $supabase } = useNuxtApp();
+
+const { data: fiverrLeads } = await $supabase
+	.from("leads")
+	.select("*")
+	.eq("texted", true)
+	.eq("leadType", "fiverr");
+
+const { data: propStreamLeads } = await $supabase
+	.from("leads")
+	.select("*")
+	.eq("texted", true)
+	.eq("leadType", "propStream");
+
+const { data: foreclosureDailyLeads } = await $supabase
+	.from("leads")
+	.select("*")
+	.eq("texted", true)
+	.eq("leadType", "foreclosureDaily");
+
+const { data: otherLeads } = await $supabase
+	.from("leads")
+	.select("*")
+	.eq("texted", true)
+	.eq("leadType", "other");
+
 const chartData = {
-	labels: ["Fiverr", "Blue", "Yellow", "Green", "Purple", "Orange"],
+	labels: ["Fiverr", "ForeclosureDaily", "PropStream", "Other"],
 	datasets: [
 		{
 			label: "Total Leads Marketed",
-			data: [10, 20, 30, 40, 50, 60],
+			data: [
+				fiverrLeads?.length,
+				foreclosureDailyLeads?.length || 15,
+				propStreamLeads?.length,
+				otherLeads?.length,
+			],
 			backgroundColor: [
-				"rgba(255, 99, 132)",
-				"rgba(54, 162, 235, 0.2)",
-				"rgba(255, 206, 86, 0.2)",
-				"rgba(75, 192, 192, 0.2)",
-				"rgba(153, 102, 255, 0.2)",
-				"rgba(255, 159, 64, 0.2)",
+				"rgba(2, 173, 36, .9)",
+				"rgba(2, 173, 36, 0.9)",
+				"rgba(2, 173, 36, 0.9)",
+				"rgba(2, 173, 36, 0.9)",
 			],
 		},
 	],
