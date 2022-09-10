@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
 	const body: TwilioIncoming = await useBody(event);
 
-	let user_id;
+	let user_id = null;
 	try {
 		const { data } = await supabase
 			.from("profiles")
@@ -30,20 +30,21 @@ export default defineEventHandler(async (event) => {
 
 	// will need to clean this up to use user_id's if making public app
 	let leads = [];
-	// try {
-	// 	const { data, error } = await supabase
-	// 		.from("leads")
-	// 		.select("*")
-	// 		.eq("user_id", user_id)
-	// 		.contains("wireless", [body.from]);
 
-	// 	if (error) {
-	// 		throw error;
-	// 	}
-	// 	leads = data.map((lead) => lead);
-	// } catch (error) {
-	// 	console.log(error);
-	// }
+	try {
+		const { data, error } = await supabase
+			.from("leads")
+			.select("*")
+			.eq("user_id", user_id)
+			.contains("wireless", [body.from]);
+
+		if (error) {
+			throw error;
+		}
+		leads = data.map((lead) => lead);
+	} catch (error) {
+		console.log(error);
+	}
 
 	if (leads?.length > 1) {
 		console.log("more than one lead found with that number");
@@ -98,17 +99,17 @@ export default defineEventHandler(async (event) => {
 				: null,
 		};
 
-		// try {
-		// 	const { error } = await supabase
-		// 		.from("incoming_messages")
-		// 		.insert(incoming_message);
+		try {
+			const { error } = await supabase
+				.from("incoming_messages")
+				.insert(incoming_message);
 
-		// 	if (error) {
-		// 		throw error;
-		// 	}
-		// } catch (error) {
-		// 	console.log(error);
-		// }
+			if (error) {
+				throw error;
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 	// perform logic based on what the event is (e.g. message sent, message received, etc.)
 
@@ -118,7 +119,7 @@ export default defineEventHandler(async (event) => {
 
 	twiml.message("Thank you for your reply we will get back to you shortly");
 
-	const contactPhoneNumbers = ["+18134084221", "+18134750728", "+18137356162"];
+	const contactPhoneNumbers = ["+18134084221"];
 
 	contactPhoneNumbers.forEach(async (number) => {
 		const res = await client.messages.create({
