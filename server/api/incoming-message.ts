@@ -23,29 +23,29 @@ export default defineEventHandler(async (event) => {
 			.from("profiles")
 			.select("*")
 			.contains("phoneNumbers", [body.to]);
-		user_id = data[0].user_id;
+		user_id = !!data[0] ? data[0].user_id : null;
 	} catch (error) {
 		console.log(error);
 	}
 
 	// will need to clean this up to use user_id's if making public app
-	let leads;
-	try {
-		const { data, error } = await supabase
-			.from("leads")
-			.select("*")
-			.eq("user_id", user_id)
-			.contains("wireless", [body.from]);
+	let leads = [];
+	// try {
+	// 	const { data, error } = await supabase
+	// 		.from("leads")
+	// 		.select("*")
+	// 		.eq("user_id", user_id)
+	// 		.contains("wireless", [body.from]);
 
-		if (error) {
-			throw error;
-		}
-		leads = data.map((lead) => lead);
-	} catch (error) {
-		console.log(error);
-	}
+	// 	if (error) {
+	// 		throw error;
+	// 	}
+	// 	leads = data.map((lead) => lead);
+	// } catch (error) {
+	// 	console.log(error);
+	// }
 
-	if (leads.length > 1) {
+	if (leads?.length > 1) {
 		console.log("more than one lead found with that number");
 
 		let counter = 0;
@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
 		});
 	} else {
 		let incoming_message: IncomingMessage = {
-			user_id: user_id,
+			user_id: !!user_id ? user_id : null,
 			message: body.body,
 			from: body.from,
 			to: body.to,
@@ -92,23 +92,23 @@ export default defineEventHandler(async (event) => {
 			direction: body.direction,
 			error_code: body.error_code,
 			error_message: body.error_message,
-			lead_id: !!leads[0].lead_id ? leads[0].lead_id : null,
-			propertyAddress: !!leads[0].propertyAddress
+			lead_id: !!leads[0]?.lead_id ? leads[0].lead_id : null,
+			propertyAddress: !!leads[0]?.propertyAddress
 				? leads[0].propertyAddress
 				: null,
 		};
 
-		try {
-			const { error } = await supabase
-				.from("incoming_messages")
-				.insert(incoming_message);
+		// try {
+		// 	const { error } = await supabase
+		// 		.from("incoming_messages")
+		// 		.insert(incoming_message);
 
-			if (error) {
-				throw error;
-			}
-		} catch (error) {
-			console.log(error);
-		}
+		// 	if (error) {
+		// 		throw error;
+		// 	}
+		// } catch (error) {
+		// 	console.log(error);
+		// }
 	}
 	// perform logic based on what the event is (e.g. message sent, message received, etc.)
 
@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
 
 	twiml.message("Thank you for your reply we will get back to you shortly");
 
-	const contactPhoneNumbers = ["+18134084221", "+8134750728"];
+	const contactPhoneNumbers = ["+18134084221", "+18134750728", "+18137356162"];
 
 	contactPhoneNumbers.forEach(async (number) => {
 		const res = await client.messages.create({
