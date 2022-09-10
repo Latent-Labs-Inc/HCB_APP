@@ -5,8 +5,11 @@
 			:chart-data="chartData"
 			:chart-id="chartId"
 			:dataset-id-key="datasetIdKey"
+			:css-classes="cssClasses"
+			:styles="styles"
+			:width="width"
+			:height="height"
 		/>
-		<!-- :css-classes="cssClasses" :styles="styles" :width="width" :height="height" -->
 	</div>
 </template>
 
@@ -31,17 +34,33 @@ ChartJS.register(
 	LinearScale
 );
 
-const chartOptions = {
-	responsive: true,
-	maintainAspectRatio: false,
-};
-
-const chartData = {
-	labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-	datasets: [{ data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100] }],
-};
-
-const chartId = "myChart";
-
-const datasetIdKey = "id";
+const props = defineProps<{
+	chartOptions?: {
+		responsive?: boolean;
+		maintainAspectRatio?: boolean;
+		plugins?: {
+			legend: {
+				display: boolean;
+			};
+			title?: {
+				display: boolean;
+				text: string;
+			};
+		};
+	};
+	chartData: {
+		labels: string[];
+		datasets: {
+			label: string;
+			data: number[];
+			backgroundColor: string[];
+		}[];
+	};
+	chartId: string;
+	datasetIdKey: string;
+	cssClasses?: string;
+	styles?: string;
+	width?: number;
+	height?: number;
+}>();
 </script>
