@@ -10,6 +10,11 @@ export default defineEventHandler(async (event) => {
 		config.private.SUPABASE_SERVICE_KEY
 	);
 
+	const accountSid = config.private.TWILIO_ACCOUNT_SID;
+	const authToken = config.private.TWILIO_AUTH_TOKEN;
+
+	const client = twilio(accountSid, authToken);
+
 	const body: TwilioIncoming = await useBody(event);
 
 	let user_id;
@@ -87,8 +92,10 @@ export default defineEventHandler(async (event) => {
 			direction: body.direction,
 			error_code: body.error_code,
 			error_message: body.error_message,
-			lead_id: leads[0].lead_id,
-			propertyAddress: leads[0].propertyAddress,
+			lead_id: !!leads[0].lead_id ? leads[0].lead_id : null,
+			propertyAddress: !!leads[0].propertyAddress
+				? leads[0].propertyAddress
+				: null,
 		};
 
 		try {
@@ -110,6 +117,17 @@ export default defineEventHandler(async (event) => {
 	const twiml = new MessagingResponse();
 
 	twiml.message("Thank you for your reply we will get back to you shortly");
+
+	const contactPhoneNumbers = ["+18134084221", "+8134750728"];
+
+	contactPhoneNumbers.forEach(async (number) => {
+		const res = await client.messages.create({
+			body: `New message from ${body.from} to ${body.to} with message: ${body.body}`,
+			from: config.private.TWILIO_PHONE_NUMBER,
+			to: number,
+		});
+		console.log(res);
+	});
 
 	return twiml.toString();
 });
