@@ -2,9 +2,15 @@
 	<div>
 		<h3 class="header">Home</h3>
 		<LeadBarChart
+			:chart-data="leadData"
+			:chart-options="leadOptions"
+			:chart-id="'LeadsTotal'"
+			:dataset-id-key="leadId"
+		/>
+		<LeadBarChart
 			:chart-data="chartData"
 			:chart-options="chartOptions"
-			:chart-id="'Leads'"
+			:chart-id="'LeadsMarketed'"
 			:dataset-id-key="datasetIdKey"
 		/>
 		<!-- <UiTable
@@ -24,9 +30,13 @@ await useLoadContent();
 
 const { $supabase } = useNuxtApp();
 
-const { chartData, chartOptions } = await useChartDataMarketed();
+const { chartData, chartOptions, datasetIdKey } = await useChartDataMarketed();
 
-const datasetIdKey = "Leads";
+const {
+	chartData: leadData,
+	chartOptions: leadOptions,
+	datasetIdKey: leadId,
+} = await useChartDataLeads();
 
 // const cols = ref(["Name", "Email", "Phone", "Order", "Patient"]);
 

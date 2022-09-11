@@ -1,28 +1,24 @@
 export default async function useChartDataMarketed() {
 	const { $supabase } = useNuxtApp();
 
-	const { data: fiverrMarketed } = await $supabase
+	const { data: fiverrLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("texted", true)
 		.eq("leadType", "fiverr");
 
-	const { data: propStreamMarketed } = await $supabase
+	const { data: propStreamLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("texted", true)
 		.eq("leadType", "propStream");
 
-	const { data: foreclosureDailyMarketed } = await $supabase
+	const { data: foreclosureDailyLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("texted", true)
 		.eq("leadType", "foreclosureDaily");
 
-	const { data: otherMarketed } = await $supabase
+	const { data: otherLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("texted", true)
 		.eq("leadType", "other");
 
 	const chartOptions = {
@@ -34,12 +30,12 @@ export default async function useChartDataMarketed() {
 		labels: ["Fiverr", "ForeclosureDaily", "PropStream", "Other"],
 		datasets: [
 			{
-				label: "Total Leads Marketed",
+				label: "Total Leads",
 				data: [
-					fiverrMarketed?.length,
-					foreclosureDailyMarketed?.length,
-					propStreamMarketed?.length,
-					otherMarketed?.length,
+					fiverrLeads?.length,
+					foreclosureDailyLeads?.length,
+					propStreamLeads?.length,
+					otherLeads?.length,
 				],
 				backgroundColor: [
 					"rgba(2, 173, 36, .9)",
@@ -50,7 +46,8 @@ export default async function useChartDataMarketed() {
 			},
 		],
 	};
-	const datasetIdKey = "LeadsMarketed";
+
+	const datasetIdKey = "LeadsTotal";
 
 	return {
 		chartData,
