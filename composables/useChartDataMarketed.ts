@@ -5,25 +5,25 @@ export default async function useChartDataMarketed() {
 		.from("leads")
 		.select("*")
 		.eq("texted", true)
-		.eq("leadType", "fiverr");
+		.eq("leadProvider", "fiverr");
 
 	const { data: propStreamMarketed } = await $supabase
 		.from("leads")
 		.select("*")
 		.eq("texted", true)
-		.eq("leadType", "propStream");
+		.eq("leadProvider", "propStream");
 
 	const { data: foreclosureDailyMarketed } = await $supabase
 		.from("leads")
 		.select("*")
 		.eq("texted", true)
-		.eq("leadType", "foreclosureDaily");
+		.eq("leadProvider", "foreclosureDaily");
 
 	const { data: otherMarketed } = await $supabase
 		.from("leads")
 		.select("*")
 		.eq("texted", true)
-		.eq("leadType", "other");
+		.eq("leadProvider", "other");
 
 	const chartOptions = {
 		responsive: true,

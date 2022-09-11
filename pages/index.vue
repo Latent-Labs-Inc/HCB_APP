@@ -6,12 +6,15 @@
 			:chart-options="leadOptions"
 			:chart-id="'LeadsTotal'"
 			:dataset-id-key="leadId"
+			:height="300"
 		/>
 		<LeadBarChart
+			class="mt-20"
 			:chart-data="chartData"
 			:chart-options="chartOptions"
 			:chart-id="'LeadsMarketed'"
 			:dataset-id-key="datasetIdKey"
+			:height="300"
 		/>
 		<!-- <UiTable
 			:cols="cols"

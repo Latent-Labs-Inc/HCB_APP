@@ -4,22 +4,22 @@ export default async function useChartDataMarketed() {
 	const { data: fiverrLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("leadType", "fiverr");
+		.eq("leadProvider", "fiverr");
 
 	const { data: propStreamLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("leadType", "propStream");
+		.eq("leadProvider", "propStream");
 
 	const { data: foreclosureDailyLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("leadType", "foreclosureDaily");
+		.eq("leadProvider", "foreclosureDaily");
 
 	const { data: otherLeads } = await $supabase
 		.from("leads")
 		.select("*")
-		.eq("leadType", "other");
+		.eq("leadProvider", "other");
 
 	const chartOptions = {
 		responsive: true,
@@ -48,6 +48,8 @@ export default async function useChartDataMarketed() {
 	};
 
 	const datasetIdKey = "LeadsTotal";
+
+	console.log("chartData", chartData.datasets);
 
 	return {
 		chartData,
