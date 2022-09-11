@@ -1,4 +1,4 @@
-export default async function useChartData() {
+export default async function useChartDataMarketed() {
 	const { $supabase } = useNuxtApp();
 
 	const { data: fiverrMarketed } = await $supabase

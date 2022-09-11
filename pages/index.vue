@@ -24,7 +24,7 @@ await useLoadContent();
 
 const { $supabase } = useNuxtApp();
 
-const { chartData, chartOptions } = await useChartData();
+const { chartData, chartOptions } = await useChartDataMarketed();
 
 const datasetIdKey = "Leads";
 
