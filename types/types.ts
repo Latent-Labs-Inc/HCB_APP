@@ -103,3 +103,9 @@ export interface TwilioIncoming {
 	to: string;
 	uri: string;
 }
+
+export interface Filter {
+	field: string;
+	operator: string;
+	value: string | number | boolean;
+}
