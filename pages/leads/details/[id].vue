@@ -66,7 +66,9 @@ const keys = ref([
 ]);
 
 const fetchLeadDetails = async () => {
+	console.log("leadId", leadId.value);
 	leadDetails.value = await leadStore.fetchLeadById(leadId.value);
+	console.log(leadDetails.value);
 };
 onMounted(async () => {
 	await fetchLeadDetails();

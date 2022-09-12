@@ -109,3 +109,20 @@ export interface Filter {
 	operator: string;
 	value: string | number | boolean;
 }
+
+export interface Message {
+	user_id: string;
+	message: string;
+	from: string;
+	to: string;
+	sid: string;
+	created_at: string;
+	sent_at: string;
+	updated_at: string;
+	status: string;
+	direction: string;
+	errorCode: number;
+	errorMessage: string;
+	lead_id: string;
+	propertyAddress: Address;
+}

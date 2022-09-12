@@ -1,6 +1,6 @@
 import twilio from "twilio";
 import { createClient } from "@supabase/supabase-js";
-import { Lead } from "~/types/types";
+import { Lead, Message } from "../../types/types";
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -35,7 +35,8 @@ export default defineEventHandler(async (event) => {
 						.from("leads")
 						.select("*")
 						.eq("user_id", user_id)
-						.eq("texted", false);
+						.eq("texted", false)
+						.range(0, 500);
 					if (error) {
 						throw error;
 					}
@@ -46,7 +47,8 @@ export default defineEventHandler(async (event) => {
 						.select("*")
 						.eq("user_id", user_id)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
-						.eq("texted", false);
+						.eq("texted", false)
+						.range(0, 500);
 
 					if (error) {
 						throw error;
@@ -63,7 +65,8 @@ export default defineEventHandler(async (event) => {
 							"leadProvider",
 							leadProvider === "other" ? otherProvider : leadProvider
 						)
-						.eq("texted", false);
+						.eq("texted", false)
+						.range(0, 500);
 					if (error) {
 						throw error;
 					}
@@ -78,7 +81,8 @@ export default defineEventHandler(async (event) => {
 							leadProvider === "other" ? otherProvider : leadProvider
 						)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
-						.eq("texted", false);
+						.eq("texted", false)
+						.range(0, 500);
 
 					if (error) {
 						throw error;
@@ -90,31 +94,49 @@ export default defineEventHandler(async (event) => {
 			console.log(error);
 		}
 
-		leads.forEach(async (lead, index) => {
-			const msgPerMS = (ms) => {
-				return new Promise((resolve) => setTimeout(resolve, ms));
-			};
-
-			const delay = lead.wireless.length;
-
-			await msgPerMS((index + 1) * 4000);
-
-			lead.wireless.forEach(async (phone, indx) => {
-				await msgPerMS((indx + 1) * 1000);
-
-				console.log("texted", phone, indx);
-				// const res = await client.messages.create({
-				// 	body: message,
-				// 	from: config.private.TWILIO_PHONE_NUMBER,
-				// 	to: phone,
-				// });
-				// console.log(res);
-				// if (!!res.error_code) {
-				// await supabase
-				// 	.from("leads")
-				// 	.update({ texted: false })
-				// 	.eq("lead_id", lead.lead_id);
-				// }
+		leads.forEach(async (lead) => {
+			lead.wireless.forEach(async (phone) => {
+				try {
+					const res = await client.messages.create({
+						body: message,
+						from: config.private.TWILIO_PHONE_NUMBER,
+						to: phone,
+					});
+					if (!!res.errorMessage) {
+						throw res.errorMessage;
+					} else {
+						let sentMessage: Message = {
+							lead_id: lead.lead_id,
+							user_id: user_id,
+							message,
+							to: phone,
+							from: config.private.TWILIO_PHONE_NUMBER,
+							sid: res.sid,
+							status: res.status,
+							created_at: res.dateCreated.toISOString(),
+							sent_at: res.dateSent.toISOString(),
+							updated_at: res.dateUpdated.toISOString(),
+							direction: res.direction,
+							errorCode: res.errorCode,
+							errorMessage: res.errorMessage,
+							propertyAddress: lead.propertyAddress,
+						};
+						try {
+							const { error } = await supabase
+								.from("leads")
+								.update({ texted: false })
+								.eq("lead_id", lead.lead_id);
+							await supabase.from("sent_messages").insert(sentMessage);
+							if (error) {
+								throw error;
+							}
+						} catch (error) {
+							console.log(error);
+						}
+					}
+				} catch (error) {
+					console.log(error);
+				}
 			});
 		});
 		return !!error ? { error } : { data: leads };
