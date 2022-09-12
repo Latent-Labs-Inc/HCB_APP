@@ -104,7 +104,7 @@ const handleMessage = async ($event) => {
 
 	if (!!message) {
 		uiStore.toggleFunctionLoading(true);
-		const res = await $fetch("/api/twilio", {
+		const res = await $fetch("/api/send-message", {
 			method: "POST",
 			body: JSON.stringify({
 				message: !!message ? message : null,
@@ -115,6 +115,7 @@ const handleMessage = async ($event) => {
 				user_id: authStore.user_id,
 			}),
 		});
+
 		console.log(res);
 		uiStore.toggleFunctionLoading(false);
 		router.push("/messages");

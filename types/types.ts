@@ -116,9 +116,9 @@ export interface Message {
 	from: string;
 	to: string;
 	sid: string;
-	created_at: string;
-	sent_at: string;
-	updated_at: string;
+	created_at: Date;
+	sent_at: Date;
+	updated_at: Date;
 	status: string;
 	direction: string;
 	errorCode: number;

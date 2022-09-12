@@ -85,8 +85,8 @@ export default defineEventHandler(async (event) => {
 				updated_at: body.date_updated,
 				status: body.status,
 				direction: body.direction,
-				error_code: body.error_code,
-				error_message: body.error_message,
+				errorCode: body.error_code,
+				errorMessage: body.error_message,
 				lead_id: lead.lead_id,
 				propertyAddress: propertyAddress,
 			};
@@ -116,8 +116,8 @@ export default defineEventHandler(async (event) => {
 			updated_at: body.date_updated,
 			status: body.status,
 			direction: body.direction,
-			error_code: body.error_code,
-			error_message: body.error_message,
+			errorCode: body.error_code,
+			errorMessage: body.error_message,
 			lead_id: !!leads[0]?.lead_id ? leads[0].lead_id : null,
 			propertyAddress: propertyAddress,
 		};

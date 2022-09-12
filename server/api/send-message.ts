@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
 	console.log(message);
 
 	let leads = [] as Lead[];
+	const sentMessages = [] as Message[];
 
 	let error;
 
@@ -100,8 +101,9 @@ export default defineEventHandler(async (event) => {
 					const res = await client.messages.create({
 						body: message,
 						from: config.private.TWILIO_PHONE_NUMBER,
-						to: phone,
+						to: "+18134084221",
 					});
+					console.log(res);
 					if (!!res.errorMessage) {
 						throw res.errorMessage;
 					} else {
@@ -113,9 +115,9 @@ export default defineEventHandler(async (event) => {
 							from: config.private.TWILIO_PHONE_NUMBER,
 							sid: res.sid,
 							status: res.status,
-							created_at: res.dateCreated.toISOString(),
-							sent_at: res.dateSent.toISOString(),
-							updated_at: res.dateUpdated.toISOString(),
+							created_at: res.dateCreated,
+							sent_at: res.dateSent,
+							updated_at: res.dateUpdated,
 							direction: res.direction,
 							errorCode: res.errorCode,
 							errorMessage: res.errorMessage,
@@ -124,11 +126,14 @@ export default defineEventHandler(async (event) => {
 						try {
 							const { error } = await supabase
 								.from("leads")
-								.update({ texted: false })
-								.eq("lead_id", lead.lead_id);
-							await supabase.from("sent_messages").insert(sentMessage);
-							if (error) {
-								throw error;
+								.update({ texted: true })
+								.eq("lead_id", lead?.lead_id);
+							const { error: err, data } = await supabase
+								.from("sent_messages")
+								.insert(sentMessage);
+							sentMessages.push(sentMessage);
+							if (error || err) {
+								throw error || err;
 							}
 						} catch (error) {
 							console.log(error);
@@ -139,6 +144,6 @@ export default defineEventHandler(async (event) => {
 				}
 			});
 		});
-		return !!error ? { error } : { data: leads };
+		return !!error ? { error } : { data: sentMessages };
 	}
 });
