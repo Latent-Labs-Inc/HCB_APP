@@ -11,6 +11,7 @@ export default async function useLoadContent() {
 		uiStore.toggleAppLoading(true);
 		uiStore.toggleSidebar(true);
 		await profileStore.fetchProfile();
+
 		setTimeout(() => {
 			uiStore.toggleAppLoading(false);
 		}, 1000);

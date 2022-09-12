@@ -2,6 +2,7 @@
 	<div>
 		<h3 class="header">Home</h3>
 		<LeadBarChart
+			class="w-1/2"
 			:chart-data="leadData"
 			:chart-options="leadOptions"
 			:chart-id="'LeadsTotal'"
@@ -9,7 +10,7 @@
 			:height="300"
 		/>
 		<LeadBarChart
-			class="mt-20"
+			class="mt-20 w-1/2"
 			:chart-data="chartData"
 			:chart-options="chartOptions"
 			:chart-id="'LeadsMarketed'"
