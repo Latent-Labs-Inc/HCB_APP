@@ -2,7 +2,7 @@
 	<div>
 		<h3 class="header">Home</h3>
 		<div class="flex flex-col gap-6">
-			<div class="flex gap-4 justify-evenly">
+			<!-- <div class="flex gap-4 justify-evenly">
 				<LeadBarChart
 					class="sm:w-1/3 lg:w-2/5"
 					:chart-data="leadData"
@@ -19,7 +19,7 @@
 					:dataset-id-key="datasetIdKey"
 					:height="300"
 				/>
-			</div>
+			</div> -->
 			<div>
 				<p class="text-2xl text-center">Received Messages</p>
 				<MessageReceived />
