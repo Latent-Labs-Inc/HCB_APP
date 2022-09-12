@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { Lead, Filter } from "~/types/types";
+import { useAuthStore } from "./auth";
 
 export const useLeadStore = defineStore("lead", {
 	state: () => ({
@@ -60,49 +61,139 @@ export const useLeadStore = defineStore("lead", {
 			}
 		},
 		async removeLeads(filters: Filter[]) {
+			const authStore = useAuthStore();
 			const { $supabase } = useNuxtApp();
-			try {
-				// make it so it delete all the leads that match the filters including the marketing ones
+			if (filters.length === 1) {
+				try {
+					// make it so it delete all the leads that match the filters including the marketing ones
 
-				const filterConstructor = (filters) => {
-					console.log(filters);
-					let filterString = "";
-					filters.forEach((filter: Filter, index) => {
-						if (index === 0) {
-							filterString += `${filter.field}.${filter.operator}.${filter.value}`;
-						} else {
-							filterString += `and(${filter.field}.${filter.operator}.${filter.value})`;
-						}
-					});
-					return filterString;
-				};
-
-				let filterString = !!filterConstructor(filters)
-					? filterConstructor(filters)
-					: "";
-
-				let data;
-				let error;
-				if (!!filterString) {
-					const { data1, error1 } = await $supabase
+					const { data, error } = await $supabase
 						.from("leads")
 						.delete()
-						.or(filterString);
-					data = data1;
-					error = error1;
-				} else {
-					const { data1, error1 } = await $supabase.from("leads").delete();
-					data = data1;
-					error = error1;
-				}
+						.filter(
+							`${filters[0].field}`,
+							`${filters[0].operator}`,
+							`${filters[0].value}`
+						);
 
-				if (error) {
-					throw error;
+					if (error) {
+						throw error;
+					}
+					console.log(data);
+					return data;
+				} catch (error) {
+					console.log(error);
 				}
-				console.log(data);
-				return data;
-			} catch (error) {
-				console.log(error);
+			} else if (filters.length === 2) {
+				try {
+					// make it so it delete all the leads that match the filters including the marketing ones
+
+					const { data, error } = await $supabase
+						.from("leads")
+						.delete()
+						.filter(
+							`${filters[0].field}`,
+							`${filters[0].operator}`,
+							`${filters[0].value}`
+						)
+						.filter(
+							`${filters[1].field}`,
+							`${filters[1].operator}`,
+							`${filters[1].value}`
+						);
+
+					if (error) {
+						throw error;
+					}
+					console.log(data);
+					return data;
+				} catch (error) {
+					console.log(error);
+				}
+			} else if (filters.length === 3) {
+				try {
+					// make it so it delete all the leads that match the filters including the marketing ones
+
+					const { data, error } = await $supabase
+						.from("leads")
+						.delete()
+						.filter(
+							`${filters[0].field}`,
+							`${filters[0].operator}`,
+							`${filters[0].value}`
+						)
+						.filter(
+							`${filters[1].field}`,
+							`${filters[1].operator}`,
+							`${filters[1].value}`
+						)
+						.filter(
+							`${filters[2].field}`,
+							`${filters[2].operator}`,
+							`${filters[2].value}`
+						);
+
+					if (error) {
+						throw error;
+					}
+					console.log(data);
+					return data;
+				} catch (error) {
+					console.log(error);
+				}
+			} else if (filters.length === 4) {
+				try {
+					// make it so it delete all the leads that match the filters including the marketing ones
+
+					const { data, error } = await $supabase
+						.from("leads")
+						.delete()
+						.filter(
+							`${filters[0].field}`,
+							`${filters[0].operator}`,
+							`${filters[0].value}`
+						)
+						.filter(
+							`${filters[1].field}`,
+							`${filters[1].operator}`,
+							`${filters[1].value}`
+						)
+						.filter(
+							`${filters[2].field}`,
+							`${filters[2].operator}`,
+							`${filters[2].value}`
+						)
+						.filter(
+							`${filters[3].field}`,
+							`${filters[3].operator}`,
+							`${filters[3].value}`
+						);
+
+					if (error) {
+						throw error;
+					}
+					console.log(data);
+					return data;
+				} catch (error) {
+					console.log(error);
+				}
+			} else if (filters.length === 0) {
+				try {
+					// make it so it delete all the leads that match the filters including the marketing ones
+
+					const { data, error } = await $supabase
+						.from("leads")
+						.delete()
+						.eq("user_id", authStore.user_id);
+
+					if (error) {
+						throw error;
+					}
+					console.log(data);
+					return data;
+				} catch (error) {
+					console.log(error);
+				}
 			}
 		},
 	},
