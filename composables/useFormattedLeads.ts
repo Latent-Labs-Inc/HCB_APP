@@ -75,15 +75,15 @@ export default async function useFormattedLeads(data: any[]) {
 				created_at: new Date(),
 				modified_at: new Date(),
 				propertyAddress: {
-					address1: null,
-					address2: null,
-					city: null,
-					state: null,
-					zip: null,
-					county: null,
+					address1: lead["Property Address"],
+					address2: !!lead["Property Address 2"] ? lead["Property Address 2"] : null,
+					city: lead["Property City"],
+					state: lead["Property State"],
+					zip: lead["Property Zip"],
+					county: lead["Property County"],
 				},
-				ownerFirstName: null,
-				ownerLastName: null,
+				ownerFirstName: lead["Owner First Name"],
+				ownerLastName: lead["Owner Last Name"],
 				wireless: [],
 				landline: [],
 				email: [],
@@ -94,11 +94,11 @@ export default async function useFormattedLeads(data: any[]) {
 				mailed: false,
 				fileDate: null,
 				mailingAddress: {
-					address1: null,
-					address2: null,
-					city: null,
-					state: null,
-					zip: null,
+					address1: lead["Owner Address"],
+					address2: !!lead["Owner Address 2"] ? lead["Owner Address 2"] : null,
+					city: lead["Owner City"],
+					state: lead["Owner State"],
+					zip: lead["Owner Zip"],
 				},
 			};
 			for (let key in lead) {
@@ -118,20 +118,64 @@ export default async function useFormattedLeads(data: any[]) {
 						let newPhone = "+1" + lead[key].replace(/[^0-9]/g, "");
 						newLead.landline.push(newPhone);
 					}
-				} else if (lowerCaseKey.includes("property address")) {
-					newLead.propertyAddress.address1 = lead[key];
-				} else if (lowerCaseKey.includes("property city")) {
-					newLead.propertyAddress.city = lead[key];
-				} else if (lowerCaseKey.includes("property state")) {
-					newLead.propertyAddress.state = lead[key];
-				} else if (lowerCaseKey.includes("property zip")) {
-					newLead.propertyAddress.zip = lead[key];
-				} else if (lowerCaseKey.includes("property county")) {
-					newLead.propertyAddress.county = lead[key];
-				} else if (lowerCaseKey === "owner first name") {
-					newLead.ownerFirstName = lead[key];
-				} else if (lowerCaseKey === "owner last name") {
-					newLead.ownerLastName = lead[key];
+				}
+			}
+			formattedLeads.push(newLead);
+		});
+	} else if (
+		leadStore.leadProvider === "fiverr" &&
+		leadStore.leadType === "absentee"
+	) {
+		data.forEach((lead) => {
+			let newLead: Lead = {
+				user_id: authStore.user_id,
+				lead_id: useUuid(),
+				created_at: new Date(),
+				modified_at: new Date(),
+				propertyAddress: {
+					address1: lead["Property Address"],
+					address2: !!lead["Property Address 2"] ? lead["Property Address 2"] : null,
+					city: lead["Property City"],
+					state: lead["Property State"],
+					zip: lead["Property Zip"],
+					county: lead["Property County"],
+				},
+				ownerFirstName: lead["Owner First Name"],
+				ownerLastName: lead["Owner Last Name"],
+				wireless: [],
+				landline: [],
+				email: [],
+				leadProvider: leadStore.leadProvider,
+				leadType: leadStore.leadType,
+				texted: false,
+				emailed: false,
+				mailed: false,
+				fileDate: null,
+				mailingAddress: {
+					address1: lead["Owner Address"],
+					address2: !!lead["Owner Address 2"] ? lead["Owner Address 2"] : null,
+					city: lead["Owner City"],
+					state: lead["Owner State"],
+					zip: lead["Owner Zip"],
+				},
+			};
+			for (let key in lead) {
+				let lowerCaseKey = key.toLowerCase();
+				lead[key] = lead[key].trim() || null;
+				if (lowerCaseKey.includes("e-mail")) {
+					if (!!lead[key]) {
+						newLead.email.push(lead[key]);
+					}
+				} else if (lowerCaseKey.includes("wireless")) {
+					if (!!lead[key]) {
+						let newPhone = "+1" + lead[key].replace(/[^0-9]/g, "");
+						newLead.wireless.push(newPhone);
+					}
+				} else if (lowerCaseKey.includes("landline")) {
+					if (!!lead[key]) {
+						let newPhone = "+1" + lead[key].replace(/[^0-9]/g, "");
+						newLead.landline.push(newPhone);
+					}
 				}
 			}
 			formattedLeads.push(newLead);

@@ -76,6 +76,9 @@ const handleItemClick = (item, row) => {
 const handleSearch = async () => {
 	uiStore.toggleFunctionLoading(true);
 	tableData.value = await messageStore.fetchByPhone(searchInput.value);
+	tableData.value.forEach((msg) => {
+		msg.sent_at = new Date(msg.sent_at).toLocaleString();
+	});
 	uiStore.toggleFunctionLoading(false);
 };
 </script>
