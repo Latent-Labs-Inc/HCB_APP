@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
 		leads.forEach(async (lead) => {
 			const propertyAddress = !!lead.propertyAddress
 				? lead.propertyAddress
-				: { address: "None Found", city: null, state: null, zip: null };
+				: { address1: "None Found", city: null, state: null, zip: null };
 			let incoming_message: IncomingMessage = {
 				user_id: !!user_id ? user_id : null,
 				message: body.body,
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
 	} else {
 		const propertyAddress = !!leads[0]?.propertyAddress
 			? leads[0].propertyAddress
-			: { address: "None Found", city: null, state: null, zip: null };
+			: { address1: "None Found", city: null, state: null, zip: null };
 		let incoming_message: IncomingMessage = {
 			user_id: !!user_id ? user_id : null,
 			message: body.body,
