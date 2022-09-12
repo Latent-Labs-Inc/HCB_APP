@@ -27,5 +27,21 @@ export const useMessageStore = defineStore("message", {
 				console.log(error);
 			}
 		},
+		async fetchByPhone(phone: string) {
+			const { $supabase } = useNuxtApp();
+			try {
+				const { data, error } = await $supabase
+					.from("incoming_messages")
+					.select("*")
+					.contains("wireless", [phone]);
+				if (error) {
+					throw error;
+				}
+				this.messages = data;
+				return this.messages;
+			} catch (error) {
+				console.log(error);
+			}
+		},
 	},
 });

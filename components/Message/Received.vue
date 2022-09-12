@@ -2,7 +2,7 @@
 	<div>
 		<div>
 			<div class="flex justify-center">
-				<UiSearchInline v-model="searchInput" :label="'Leads'" />
+				<UiSearchInline v-model="searchInput" :label="'Messages By Phone Number'" />
 			</div>
 			<UiTable
 				:cols="cols"
@@ -71,5 +71,11 @@ const handleItemClick = (item, row) => {
 	if (item.id === "view") {
 		router.push(`/leads/details/${row.lead_id}`);
 	}
+};
+
+const handleSearch = async () => {
+	uiStore.toggleFunctionLoading(true);
+	tableData.value = await messageStore.fetchByPhone(searchInput.value);
+	uiStore.toggleFunctionLoading(false);
 };
 </script>
