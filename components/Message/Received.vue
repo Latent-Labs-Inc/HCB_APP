@@ -2,7 +2,11 @@
 	<div>
 		<div>
 			<div class="flex justify-center">
-				<UiSearchInline v-model="searchInput" :label="'Messages By Phone Number'" />
+				<UiSearchInline
+					v-model="searchInput"
+					:label="'Messages By Phone Number'"
+					@search="handleSearch"
+				/>
 			</div>
 			<UiTable
 				:cols="cols"
@@ -22,7 +26,7 @@ import { useMessageStore } from "~/stores/message";
 import { IncomingMessage } from "~/types/types";
 import { useUiStore } from "~/stores/ui";
 
-const searchInput = ref("");
+const searchInput = ref("+1");
 const messageStore = useMessageStore();
 const router = useRouter();
 const uiStore = useUiStore();
@@ -75,7 +79,8 @@ const handleItemClick = (item, row) => {
 
 const handleSearch = async () => {
 	uiStore.toggleFunctionLoading(true);
-	tableData.value = await messageStore.fetchByPhone(searchInput.value);
+	const messages = await messageStore.fetchByPhone(searchInput.value);
+	tableData.value = messages;
 	tableData.value.forEach((msg) => {
 		msg.sent_at = new Date(msg.sent_at).toLocaleString();
 	});

@@ -33,10 +33,11 @@ export const useMessageStore = defineStore("message", {
 				const { data, error } = await $supabase
 					.from("incoming_messages")
 					.select("*")
-					.contains("wireless", [phone]);
+					.like("from", `%${phone}%`);
 				if (error) {
 					throw error;
 				}
+
 				this.messages = data;
 				return this.messages;
 			} catch (error) {
