@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 						.select("*")
 						.eq("user_id", user_id)
 						.eq("texted", false)
-						.range(0, 500);
+						.range(0, 1);
 					if (error) {
 						throw error;
 					}
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 						.eq("user_id", user_id)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 500);
+						.range(0, 1);
 
 					if (error) {
 						throw error;
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 							leadProvider === "other" ? otherProvider : leadProvider
 						)
 						.eq("texted", false)
-						.range(0, 500);
+						.range(0, 1);
 					if (error) {
 						throw error;
 					}
@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
 						)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 500);
+						.range(0, 1);
 
 					if (error) {
 						throw error;
