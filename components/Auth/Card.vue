@@ -16,10 +16,15 @@
 					<label for="password">Password</label>
 					<input
 						v-model="input.password"
-						type="password"
+						:type="hide ? 'password' : 'text'"
 						placeholder="password"
 						class="w-sm mx-auto border shadow-sm border-slate-300 placeholder-slate-400 dark:focus:outline-darkPrimary dark:bg-darkBg"
 					/>
+				</div>
+				<div class="mt-4 mb-0 pb-0">
+					<p class="text-sm text-center cursor-pointer trans" @click="handleHide">
+						{{ hide ? "Show" : "Hide" }}
+					</p>
 				</div>
 				<div class="flex flex-col gap-4">
 					<UiButton class="mt-7" @click="handleSubmit" mode="reverse">
@@ -70,6 +75,10 @@ const input = reactive({
 	password: "",
 });
 
+const handleHide = () => {
+	hide.value = !hide.value;
+};
+
 const clearInput = () => {
 	input.email = "";
 	input.password = "";
@@ -102,6 +111,8 @@ const handleReset = async () => {
 const cancelReset = () => {
 	reset.value = false;
 };
+
+const hide = ref(true);
 
 onMounted(async () => {
 	if (authStore.isLoggedIn) {
