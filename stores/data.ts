@@ -81,22 +81,11 @@ export const useDataStore = defineStore("data", {
 		async fetchLeadData() {
 			const { $supabase } = useNuxtApp();
 			try {
-				const { data, error } = await $supabase.from("leads").select("*");
-				if (error) {
-					throw error;
-				}
-				const fiverrLeads = data.filter((lead) => lead.leadProvider === "fiverr");
-				const foreclosureDailyLeads = data.filter(
-					(lead) => lead.leadProvider === "foreclosureDaily"
-				);
-				const propStreamLeads = data.filter(
-					(lead) => lead.leadProvider === "propStream"
-				);
-				const otherLeads = data.filter((lead) => lead.leadProvider === "other");
-				this.fiverrLeads = fiverrLeads.length;
-				this.foreclosureDailyLeads = foreclosureDailyLeads.length;
-				this.propStreamLeads = propStreamLeads.length;
-				this.otherLeads = otherLeads.length;
+				const { data, error } = await $supabase.rpc("get_chart_data");
+				this.fiverrLeads = data[0];
+				this.propStreamLeads = data[1];
+				this.foreclosureDailyLeads = data[2];
+				this.otherLeads = data[3];
 			} catch (error) {
 				console.log(error);
 			}
@@ -104,25 +93,12 @@ export const useDataStore = defineStore("data", {
 		async fetchTextedData() {
 			const { $supabase } = useNuxtApp();
 			try {
-				const { data, error } = await $supabase
-					.from("leads")
-					.select("*")
-					.eq("texted", true);
-				if (error) {
-					throw error;
-				}
-				const fiverrLeads = data.filter((lead) => lead.leadProvider === "fiverr");
-				const foreclosureDailyLeads = data.filter(
-					(lead) => lead.leadProvider === "foreclosureDaily"
-				);
-				const propStreamLeads = data.filter(
-					(lead) => lead.leadProvider === "propStream"
-				);
-				const otherLeads = data.filter((lead) => lead.leadProvider === "other");
-				this.fiverrTexted = fiverrLeads.length;
-				this.foreclosureDailyTexted = foreclosureDailyLeads.length;
-				this.propStreamTexted = propStreamLeads.length;
-				this.otherTexted = otherLeads.length;
+				const { data, error } = await $supabase.rpc("get_chart_data_texted");
+				this.fiverrTexted = data[0];
+				this.propStreamTexted = data[1];
+				this.foreclosureDailyTexted = data[2];
+				this.otherTexted = data[3];
+				console.log(data);
 			} catch (error) {
 				console.log(error);
 			}
