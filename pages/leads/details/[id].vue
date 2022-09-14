@@ -6,10 +6,10 @@
 				class="ml-2 mx-auto grid sm:grid-cols-1 lg:grid-cols-2 gap-y-2"
 				v-if="!!leadDetails"
 			>
-				<div v-for="key in keys">
-					<p v-if="key.split('.').length > 1">
-						{{ key.split(".")[1].toTitle() }} :
-						{{ leadDetails[key.split(".")[0]][key.split(".")[1]] }}
+				<div v-for="(key, index) in keys">
+					<p v-if="index + 1 <= 5">
+						{{ key.toTitle() }} :
+						{{ leadDetails.propertyAddress[key] }}
 					</p>
 					<p v-else>{{ key.camel2title() }}: {{ leadDetails[key] }}</p>
 				</div>
@@ -44,11 +44,11 @@ const leadId = ref(route.params.id as string);
 const leadDetails = ref(null as Lead);
 
 const keys = ref([
-	"propertyAddress.address1",
-	"propertyAddress.city",
-	"propertyAddress.state",
-	"propertyAddress.zip",
-	"propertyAddress.county",
+	"address1",
+	"city",
+	"state",
+	"zip",
+	"county",
 	"leadType",
 	"leadProvider",
 	"ownerFirstName",
