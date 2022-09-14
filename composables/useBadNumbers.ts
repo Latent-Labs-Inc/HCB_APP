@@ -14,11 +14,30 @@ export default async function useFormattedLeads(data: TwilioCSV[]) {
 
 	const authStore = useAuthStore();
 	console.log(data);
+
 	data.forEach((item) => {
-		if (item.From !== "+17274968795" && !duplicates.includes(item.From)) {
+		item.From = "+" + item.From;
+		item.To = "+" + item.To;
+	});
+
+	// get the bad numbers from the database
+	const { $supabase } = useNuxtApp();
+	const { data: badNumbersData, error: badNumbersError } = await $supabase
+		.from("bad_numbers")
+		.select("*");
+
+	console.log(badNumbersData);
+
+	data.forEach((item) => {
+		if (
+			item.From !== "+17274968795" &&
+			!duplicates.includes(item.From) &&
+			badNumbersData.filter((badNumber) => badNumber.number === item.From)
+				.length === 0
+		) {
 			duplicates.push(item.From);
 			badNumbers.push({
-				number: `+${item.From}`,
+				number: item.From,
 				user_id: authStore.user.id,
 			});
 		}
@@ -31,7 +50,6 @@ export default async function useFormattedLeads(data: TwilioCSV[]) {
 		if (error) {
 			console.log(error);
 		}
-		console.log(supabaseData);
 	} catch (error) {
 		console.log(error);
 	}
