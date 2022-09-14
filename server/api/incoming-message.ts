@@ -30,7 +30,6 @@ export default defineEventHandler(async (event) => {
 			from: config.private.TWILIO_PHONE_NUMBER,
 			to: number,
 		});
-		console.log(res);
 	});
 
 	let user_id = null;
@@ -79,7 +78,7 @@ export default defineEventHandler(async (event) => {
 				message: body.Body,
 				from: body.From,
 				to: body.To,
-				sid: body.MessageSid,
+				sid: body.MessageSid + `-${counter}`,
 				created_at: new Date().toISOString(),
 				sent_at: new Date().toISOString(),
 				updated_at: new Date().toISOString(),
