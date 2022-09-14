@@ -1,6 +1,7 @@
 import twilio from "twilio";
 import { createClient } from "@supabase/supabase-js";
 import { Lead, Message } from "../../types/types";
+import badNumbers from "./bad-numbers";
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -94,53 +95,71 @@ export default defineEventHandler(async (event) => {
 		} catch (error) {
 			console.log(error);
 		}
+		const badNumbers = [];
+		try {
+			const { data, error: badNumbersError } = await supabase
+				.from("bad_numbers")
+				.select("*")
+				.eq("user_id", user_id);
+
+			if (badNumbersError) {
+				throw badNumbersError;
+			}
+			data.forEach((badNumber) => {
+				badNumbers.push(badNumber.number);
+			});
+		} catch (error) {
+			console.log(error);
+		}
 
 		leads.forEach(async (lead) => {
 			lead.wireless.forEach(async (phone) => {
-				try {
-					const res = await client.messages.create({
-						body: message,
-						from: config.private.TWILIO_PHONE_NUMBER,
-						to: phone,
-					});
-					console.log(res);
-					if (!!res.errorMessage) {
-						throw res.errorMessage;
-					} else {
-						let sentMessage: Message = {
-							lead_id: lead.lead_id,
-							user_id: user_id,
-							message,
-							to: phone,
+				if (!badNumbers.includes(phone)) {
+					try {
+						const res = await client.messages.create({
+							body: message,
 							from: config.private.TWILIO_PHONE_NUMBER,
-							sid: res.sid,
-							status: res.status,
-							created_at: res.dateCreated,
-							sent_at: res.dateSent,
-							updated_at: res.dateUpdated,
-							direction: res.direction,
-							errorCode: res.errorCode,
-							errorMessage: res.errorMessage,
-							propertyAddress: lead.propertyAddress,
-						};
-						try {
-							const { error } = await supabase
-								.from("leads")
-								.update({ texted: true })
-								.eq("lead_id", lead?.lead_id);
-							const { error: err, data } = await supabase
-								.from("sent_messages")
-								.insert(sentMessage);
-							sentMessages.push(sentMessage);
-							if (error || err) {
-								throw error || err;
+							to: phone,
+						});
+						console.log(res);
+						if (!!res.errorMessage) {
+							throw res.errorMessage;
+						} else {
+							let sentMessage: Message = {
+								lead_id: lead.lead_id,
+								user_id: user_id,
+								message,
+								to: phone,
+								from: config.private.TWILIO_PHONE_NUMBER,
+								sid: res.sid,
+								status: res.status,
+								created_at: res.dateCreated,
+								sent_at: res.dateSent,
+								updated_at: res.dateUpdated,
+								direction: res.direction,
+								errorCode: res.errorCode,
+								errorMessage: res.errorMessage,
+								propertyAddress: lead.propertyAddress,
+							};
+							try {
+								const { error } = await supabase
+									.from("leads")
+									.update({ texted: true })
+									.eq("lead_id", lead?.lead_id);
+								const { error: err, data } = await supabase
+									.from("sent_messages")
+									.insert(sentMessage);
+								sentMessages.push(sentMessage);
+								if (error || err) {
+									throw error || err;
+								}
+							} catch (error) {
+								console.log(error);
 							}
-						} catch (error) {
-							console.log(error);
 						}
+					} catch (error) {
+						console.log(error);
 					}
-				} catch (error) {
-					console.log(error);
 				}
 			});
 		});

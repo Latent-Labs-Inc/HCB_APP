@@ -7,13 +7,20 @@ interface BadNumber {
 }
 
 export default async function useFormattedLeads(data: TwilioCSV[]) {
+	const duplicates = [] as string[];
 	const badNumbers = [] as BadNumber[];
 
-	const authStore = useAuthStore();
+	// filter out the duplicates
 
+	const authStore = useAuthStore();
+	console.log(data);
 	data.forEach((item) => {
-		if (item.From !== "+17274968795") {
-			badNumbers.push({ number: item.From, user_id: authStore.user_id });
+		if (item.From !== "+17274968795" && !duplicates.includes(item.From)) {
+			duplicates.push(item.From);
+			badNumbers.push({
+				number: `+${item.From}`,
+				user_id: authStore.user.id,
+			});
 		}
 	});
 	try {

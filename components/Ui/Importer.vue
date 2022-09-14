@@ -116,6 +116,7 @@ const uploadData = async () => {
 	if (fileType.value === "csv") {
 		const reader = new FileReader();
 		reader.readAsText(selectedFile.value);
+
 		reader.onload = async (e) => {
 			const data = e.target.result;
 
@@ -124,6 +125,8 @@ const uploadData = async () => {
 			let result = [];
 
 			let headers = array[0].split(",");
+
+			console.log(headers);
 
 			for (let i = 1; i < array.length - 1; i++) {
 				let obj = {};
