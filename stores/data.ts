@@ -98,7 +98,6 @@ export const useDataStore = defineStore("data", {
 				this.propStreamTexted = data[1];
 				this.foreclosureDailyTexted = data[2];
 				this.otherTexted = data[3];
-				console.log(data);
 			} catch (error) {
 				console.log(error);
 			}

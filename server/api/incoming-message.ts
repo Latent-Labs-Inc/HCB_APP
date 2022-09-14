@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
 	twiml.message("Thank you for your reply we will get back to you shortly");
 
-	const contactPhoneNumbers = ["+18134084221"];
+	const contactPhoneNumbers = ["+18134084221", "+18134750728"];
 
 	contactPhoneNumbers.forEach(async (number) => {
 		const res = await client.messages.create({

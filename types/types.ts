@@ -73,8 +73,8 @@ export interface IncomingMessage {
 	updated_at: string;
 	status: string;
 	direction: string;
-	error_code: string;
-	error_message: string;
+	errorCode: string;
+	errorMessage: string;
 	lead_id: string;
 	propertyAddress: Address;
 }
