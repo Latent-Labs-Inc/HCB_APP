@@ -134,5 +134,5 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 
-	return twiml.toString();
+	return { success: true };
 });
