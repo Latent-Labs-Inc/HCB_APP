@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
 	contactPhoneNumbers.forEach(async (number) => {
 		const res = await client.messages.create({
-			body: `New message from ${body.from} to ${body.to} with message: ${body.body}`,
+			body: `New message from ${body.From} to ${body.To} with message: ${body.Body}`,
 			from: config.private.TWILIO_PHONE_NUMBER,
 			to: number,
 		});
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
 		const { data } = await supabase
 			.from("profiles")
 			.select("*")
-			.contains("phoneNumbers", [body.to]);
+			.contains("phoneNumbers", [body.To]);
 		user_id = !!data[0] ? data[0].user_id : null;
 	} catch (error) {
 		console.log(error);
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
 				.from("leads")
 				.select("*")
 				.eq("user_id", user_id)
-				.contains("wireless", [body.from]);
+				.contains("wireless", [body.From]);
 
 			if (error) {
 				throw error;
@@ -76,17 +76,17 @@ export default defineEventHandler(async (event) => {
 				: { address1: "None Found", city: null, state: null, zip: null };
 			let incoming_message: IncomingMessage = {
 				user_id: !!user_id ? user_id : null,
-				message: body.body,
-				from: body.from,
-				to: body.to,
-				sid: body.sid + `_${counter}`,
-				created_at: body.date_created,
-				sent_at: body.date_sent,
-				updated_at: body.date_updated,
-				status: body.status,
-				direction: body.direction,
-				errorCode: body.error_code,
-				errorMessage: body.error_message,
+				message: body.Body,
+				from: body.From,
+				to: body.To,
+				sid: body.MessageSid,
+				created_at: new Date().toISOString(),
+				sent_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
+				status: body.MessageStatus,
+				direction: "inbound",
+				errorCode: null,
+				errorMessage: null,
 				lead_id: lead.lead_id,
 				propertyAddress: propertyAddress,
 			};
@@ -107,17 +107,17 @@ export default defineEventHandler(async (event) => {
 			: { address1: "None Found", city: null, state: null, zip: null };
 		let incoming_message: IncomingMessage = {
 			user_id: !!user_id ? user_id : null,
-			message: body.body,
-			from: body.from,
-			to: body.to,
-			sid: body.sid,
-			created_at: body.date_created,
-			sent_at: body.date_sent,
-			updated_at: body.date_updated,
-			status: body.status,
-			direction: body.direction,
-			errorCode: body.error_code,
-			errorMessage: body.error_message,
+			message: body.Body,
+			from: body.From,
+			to: body.To,
+			sid: body.MessageSid,
+			created_at: new Date().toISOString(),
+			sent_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+			status: body.MessageStatus,
+			direction: "inbound",
+			errorCode: null,
+			errorMessage: null,
 			lead_id: !!leads[0]?.lead_id ? leads[0].lead_id : null,
 			propertyAddress: propertyAddress,
 		};

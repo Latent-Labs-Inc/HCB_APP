@@ -80,28 +80,24 @@ export interface IncomingMessage {
 }
 
 export interface TwilioIncoming {
-	account_sid: string;
-	api_version: string;
-	body: string;
-	date_created: string;
-	date_sent: string;
-	date_updated: string;
-	direction: string;
-	error_code: null;
-	error_message: null;
-	from: string;
-	messaging_service_sid: string;
-	num_media: string;
-	num_segments: string;
-	price: null | string;
-	price_unit: null | string;
-	sid: string;
-	status: string;
-	subresource_uris: {
-		media: string;
-	};
-	to: string;
-	uri: string;
+	MessageSid: string;
+	AccountSid: string;
+	MessagingServiceSid: string;
+	From: string;
+	To: string;
+	Body: string;
+	NumMedia: string;
+	NumSegments: string;
+	ReferralNumMedia?: string;
+	FromCity: string;
+	FromState: string;
+	FromZip: string;
+	FromCountry: string;
+	ToCity: string;
+	ToState: string;
+	ToZip: string;
+	ToCountry: string;
+	MessageStatus: string;
 }
 
 export interface Filter {
