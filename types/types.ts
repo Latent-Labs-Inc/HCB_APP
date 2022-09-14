@@ -122,3 +122,19 @@ export interface Message {
 	lead_id: string;
 	propertyAddress: Address;
 }
+
+export interface TwilioCSV {
+	From: string;
+	To: string;
+	Body: string;
+	Status: string;
+	SentDate: string;
+	ApiVersion: string;
+	NumSegments: string;
+	ErrorCode: string;
+	AccountSid: string;
+	Sid: string;
+	Direction: string;
+	Price: string;
+	PriceUnit: string;
+}
