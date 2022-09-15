@@ -181,6 +181,9 @@ export default defineEventHandler(async (event) => {
 						.from("leads")
 						.update({ texted: true })
 						.eq("lead_id", lead?.lead_id);
+					if (error) {
+						throw error;
+					}
 				} catch (error) {
 					console.log(error);
 				}
