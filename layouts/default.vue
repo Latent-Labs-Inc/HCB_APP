@@ -16,7 +16,7 @@
 				<transition name="fade" mode="out-in">
 					<div
 						v-if="!uiStore.appLoading"
-						class="max-h-full dark:bg-black trans sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl mx-auto"
+						class="max-h-full dark:bg-black trans max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl mx-auto flex-grow"
 					>
 						<client-only>
 							<transition name="route-fade" mode="out-in" appear>
