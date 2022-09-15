@@ -106,15 +106,18 @@ const handleMessage = async ($event) => {
 		uiStore.toggleFunctionLoading(true);
 		const res = await $fetch("/api/send-message", {
 			method: "POST",
-			body: JSON.stringify({
+			body: {
 				message: !!message ? message : null,
 				leadProvider: leadProvider.value,
-				otherProvider: otherProviderInput.value,
+				otherProvider: !!otherProviderInput.value ? otherProviderInput.value : null,
 				leadType: leadType.value,
-				otherLeadType: otherLeadTypeInput.value,
+				otherLeadType: !!otherLeadTypeInput.value ? otherLeadTypeInput.value : null,
 				user_id: authStore.user_id,
-			}),
+			},
 		});
+
+		console.log(otherProviderInput.value);
+		console.log(otherLeadTypeInput.value);
 
 		console.log(res);
 		uiStore.toggleFunctionLoading(false);
