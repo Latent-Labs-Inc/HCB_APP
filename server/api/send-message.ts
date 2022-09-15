@@ -23,6 +23,10 @@ export default defineEventHandler(async (event) => {
 
 	const sentMessages = [] as Message[];
 
+	let messageCounter = 0;
+
+	let badNumberCounter = 0;
+
 	let error;
 
 	if (message === null) {
@@ -50,7 +54,7 @@ export default defineEventHandler(async (event) => {
 						.eq("user_id", user_id)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 100);
+						.range(0, 10);
 
 					if (error) {
 						throw error;
@@ -68,7 +72,7 @@ export default defineEventHandler(async (event) => {
 							leadProvider === "other" ? otherProvider : leadProvider
 						)
 						.eq("texted", false)
-						.range(0, 100);
+						.range(0, 10);
 					if (error) {
 						throw error;
 					}
@@ -84,7 +88,7 @@ export default defineEventHandler(async (event) => {
 						)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 100);
+						.range(0, 10);
 
 					if (error) {
 						throw error;
@@ -95,7 +99,9 @@ export default defineEventHandler(async (event) => {
 		} catch (error) {
 			console.log(error);
 		}
+
 		const badNumbers = [];
+
 		try {
 			const { data, error: badNumbersError } = await supabase
 				.from("bad_numbers")
@@ -105,6 +111,7 @@ export default defineEventHandler(async (event) => {
 			if (badNumbersError) {
 				throw badNumbersError;
 			}
+
 			data.forEach((badNumber) => {
 				badNumbers.push(badNumber.number);
 			});
@@ -113,62 +120,75 @@ export default defineEventHandler(async (event) => {
 		}
 
 		leads.forEach(async (lead) => {
-			lead.wireless.forEach(async (phone) => {
-				if (!badNumbers.includes(phone)) {
-					try {
-						const res = await client.messages.create({
-							body: message,
-							from: config.private.TWILIO_PHONE_NUMBER,
-							to: phone,
-						});
-
-						console.log(res);
-						if (!!res.errorMessage) {
-							throw res.errorMessage;
-						}
-
-						let sentMessage: Message = {
-							lead_id: lead.lead_id,
-							user_id: user_id,
-							message,
-							to: phone,
-							from: config.private.TWILIO_PHONE_NUMBER,
-							sid: res.sid,
-							status: res.status,
-							created_at: res.dateCreated,
-							sent_at: res.dateSent,
-							updated_at: res.dateUpdated,
-							direction: res.direction,
-							errorCode: res.errorCode,
-							errorMessage: res.errorMessage,
-							propertyAddress: lead.propertyAddress,
-						};
-						sentMessages.push(sentMessage);
+			if (lead.wireless.length > 0) {
+				lead.wireless.forEach(async (phone) => {
+					messageCounter++;
+					if (!badNumbers.includes(phone)) {
 						try {
-							const { error } = await supabase
-								.from("leads")
-								.update({ texted: true })
-								.eq("lead_id", lead?.lead_id);
-							const { error: err, data } = await supabase
-								.from("sent_messages")
-								.insert(sentMessage);
-							await supabase
-								.from("bad_numbers")
-								.insert({ number: phone, user_id: user_id });
-
-							if (error || err) {
-								throw error || err;
+							const res = await client.messages.create({
+								body: message,
+								from: config.private.TWILIO_PHONE_NUMBER,
+								to: phone,
+							});
+							console.log(res);
+							if (!!res.errorMessage) {
+								throw res.errorMessage;
+							}
+							let sentMessage: Message = {
+								lead_id: lead.lead_id,
+								user_id: user_id,
+								message,
+								to: phone,
+								from: config.private.TWILIO_PHONE_NUMBER,
+								sid: res.sid,
+								status: res.status,
+								created_at: res.dateCreated,
+								sent_at: !!res.dateSent ? res.dateSent : new Date(),
+								updated_at: res.dateUpdated,
+								direction: res.direction,
+								errorCode: res.errorCode,
+								errorMessage: res.errorMessage,
+								propertyAddress: lead.propertyAddress,
+							};
+							try {
+								const { error } = await supabase
+									.from("leads")
+									.update({ texted: true })
+									.eq("lead_id", lead?.lead_id);
+								const { error: err, data } = await supabase
+									.from("sent_messages")
+									.insert(sentMessage);
+								await supabase
+									.from("bad_numbers")
+									.insert({ number: phone, user_id: user_id });
+								if (error || err) {
+									throw error || err;
+								}
+							} catch (error) {
+								console.log(error);
 							}
 						} catch (error) {
 							console.log(error);
 						}
-					} catch (error) {
-						console.log(error);
+					} else {
+						console.log("bad number");
+						badNumberCounter++;
 					}
+				});
+			} else {
+				try {
+					const { error } = await supabase
+						.from("leads")
+						.update({ texted: true })
+						.eq("lead_id", lead?.lead_id);
+				} catch (error) {
+					console.log(error);
 				}
-			});
+			}
 		});
-
-		return { data: sentMessages };
+		console.log(messageCounter);
+		console.log(badNumberCounter);
+		console.log(sentMessages);
 	}
+	return { messageCounter, badNumberCounter, sentMessages };
 });
