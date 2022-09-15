@@ -116,10 +116,8 @@ const handleMessage = async ($event) => {
 			},
 		});
 
-		console.log(otherProviderInput.value);
-		console.log(otherTypeInput.value);
-
 		console.log(res);
+
 		uiStore.toggleFunctionLoading(false);
 		router.push("/messages");
 	} else {

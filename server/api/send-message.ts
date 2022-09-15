@@ -36,7 +36,6 @@ export default defineEventHandler(async (event) => {
 			value: !!otherType ? otherType : leadType,
 		});
 	}
-	console.log(filters);
 	let leads = [] as Lead[];
 
 	let sentMessages = [] as Message[];
@@ -47,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
 	let error;
 
-	let range = 19;
+	let range = 74;
 
 	if (message === null) {
 		error = new Error("Message is required");
