@@ -24,9 +24,6 @@
 				<p class="text-2xl text-center">Received Messages</p>
 				<MessageReceived />
 			</div>
-			<div>
-				<UiImporter :label="'Twilio Numbers'" :composable="useBadNumbers" />
-			</div>
 		</div>
 		<!-- <UiTable
 			:cols="cols"

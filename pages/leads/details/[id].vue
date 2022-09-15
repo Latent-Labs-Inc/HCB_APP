@@ -8,8 +8,12 @@
 			>
 				<div v-for="(key, index) in keys">
 					<p v-if="index + 1 <= 5">
-						{{ key.toTitle() }} :
+						Property {{ key.toTitle() }} :
 						{{ leadDetails.propertyAddress[key] }}
+					</p>
+					<p v-else-if="index + 1 >= 10 && index + 1 <= 13">
+						Mailing {{ key.toTitle() }} :
+						{{ leadDetails.mailingAddress[key] }}
 					</p>
 					<p v-else>{{ key.camel2title() }}: {{ leadDetails[key] }}</p>
 				</div>
@@ -53,10 +57,10 @@ const keys = ref([
 	"leadProvider",
 	"ownerFirstName",
 	"ownerLastName",
-	"ownerAddress.address1",
-	"ownerAddress.city",
-	"ownerAddress.state",
-	"ownerAddress.zip",
+	"address1",
+	"city",
+	"state",
+	"zip",
 	"wireless",
 	"landline",
 	"email",

@@ -2,6 +2,9 @@
 	<div>
 		<h3 class="header">Messages</h3>
 		<UiActionButtons :action-props="actionProps" @actionClicked="handleAction" />
+		<div>
+			<UiImporter :label="'Twilio Sent Numbers'" :composable="useBadNumbers" />
+		</div>
 	</div>
 </template>
 
