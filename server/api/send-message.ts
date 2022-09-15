@@ -121,8 +121,6 @@ export default defineEventHandler(async (event) => {
 			console.log(error);
 		}
 
-		console.log(leads);
-
 		leads.forEach(async (lead) => {
 			if (lead.wireless.length > 0) {
 				lead.wireless.forEach(async (phone) => {
@@ -160,6 +158,7 @@ export default defineEventHandler(async (event) => {
 							errorMessage: twilioMessage.errorMessage,
 							propertyAddress: lead.propertyAddress,
 						};
+
 						sentMessages.push(sentMessage);
 
 						try {
@@ -199,9 +198,10 @@ export default defineEventHandler(async (event) => {
 				console.log("no phone numbers in lead");
 			}
 		});
+		console.log(messageCounter);
+		console.log(badNumberCounter);
+		console.log(sentMessages);
 	}
-	console.log(messageCounter);
-	console.log(badNumberCounter);
-	console.log(sentMessages);
+
 	return { messageCounter, badNumberCounter, sentMessages };
 });

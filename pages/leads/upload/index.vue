@@ -82,9 +82,15 @@ const leadTypes = [
 
 const leadStore = useLeadStore();
 
+onMounted(() => {
+	leadStore.setLeadProvider("propStream");
+	leadStore.setLeadType("foreclosure");
+});
+
 watch(leadProvider, (newProvider) => {
 	leadStore.setLeadProvider(newProvider);
 });
+
 watch(leadType, (newType) => {
 	leadStore.setLeadType(newType);
 });

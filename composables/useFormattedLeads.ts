@@ -9,7 +9,10 @@ export default async function useFormattedLeads(data: any[]) {
 
 	const leadStore = useLeadStore();
 
+	console.log(leadStore.leadProvider, leadStore.leadType);
+
 	let keys = Object.keys(data[0]);
+
 	console.log(data[0]);
 	console.log(keys);
 
@@ -179,6 +182,72 @@ export default async function useFormattedLeads(data: any[]) {
 				}
 			}
 			formattedLeads.push(newLead);
+		});
+	} else if (leadStore.leadProvider === "propStream") {
+		data.forEach((lead) => {
+			if (!!lead["Company Name"]) {
+			} else {
+				let newLead: Lead = {
+					user_id: authStore.user_id,
+					lead_id: useUuid(),
+					created_at: new Date(),
+					modified_at: new Date(),
+					propertyAddress: {
+						address1: lead["Street Address"],
+						address2: !!lead["Street Address 2"] ? lead["Street Address 2"] : null,
+						city: lead["City"],
+						state: lead["State"],
+						zip: lead["Zip"],
+						county: !!lead["County"] ? lead["County"] : null,
+					},
+					ownerFirstName: lead["First Name"],
+					ownerLastName: lead["Last Name"],
+					wireless: [],
+					landline: [],
+					email: [],
+					prFirstName: lead["First Name"],
+					prLastName: lead["Last Name"],
+					leadProvider: leadStore.leadProvider,
+					leadType: leadStore.leadType,
+					texted: false,
+					emailed: false,
+					mailed: false,
+					fileDate: null,
+					mailingAddress: {
+						address1: lead["Mail Street Address"],
+						address2: !!lead["Mail Street Address 2"]
+							? lead["Mail Street Address 2"]
+							: null,
+						city: lead["Mail City"],
+						state: lead["Mail State"],
+						zip: lead["Mail Zip"],
+					},
+				};
+				for (let key in lead) {
+					let lowerCaseKey = key.toLowerCase();
+					lead[key] = lead[key].trim() || null;
+					if (lowerCaseKey.includes("e mail")) {
+						if (!!lead[key]) {
+							newLead.email.push(lead[key]);
+						}
+					} else if (
+						lowerCaseKey.includes("cell") ||
+						lowerCaseKey.includes("phone") ||
+						lowerCaseKey.includes("mobile")
+					) {
+						if (!!lead[key]) {
+							let newPhone = "+1" + lead[key].replace(/[^0-9]/g, "");
+							newLead.wireless.push(newPhone);
+						}
+					} else if (lowerCaseKey.includes("landline")) {
+						if (!!lead[key]) {
+							let newPhone = "+1" + lead[key].replace(/[^0-9]/g, "");
+							newLead.landline.push(newPhone);
+						}
+					}
+				}
+				formattedLeads.push(newLead);
+			}
 		});
 	}
 	console.log(formattedLeads);
