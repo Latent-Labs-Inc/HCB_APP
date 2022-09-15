@@ -1,6 +1,6 @@
 <template>
-	<nav class="w-48 min-h-screen flex flex-col bg-darkBg dark:bg-black">
-		<ul class="">
+	<nav class="min-h-screen bg-darkBg dark:bg-black">
+		<ul class="flex flex-col items-center gap-4">
 			<li class="sidebar-li"><NuxtLink to="/">Home</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/messages">Messages</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/leads">Leads</NuxtLink></li>
@@ -18,17 +18,15 @@
 }
 .sidebar-li {
 	font-size: 1.3rem;
-	@apply flex align-middle my-3 py-1 justify-center text-center trans rounded-3xl;
+	@apply flex align-middle py-1 px-6 justify-center text-center trans rounded-3xl;
 }
 .sidebar-li:hover {
 	cursor: pointer;
-	@apply bg-secondary dark:bg-darkPrimary py-2 rounded-full;
+	@apply bg-secondary dark:bg-darkPrimary py-2 px-8 rounded-full;
 }
 a {
 	text-decoration: none;
 	color: white;
-	display: inline-block;
-	width: 100%;
 }
 a.active,
 a.router-link-exact-active {

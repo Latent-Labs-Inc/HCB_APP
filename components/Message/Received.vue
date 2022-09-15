@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div>
+		<div class="flex flex-col justify-center items-center">
 			<div class="flex justify-center">
 				<UiSearchInline
 					v-model="searchInput"
@@ -9,6 +9,7 @@
 				/>
 			</div>
 			<UiTable
+				class=""
 				:cols="cols"
 				:grid-cols="'grid-cols-5'"
 				:dropdown-items="dropdownItems"
