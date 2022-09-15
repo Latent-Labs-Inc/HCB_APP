@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 						.select("*")
 						.eq("user_id", user_id)
 						.eq("texted", false)
-						.range(0, 10);
+						.range(0, 100);
 					if (error) {
 						throw error;
 					}
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
 						.eq("user_id", user_id)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 10);
+						.range(0, 100);
 
 					if (error) {
 						throw error;
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
 							leadProvider === "other" ? otherProvider : leadProvider
 						)
 						.eq("texted", false)
-						.range(0, 10);
+						.range(0, 100);
 					if (error) {
 						throw error;
 					}
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
 						)
 						.eq("leadType", leadType === "other" ? otherType : leadType)
 						.eq("texted", false)
-						.range(0, 10);
+						.range(0, 100);
 
 					if (error) {
 						throw error;
@@ -119,11 +119,14 @@ export default defineEventHandler(async (event) => {
 			console.log(error);
 		}
 
+		console.log(leads);
+
 		leads.forEach(async (lead) => {
 			if (lead.wireless.length > 0) {
 				lead.wireless.forEach(async (phone) => {
 					messageCounter++;
 					if (!badNumbers.includes(phone)) {
+						let twilioMessage;
 						try {
 							const res = await client.messages.create({
 								body: message,
@@ -131,41 +134,45 @@ export default defineEventHandler(async (event) => {
 								to: phone,
 							});
 							console.log(res);
+							twilioMessage = res;
 							if (!!res.errorMessage) {
 								throw res.errorMessage;
 							}
-							let sentMessage: Message = {
-								lead_id: lead.lead_id,
-								user_id: user_id,
-								message,
-								to: phone,
-								from: config.private.TWILIO_PHONE_NUMBER,
-								sid: res.sid,
-								status: res.status,
-								created_at: res.dateCreated,
-								sent_at: !!res.dateSent ? res.dateSent : new Date(),
-								updated_at: res.dateUpdated,
-								direction: res.direction,
-								errorCode: res.errorCode,
-								errorMessage: res.errorMessage,
-								propertyAddress: lead.propertyAddress,
-							};
-							try {
-								const { error } = await supabase
-									.from("leads")
-									.update({ texted: true })
-									.eq("lead_id", lead?.lead_id);
-								const { error: err, data } = await supabase
-									.from("sent_messages")
-									.insert(sentMessage);
-								await supabase
-									.from("bad_numbers")
-									.insert({ number: phone, user_id: user_id });
-								if (error || err) {
-									throw error || err;
-								}
-							} catch (error) {
-								console.log(error);
+						} catch (error) {
+							console.log(error);
+						}
+
+						let sentMessage: Message = {
+							lead_id: lead.lead_id,
+							user_id: user_id,
+							message,
+							to: phone,
+							from: config.private.TWILIO_PHONE_NUMBER,
+							sid: twilioMessage.sid,
+							status: twilioMessage.status,
+							created_at: twilioMessage.dateCreated,
+							sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
+							updated_at: twilioMessage.dateUpdated,
+							direction: twilioMessage.direction,
+							errorCode: twilioMessage.errorCode,
+							errorMessage: twilioMessage.errorMessage,
+							propertyAddress: lead.propertyAddress,
+						};
+						sentMessages.push(sentMessage);
+
+						try {
+							const { error } = await supabase
+								.from("leads")
+								.update({ texted: true })
+								.eq("lead_id", lead?.lead_id);
+							const { error: err, data } = await supabase
+								.from("sent_messages")
+								.insert(sentMessage);
+							await supabase
+								.from("bad_numbers")
+								.insert({ number: phone, user_id: user_id });
+							if (error || err) {
+								throw error || err;
 							}
 						} catch (error) {
 							console.log(error);
@@ -187,6 +194,7 @@ export default defineEventHandler(async (event) => {
 				} catch (error) {
 					console.log(error);
 				}
+				console.log("no phone numbers in lead");
 			}
 		});
 		console.log(messageCounter);
