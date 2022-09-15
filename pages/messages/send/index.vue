@@ -19,7 +19,7 @@
 			<transition name="fade" mode="out-in">
 				<div class="flex justify-center gap-4" v-if="leadType === 'other'">
 					<label for="">Other: </label>
-					<input type="text" v-model="otherLeadTypeInput" />
+					<input type="text" v-model="otherTypeInput" />
 				</div>
 			</transition>
 		</div>
@@ -68,7 +68,7 @@ const providerTypes = [
 
 const leadType = ref("all");
 
-const otherLeadTypeInput = ref("");
+const otherTypeInput = ref("");
 
 const leadTypes = [
 	{
@@ -111,13 +111,13 @@ const handleMessage = async ($event) => {
 				leadProvider: leadProvider.value,
 				otherProvider: !!otherProviderInput.value ? otherProviderInput.value : null,
 				leadType: leadType.value,
-				otherLeadType: !!otherLeadTypeInput.value ? otherLeadTypeInput.value : null,
+				otherType: !!otherTypeInput.value ? otherTypeInput.value : null,
 				user_id: authStore.user_id,
 			},
 		});
 
 		console.log(otherProviderInput.value);
-		console.log(otherLeadTypeInput.value);
+		console.log(otherTypeInput.value);
 
 		console.log(res);
 		uiStore.toggleFunctionLoading(false);
@@ -137,7 +137,7 @@ watch(leadProvider, (newType) => {
 
 watch(leadType, (newType) => {
 	if (newType === "other") {
-		leadStore.setLeadType(otherLeadTypeInput.value);
+		leadStore.setLeadType(otherTypeInput.value);
 	} else {
 		leadStore.setLeadType(newType);
 	}
