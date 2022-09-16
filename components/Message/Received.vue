@@ -76,7 +76,7 @@ const handleItemClick = (item, row) => {
 	if (item.id === "view") {
 		router.push(`/leads/details/${row.lead_id}`);
 	} else if (item.id === "reply") {
-		router.push(`/leads/reply/${row.lead_id}`);
+		router.push(`/leads/details/reply/${row.from}`);
 	}
 };
 
