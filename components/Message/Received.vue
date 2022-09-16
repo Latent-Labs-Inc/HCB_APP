@@ -43,8 +43,8 @@ const properties = ref([
 ]);
 
 const dropdownItems = ref([
-	{ id: "message", label: "Message" },
 	{ id: "view", label: "View Lead Info" },
+	{ id: "reply", label: "Reply" },
 	{ id: "delete", label: "Delete Message" },
 ]);
 
@@ -75,6 +75,8 @@ const handleItemClick = (item, row) => {
 	console.log(item, row);
 	if (item.id === "view") {
 		router.push(`/leads/details/${row.lead_id}`);
+	} else if (item.id === "reply") {
+		router.push(`/leads/reply/${row.lead_id}`);
 	}
 };
 
