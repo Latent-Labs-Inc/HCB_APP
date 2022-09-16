@@ -149,7 +149,7 @@ const removeLeads = async () => {
 			value: true,
 		});
 	}
-
-	const res = await leadStore.removeLeads(filters);
+	console.log(filters);
+	// const res = await leadStore.removeLeads(filters);
 };
 </script>
