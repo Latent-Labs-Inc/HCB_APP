@@ -62,7 +62,7 @@ export default async function useFormattedLeads(data: any[]) {
 				for (let key in lead) {
 					let lowerCaseKey = key.toLowerCase();
 					lead[key] = lead[key].trim() || null;
-					if (lowerCaseKey.includes("e mail")) {
+					if (lowerCaseKey.includes("email")) {
 						if (!!lead[key]) {
 							newLead.email.push(lead[key]);
 						}
@@ -286,7 +286,7 @@ export default async function useFormattedLeads(data: any[]) {
 				for (let key in lead) {
 					let lowerCaseKey = key.toLowerCase();
 					lead[key] = lead[key].trim() || null;
-					if (lowerCaseKey.includes("e mail")) {
+					if (lowerCaseKey.includes("email")) {
 						if (!!lead[key]) {
 							newLead.email.push(lead[key]);
 						}
