@@ -30,13 +30,15 @@
 import { useMessageStore } from "~~/stores/message";
 import { useUiStore } from "~~/stores/ui";
 import { useLeadStore } from "~~/stores/lead";
-import { IncomingMessage } from "h3";
+import { useAuthStore } from "~~/stores/auth";
+
 import { Message } from "~~/types/types";
 
 const route = useRoute();
 const router = useRouter();
 const uiStore = useUiStore();
 const leadStore = useLeadStore();
+const authStore = useAuthStore();
 
 const phone = ref(route.params.phone as string);
 
@@ -57,12 +59,14 @@ const message = ref("");
 
 const sendMessage = async () => {
 	uiStore.toggleFunctionLoading(true);
-	const res = await $fetch("/api/messages", {
+	const res = await $fetch("/api/send-message", {
 		method: "POST",
-		body: JSON.stringify({
+		body: {
 			to: phone.value,
 			message: message.value,
-		}),
+			user_id: authStore.user_id,
+			lead_id: leadStore.lead_id,
+		},
 	});
 	console.log(res);
 	uiStore.toggleFunctionLoading(false);
