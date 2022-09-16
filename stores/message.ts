@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Lead, IncomingMessage } from "~/types/types";
+import { Lead, IncomingMessage, Message } from "~/types/types";
 
 export const useMessageStore = defineStore("message", {
 	state: () => ({
@@ -24,6 +24,29 @@ export const useMessageStore = defineStore("message", {
 				}
 				this.messages = data;
 				return this.messages;
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		async fetchConversation(phone: string) {
+			try {
+				console.log("fetching conversation from ", phone);
+				const { $supabase } = useNuxtApp();
+				const { data: received, error } = await $supabase
+					.from("incoming_messages")
+					.select("*")
+					.eq("from", phone)
+					.order("created_at", { ascending: false });
+				const { data: sent, error: err } = await $supabase
+					.from("sent_messages")
+					.select("*")
+					.eq("to", phone)
+					.order("created_at", { ascending: false });
+				if (error || err) {
+					throw error || err;
+				}
+				let conversation = [...received, ...sent];
+				return conversation;
 			} catch (error) {
 				console.log(error);
 			}

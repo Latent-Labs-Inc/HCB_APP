@@ -104,7 +104,7 @@ const handleMessage = async ($event) => {
 
 	if (!!message) {
 		uiStore.toggleFunctionLoading(true);
-		const res = await $fetch("/api/send-message", {
+		const res = await $fetch("/api/message-leads", {
 			method: "POST",
 			body: {
 				message: !!message ? message : null,

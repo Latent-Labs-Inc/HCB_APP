@@ -26,9 +26,11 @@
 import { useMessageStore } from "~/stores/message";
 import { IncomingMessage } from "~/types/types";
 import { useUiStore } from "~/stores/ui";
+import { useLeadStore } from "~~/stores/lead";
 
 const searchInput = ref("+1");
 const messageStore = useMessageStore();
+const leadStore = useLeadStore();
 const router = useRouter();
 const uiStore = useUiStore();
 
@@ -76,6 +78,7 @@ const handleItemClick = (item, row) => {
 	if (item.id === "view") {
 		router.push(`/leads/details/${row.lead_id}`);
 	} else if (item.id === "reply") {
+		leadStore.setSelectedLeadId(row.lead_id);
 		router.push(`/leads/details/reply/${row.from}`);
 	}
 };

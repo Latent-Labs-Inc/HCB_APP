@@ -8,6 +8,7 @@ export const useLeadStore = defineStore("lead", {
 		leadSelected: null,
 		leadType: null,
 		leadProvider: null,
+		lead_id: null,
 	}),
 	getters: {
 		getLeadById: (state) => (id) => {
@@ -15,6 +16,9 @@ export const useLeadStore = defineStore("lead", {
 		},
 	},
 	actions: {
+		setSelectedLeadId(lead_id) {
+			this.lead_id = lead_id;
+		},
 		async fetchLeads() {
 			const { $supabase } = useNuxtApp();
 			try {
