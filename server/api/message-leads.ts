@@ -125,6 +125,7 @@ export default defineEventHandler(async (event) => {
 				lead.wireless.forEach(async (phone) => {
 					messageCounter++;
 					if (!badNumbers.includes(phone)) {
+						badNumbers.push(phone);
 						let twilioMessage;
 						try {
 							const res = await client.messages.create({
