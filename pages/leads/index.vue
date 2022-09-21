@@ -9,6 +9,7 @@
 // import IconUser from "~icons/fa-solid/user";
 import IconRemove from "~icons/fa-solid/trash";
 import IconUpload from "~icons/fa-solid/file-download";
+import IconFavorite from "~icons/fa-solid/star";
 
 import { useAuthStore } from "~/stores/auth";
 import { ActionProps, Lead } from "~~/types/types";
@@ -27,6 +28,11 @@ const actionProps: ActionProps[] = [
 		name: "Remove Leads",
 		icon: IconRemove,
 	},
+	{
+		id: "viewFavorites",
+		name: "View Favorites",
+		icon: IconFavorite,
+	},
 ];
 
 const searchInput = ref("");
@@ -38,6 +44,8 @@ const handleAction = async (action: string) => {
 		router.push("/leads/remove");
 	} else if (action === "uploadLeads") {
 		router.push("/leads/upload");
+	} else if (action === "viewFavorites") {
+		router.push("/leads/favorites");
 	}
 };
 

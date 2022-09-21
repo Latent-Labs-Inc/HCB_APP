@@ -9,6 +9,7 @@ export const useLeadStore = defineStore("lead", {
 		leadType: null,
 		leadProvider: null,
 		lead_id: null,
+		favorites: [],
 	}),
 	getters: {
 		getLeadById: (state) => (id) => {
@@ -26,6 +27,38 @@ export const useLeadStore = defineStore("lead", {
 					.from("leads")
 					.select("*")
 					.eq("favorite", true);
+				if (error) {
+					throw error;
+				}
+				this.favorites = data;
+				return data;
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		async favorite(lead_id) {
+			const { $supabase } = useNuxtApp();
+			try {
+				const { data, error } = await $supabase
+					.from("leads")
+					.update({ favorite: true })
+					.eq("lead_id", lead_id);
+				if (error) {
+					throw error;
+				}
+
+				return data;
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		async unfavorite(lead_id) {
+			const { $supabase } = useNuxtApp();
+			try {
+				const { data, error } = await $supabase
+					.from("leads")
+					.update({ favorite: false })
+					.eq("lead_id", lead_id);
 				if (error) {
 					throw error;
 				}

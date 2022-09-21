@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { useMessageStore } from "~/stores/message";
-import { IncomingMessage } from "~/types/types";
+import { IncomingMessage, Lead } from "~/types/types";
 import { useUiStore } from "~/stores/ui";
 import { useLeadStore } from "~~/stores/lead";
 
@@ -48,6 +48,7 @@ const dropdownItems = ref([
 	{ id: "view", label: "View Lead Info" },
 	{ id: "reply", label: "Reply" },
 	{ id: "delete", label: "Delete Message" },
+	{ id: "favorite", label: "Favorite" },
 ]);
 
 const tableData = ref([] as IncomingMessage[]);
@@ -80,6 +81,8 @@ const handleItemClick = (item, row) => {
 	} else if (item.id === "reply") {
 		leadStore.setSelectedLeadId(row.lead_id);
 		router.push(`/leads/details/reply/${row.from}`);
+	} else if (item.id === "favorite") {
+		leadStore.favorite(row.lead_id);
 	}
 };
 

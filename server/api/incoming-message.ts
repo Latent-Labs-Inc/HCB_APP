@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
 
 	const twiml = new MessagingResponse();
 
-	twiml.message("Thank you for your reply we will get back to you shortly");
+	twiml.message("Thank you for your reply!");
 
 	const contactPhoneNumbers = ["+18134084221"];
 
@@ -134,5 +134,5 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 
-	return { success: true };
+	return twiml.toString();
 });
