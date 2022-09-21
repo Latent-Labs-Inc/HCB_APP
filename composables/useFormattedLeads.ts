@@ -16,10 +16,7 @@ export default async function useFormattedLeads(data: any[]) {
 	console.log(data[0]);
 	console.log(keys);
 
-	if (
-		leadStore.leadProvider === "foreclosureDaily" &&
-		leadStore.leadType === "probate"
-	) {
+	if (leadStore.leadProvider === "foreclosureDaily") {
 		data.forEach((lead) => {
 			if (!!lead["Company Name"]) {
 			} else {
@@ -41,8 +38,8 @@ export default async function useFormattedLeads(data: any[]) {
 					wireless: [],
 					landline: [],
 					email: [],
-					prFirstName: lead["First Name"],
-					prLastName: lead["Last Name"],
+					prFirstName: lead["First Name"] || null,
+					prLastName: lead["Last Name"] || null,
 					leadProvider: leadStore.leadProvider,
 					leadType: leadStore.leadType,
 					texted: false,
@@ -85,48 +82,6 @@ export default async function useFormattedLeads(data: any[]) {
 				formattedLeads.push(newLead);
 			}
 		});
-		// data.forEach((lead) => {
-		// 	let newLead: Lead = {
-		// 		user_id: authStore.user_id,
-		// 		lead_id: useUuid(),
-		// 		created_at: new Date(),
-		// 		modified_at: new Date(),
-		// 		propertyAddress: {
-		// 			address1: lead["Property Address"],
-		// 			address2: null,
-		// 			city: lead["Property City"],
-		// 			state: lead["Property State"],
-		// 			zip: lead["Property Zip"],
-		// 			county: lead["County"],
-		// 		},
-		// 		ownerFirstName: lead["First Name"],
-		// 		ownerLastName: lead["Last Name"],
-		// 		prAddress: {
-		// 			address1: lead["PR Address"],
-		// 			address2: null,
-		// 			city: lead["PR City"],
-		// 			state: lead["PR State"],
-		// 			zip: lead["PR Zip"],
-		// 		},
-		// 		prFirstName: lead["PR First Name"],
-		// 		prLastName: lead["PR Last Name"],
-		// 		mailingAddress: {
-		// 			address1: lead["Mailing Address"],
-		// 			address2: null,
-		// 			city: lead["Mailing City"],
-		// 			state: lead["Mailing State"],
-		// 			zip: lead["Mailing Zip"],
-		// 		},
-		// 		wireless: [],
-		// 		landline: [],
-		// 		email: [],
-		// 		leadProvider: leadStore.leadProvider,
-		// 		leadType: leadStore.leadType,
-		// 		texted: false,
-		// 		emailed: false,
-		// 		mailed: false,
-		// 		fileDate: lead["File Date"],
-		// 	};
 	} else if (
 		leadStore.leadProvider === "fiverr" &&
 		leadStore.leadType === "highEquity"

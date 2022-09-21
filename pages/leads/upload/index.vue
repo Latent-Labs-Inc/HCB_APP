@@ -21,7 +21,11 @@
 				</div>
 			</transition>
 			<div>
-				<UiImporter :label="'Leads'" :composable="useFormattedLeads" />
+				<UiImporter
+					:label="'Leads'"
+					:composable="useFormattedLeads"
+					:redirect="'/leads'"
+				/>
 			</div>
 		</div>
 	</div>

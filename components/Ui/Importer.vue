@@ -47,10 +47,12 @@ import { useUiStore } from "~~/stores/ui";
 
 const props = defineProps<{
 	label: string;
+	redirect: string;
 	composable: (aoa) => void;
 }>();
 
 const uiStore = useUiStore();
+const router = useRouter();
 const selectedFile = ref<any>(null);
 const fileType = ref<"xlsx" | "csv">(null);
 const fileWasImported = ref(false);
@@ -167,7 +169,7 @@ const uploadData = async () => {
 
 			await props.composable(result);
 		};
-
+		router.push(`${props.redirect}`);
 		uiStore.toggleAppLoading(false);
 	}
 	clearFile();
