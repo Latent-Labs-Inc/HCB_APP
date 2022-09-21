@@ -57,8 +57,9 @@ const setTableData = async () => {
 	uiStore.toggleFunctionLoading(true);
 	const messages: IncomingMessage[] = await messageStore.fetchMessages();
 	messages.forEach((message) => {
-		message.message = message.message.toLowerCase();
-		if (!message.message.includes("stop")) {
+		let regex = /stop|no|harassment|fuck/gi;
+
+		if (!message.message.match(regex)) {
 			tableData.value.push(message);
 		}
 	});
