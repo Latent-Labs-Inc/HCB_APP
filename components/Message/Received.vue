@@ -55,8 +55,13 @@ const tableData = ref([] as IncomingMessage[]);
 
 const setTableData = async () => {
 	uiStore.toggleFunctionLoading(true);
-	tableData.value = await messageStore.fetchMessages();
-
+	const messages: IncomingMessage[] = await messageStore.fetchMessages();
+	messages.forEach((message) => {
+		message.message = message.message.toLowerCase();
+		if (!message.message.includes("stop")) {
+			tableData.value.push(message);
+		}
+	});
 	tableData.value.forEach((msg) => {
 		msg.sent_at = new Date(msg.sent_at).toLocaleString();
 	});
