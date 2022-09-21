@@ -32,11 +32,11 @@ const cols = ref([
 ]);
 
 const properties = ref([
-	"object.propertyAddress.address1",
-	"object.propertyAddress.zip",
+	"propertyAddress.address1",
+	"propertyAddress.zip",
 	"ownerFirstName",
 	"ownerLastName",
-	"wireless",
+	"favoritePhone",
 	"dropdown",
 ]);
 
@@ -54,18 +54,25 @@ const dropdownItems = ref([
 		label: "Reply",
 		id: "reply",
 	},
+	{
+		label: "View Details",
+		id: "details",
+	},
 ] as Item[]);
 
 const handleItemClick = (item: Item, lead) => {
 	if (item.id === "unfavorite") {
 		leadStore.unfavorite(lead.lead_id);
 	} else if (item.id === "reply") {
-		router.push(`/leads/details/reply/${lead.wireless}`);
+		router.push(`/leads/details/reply/${lead.favoritePhone}`);
+	} else if (item.id === "details") {
+		router.push(`/leads/details/${lead.lead_id}`);
 	}
 };
 
 onMounted(async () => {
-	leads.value = await leadStore.getFavorites();
+	const favoriteLeads = await leadStore.getFavorites();
+	leads.value = favoriteLeads;
 	console.log(leads.value);
 	forceUpdate.value++;
 });

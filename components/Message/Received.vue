@@ -37,7 +37,7 @@ const uiStore = useUiStore();
 const cols = ref(["Property Address", "Phone Number", "Last Message", "Date"]);
 
 const properties = ref([
-	"object.propertyAddress.address1",
+	"propertyAddress.address1",
 	"from",
 	"message",
 	"sent_at",
@@ -82,7 +82,7 @@ const handleItemClick = (item, row) => {
 		leadStore.setSelectedLeadId(row.lead_id);
 		router.push(`/leads/details/reply/${row.from}`);
 	} else if (item.id === "favorite") {
-		leadStore.favorite(row.lead_id);
+		leadStore.favorite(row.lead_id, row.from);
 	}
 };
 

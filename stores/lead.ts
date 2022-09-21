@@ -36,17 +36,16 @@ export const useLeadStore = defineStore("lead", {
 				console.log(error);
 			}
 		},
-		async favorite(lead_id) {
+		async favorite(lead_id, from) {
 			const { $supabase } = useNuxtApp();
 			try {
 				const { data, error } = await $supabase
 					.from("leads")
-					.update({ favorite: true })
+					.update({ favorite: true, favoritePhone: from })
 					.eq("lead_id", lead_id);
 				if (error) {
 					throw error;
 				}
-
 				return data;
 			} catch (error) {
 				console.log(error);

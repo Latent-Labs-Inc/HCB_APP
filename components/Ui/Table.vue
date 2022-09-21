@@ -31,7 +31,7 @@
 							</div>
 							<div v-else-if="key.includes('.')">
 								<div>
-									{{ row[key.split(".")[1]][key.split(".")[2]] }}
+									{{ row[key.split(".")[0]][key.split(".")[1]] }}
 								</div>
 							</div>
 							<div v-else>{{ row[key] }}</div>
@@ -85,16 +85,6 @@ const props = defineProps<{
 	properties: string[];
 	dropdownItems: Item[];
 }>();
-
-// const propObjKeys = ref([] as string[]);
-
-// for (let index in props.properties) {
-// 	if (props.properties[index].split(".").length > 1) {
-// 		let propObjStr = props.properties[index];
-// 		let properties = propObjStr.split(".");
-// 		propObjKeys.value = properties.splice(1, properties.length);
-// 	}
-// }
 
 const items = ref(props.tableData);
 
