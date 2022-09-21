@@ -19,6 +19,21 @@ export const useLeadStore = defineStore("lead", {
 		setSelectedLeadId(lead_id) {
 			this.lead_id = lead_id;
 		},
+		async getFavorites() {
+			const { $supabase } = useNuxtApp();
+			try {
+				const { data, error } = await $supabase
+					.from("leads")
+					.select("*")
+					.eq("favorite", true);
+				if (error) {
+					throw error;
+				}
+				return data;
+			} catch (error) {
+				console.log(error);
+			}
+		},
 		async fetchLeads() {
 			const { $supabase } = useNuxtApp();
 			try {
