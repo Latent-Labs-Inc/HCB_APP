@@ -18,7 +18,8 @@
 					rows="2"
 				></textarea>
 				<div class="flex mt-2">
-					<button class="mr-auto w-32" @click="viewLead">View Lead</button>
+					<button class="reverse mr-auto w-32" @click="viewLead">View Lead</button>
+					<button class="w-32" @click="handleFavorites">Favorite</button>
 					<button class="reverse ml-auto w-32" @click="sendMessage">Send</button>
 				</div>
 			</div>
@@ -59,31 +60,45 @@ const message = ref("");
 
 const sendMessage = async () => {
 	uiStore.toggleFunctionLoading(true);
-	const res = await $fetch("/api/send-message", {
-		method: "POST",
-		body: {
-			to: phone.value,
-			message: message.value,
-			user_id: authStore.user_id,
-			lead_id: leadStore.lead_id,
-		},
-	});
-	console.log(res);
-	uiStore.toggleFunctionLoading(false);
+	try {
+		const res = await $fetch("/api/send-message", {
+			method: "POST",
+			body: {
+				to: phone.value,
+				message: message.value,
+				user_id: authStore.user_id,
+				lead_id: leadStore.lead_id,
+			},
+		});
+		if (res.statusCode === 200) {
+			await getConversation();
+			uiStore.toggleFunctionLoading(false);
+		}
+	} catch (err) {
+		console.log(err);
+	}
 };
 
-onBeforeMount(async () => {
-	uiStore.toggleFunctionLoading(true);
+const getConversation = async () => {
 	conversation.value = await messageStore.fetchConversation(phone.value);
 	// sort the conversation arr by date
 	conversation.value.sort((a, b) => {
 		return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
 	});
+};
+
+onBeforeMount(async () => {
+	uiStore.toggleFunctionLoading(true);
+	await getConversation();
 	uiStore.toggleFunctionLoading(false);
 });
 
 const viewLead = async () => {
 	router.push(`/leads/details/${leadStore.lead_id}`);
+};
+
+const handleFavorites = () => {
+	leadStore.favorite(leadStore.lead_id, phone.value);
 };
 </script>
 

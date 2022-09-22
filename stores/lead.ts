@@ -4,16 +4,16 @@ import { useAuthStore } from "./auth";
 
 export const useLeadStore = defineStore("lead", {
 	state: () => ({
-		leads: [],
-		leadSelected: null,
-		leadType: null,
-		leadProvider: null,
-		lead_id: null,
+		leads: [] as Lead[],
+		leadSelected: null as Lead | null,
+		leadType: null as string | null,
+		leadProvider: null as string | null,
+		lead_id: null as string,
 		favorites: [],
 	}),
 	getters: {
 		getLeadById: (state) => (id) => {
-			return state.leads.find((lead) => lead.id === id);
+			return state.leads.find((lead) => lead.lead_id === id);
 		},
 	},
 	actions: {
