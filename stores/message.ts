@@ -57,7 +57,8 @@ export const useMessageStore = defineStore("message", {
 				const { data, error } = await $supabase
 					.from("incoming_messages")
 					.select("*")
-					.like("from", `%${phone}%`);
+					.like("from", `%${phone}%`)
+					.order("created_at", { ascending: false });
 				if (error) {
 					throw error;
 				}
