@@ -72,6 +72,7 @@ const sendMessage = async () => {
 		});
 		if (res.statusCode === 200) {
 			await getConversation();
+			message.value = "";
 			uiStore.toggleFunctionLoading(false);
 		}
 	} catch (err) {
