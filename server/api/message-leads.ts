@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
 	let error;
 
-	let range = 74;
+	let range = 100;
 
 	if (message === null) {
 		error = new Error("Message is required");
@@ -192,7 +192,7 @@ export default defineEventHandler(async (event) => {
 					if (error) {
 						throw error;
 					}
-					console.log("updated leads to texted true", data);
+					console.log("updated leads to texted true");
 				} catch (error) {
 					console.log(error);
 				}
