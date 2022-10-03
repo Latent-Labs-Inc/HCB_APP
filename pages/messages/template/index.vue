@@ -50,6 +50,9 @@ const handleSave = async () => {
 				name: input.templateName,
 				message: input.message,
 				user_id: authStore.user.id,
+				message_id: useUuid(),
+				created_at: new Date(),
+				modified_at: new Date(),
 			},
 		]);
 		if (error) {

@@ -24,7 +24,7 @@
 			</transition>
 		</div>
 		<div class="my-2">
-			<MessageSend @send="handleMessage" />
+			<MessageSend @send="handleMessage" :usingTemplate="isTemplate" />
 		</div>
 	</div>
 </template>
@@ -40,6 +40,7 @@ const uiStore = useUiStore();
 const router = useRouter();
 
 const leadProvider = ref("all");
+const usingTemplate = ref(false);
 
 const otherProviderInput = ref("");
 
