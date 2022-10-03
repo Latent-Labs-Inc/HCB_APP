@@ -185,17 +185,17 @@ export default defineEventHandler(async (event) => {
 				});
 			} else {
 				try {
-					const { error } = await supabase
+					const { data, error } = await supabase
 						.from("leads")
 						.update({ texted: true })
 						.eq("lead_id", lead?.lead_id);
 					if (error) {
 						throw error;
 					}
+					console.log("updated leads to texted true", data);
 				} catch (error) {
 					console.log(error);
 				}
-				console.log("no phone numbers in lead");
 			}
 		});
 		console.log(messageCounter);
