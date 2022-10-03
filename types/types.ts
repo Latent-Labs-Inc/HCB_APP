@@ -138,3 +138,16 @@ export interface TwilioCSV {
 	Price: string;
 	PriceUnit: string;
 }
+
+export interface Template {
+	name: string;
+	template_id: string;
+	message: string;
+	created_at: Date;
+	modified_at: Date;
+	user_id: string;
+}
+export interface Item {
+	id: string;
+	label: string;
+}

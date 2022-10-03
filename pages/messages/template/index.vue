@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "~~/stores/auth";
 import { useUiStore } from "~~/stores/ui";
+import { Template } from "~~/types/types";
 
 const uiStore = useUiStore();
 
@@ -50,11 +51,11 @@ const handleSave = async () => {
 				name: input.templateName,
 				message: input.message,
 				user_id: authStore.user.id,
-				message_id: useUuid(),
+				template_id: useUuid(),
 				created_at: new Date(),
 				modified_at: new Date(),
 			},
-		]);
+		] as Template[]);
 		if (error) {
 			throw error;
 		}

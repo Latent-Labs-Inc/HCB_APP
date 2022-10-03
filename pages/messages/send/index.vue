@@ -22,14 +22,36 @@
 					<input type="text" v-model="otherTypeInput" />
 				</div>
 			</transition>
+			<transition name="fade" mode="out-in">
+				<div v-if="!templateSelected.template_id">
+					<div class="">
+						<p class="mx-auto text-center mb-5 text-lg">Use Template?</p>
+						<UiRadio v-model.trim="isTemplate" :radio-types="templateRadio" />
+					</div>
+					<MessageTemplateSearch
+						v-if="isTemplate === 'yes'"
+						:isTemplate="isTemplate"
+						:useTable="useTable"
+						@selected="handleSelected"
+					/>
+				</div>
+				<div v-else class="flex flex-col gap-4">
+					<p>Selected Message: {{ templateSelected.message }}</p>
+					<button class="mx-auto" @click="handleChange">Change Message</button>
+				</div>
+			</transition>
 		</div>
 		<div class="my-2">
-			<MessageSend @send="handleMessage" :usingTemplate="isTemplate" />
+			<MessageSend
+				@send="handleMessage"
+				:usingTemplate="isTemplate === 'no' ? true : false"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { Template } from "~~/types/types";
 import { useLeadStore } from "~/stores/lead";
 import { useUiStore } from "~/stores/ui";
 import { useAuthStore } from "~~/stores/auth";
@@ -40,7 +62,12 @@ const uiStore = useUiStore();
 const router = useRouter();
 
 const leadProvider = ref("all");
-const usingTemplate = ref(false);
+const isTemplate = ref("no");
+const templateRadio = ref([
+	{ label: "Yes", id: "yes" },
+	{ label: "No", id: "no" },
+]);
+const useTable = ref(false);
 
 const otherProviderInput = ref("");
 
@@ -68,6 +95,8 @@ const providerTypes = [
 ];
 
 const leadType = ref("all");
+
+const templateSelected = ref({} as Template);
 
 const otherTypeInput = ref("");
 
@@ -101,8 +130,9 @@ const leadTypes = [
 const msgInvalid = ref(false);
 
 const handleMessage = async ($event) => {
-	const message = $event;
-
+	const message =
+		isTemplate.value === "yes" ? templateSelected.value.message : $event;
+	console.log(message);
 	if (!!message) {
 		uiStore.toggleFunctionLoading(true);
 		const res = await $fetch("/api/message-leads", {
@@ -141,4 +171,12 @@ watch(leadType, (newType) => {
 		leadStore.setLeadType(newType);
 	}
 });
+
+const handleSelected = (template: Template) => {
+	templateSelected.value = template;
+};
+
+const handleChange = async () => {
+	templateSelected.value = {} as Template;
+};
 </script>
