@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
 	let error;
 
-	let range = 10;
+	let range = 75;
 
 	if (message === null) {
 		error = new Error("Message is required");
