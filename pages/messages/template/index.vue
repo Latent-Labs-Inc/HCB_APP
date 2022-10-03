@@ -1,24 +1,66 @@
 <template>
 	<div>
 		<h3 class="header">Create Template Messages</h3>
-		<div>
+		<div class="mx-auto w-2/3 flex flex-col gap-6">
 			<div class="form-group">
-				<label for="email">Template Name</label>
+				<label for="name">Template Name</label>
 				<input
-					class="w-sm mx-auto border shadow-sm border-slate-300 placeholder-slate-400 dark:bg-darkBg dark:focus:outline-darkPrimary"
+					class="mx-auto border shadow-sm border-slate-300 placeholder-slate-400 dark:bg-darkBg dark:focus:outline-darkPrimary"
 					:type="'text'"
 					:placeholder="'Cash as is Offer'"
 					v-model="input.templateName"
 				/>
+			</div>
+			<div class="flex flex-col gap-5">
+				<textarea
+					v-model="input.message"
+					class="dark:bg-darkBg dark:text-darkSecondary bg-darkSecondary p-4 dark:focus:outline-darkSecondary focus:outline-darkBg outline-1 focus:border-none rounded trans"
+					rows="5"
+					cols="30"
+				/>
+			</div>
+			<div class="flex justify-center">
+				<button @click="handleSave">Save Template</button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "~~/stores/auth";
+import { useUiStore } from "~~/stores/ui";
+
+const uiStore = useUiStore();
+
+const authStore = useAuthStore();
+
+const router = useRouter();
+
 const input = reactive({
 	templateName: "",
+	message: "",
 });
+
+const handleSave = async () => {
+	uiStore.toggleFunctionLoading(true);
+	const { $supabase } = useNuxtApp();
+	try {
+		const { data, error } = await $supabase.from("templates").insert([
+			{
+				name: input.templateName,
+				message: input.message,
+				user_id: authStore.user.id,
+			},
+		]);
+		if (error) {
+			throw error;
+		}
+		uiStore.toggleFunctionLoading(false);
+		router.push("/messages");
+	} catch (error) {
+		console.log(error);
+	}
+};
 </script>
 
 <style scoped>
