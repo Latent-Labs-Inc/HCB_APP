@@ -14,7 +14,10 @@ export const useUiStore = defineStore("ui", {
 	getters: {},
 	actions: {
 		setWidth() {
-			this.width = window.innerWidth;
+			this.width =
+				window.innerWidth ||
+				document.documentElement.clientWidth ||
+				document.body.clientWidth;
 		},
 		setTheme(theme: string) {
 			document.documentElement.classList.add(theme);
