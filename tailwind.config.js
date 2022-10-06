@@ -21,9 +21,9 @@ module.exports = {
 				light: "rgb(203 213 225)",
 				black: "#181818",
 			},
-		},
-		screens: {
-			xs: "320px",
+			screens: {
+				xs: "320px",
+			},
 		},
 	},
 	variants: {

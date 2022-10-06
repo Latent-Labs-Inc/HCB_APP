@@ -9,7 +9,7 @@ export const useUiStore = defineStore("ui", {
 		functionLoading: false,
 		initialLoading: false,
 		mobileUser: false,
-		width: null as number,
+		width: null as number | null,
 	}),
 	getters: {},
 	actions: {

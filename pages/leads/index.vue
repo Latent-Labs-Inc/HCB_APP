@@ -35,10 +35,6 @@ const actionProps: ActionProps[] = [
 	},
 ];
 
-const searchInput = ref("");
-const filteredLeads = ref([] as Lead[]);
-const list = ref(["Address", "Wireless"]);
-
 const handleAction = async (action: string) => {
 	if (action === "removeLeads") {
 		router.push("/leads/remove");
@@ -47,20 +43,6 @@ const handleAction = async (action: string) => {
 	} else if (action === "viewFavorites") {
 		router.push("/leads/favorites");
 	}
-};
-
-const handleSelected = (lead: Lead) => {
-	// leadStore.setSelectedLead(lead);
-	// router.push(`/leads/lead-profile/${lead.lead_id}`);
-};
-
-const handleClose = () => {
-	searching.value = false;
-};
-
-const handleUpload = async (data: any[]) => {
-	console.log(data);
-	const formattedLeads = await useFormattedLeads(data);
 };
 </script>
 
@@ -81,8 +63,9 @@ const handleUpload = async (data: any[]) => {
 	overflow-x: auto;
 }
 .form-group {
-	@apply flex flex-col gap-2 justify-center  ml-7 lg:w-2/3 lg:mx-auto text-primary dark:text-darkSecondary;
+	@apply flex flex-col gap-2 justify-center  ml-7  text-primary dark:text-darkSecondary lg:w-2/3 lg:mx-auto;
 }
+
 .form-group label {
 	@apply text-lg font-semibold items-start;
 }
@@ -90,8 +73,9 @@ const handleUpload = async (data: any[]) => {
 	padding: 0.5rem;
 	border: 1px solid #ccc;
 	border-radius: 3px;
-	@apply border shadow-sm border-slate-300 placeholder-slate-400 dark:bg-darkBg dark:focus:outline-darkPrimary;
+	@apply border  border-slate-300 placeholder-slate-400 dark:bg-darkBg dark:focus:outline-darkPrimary shadow-sm;
 }
+
 p {
 	@apply text-primary dark:text-darkSecondary;
 }

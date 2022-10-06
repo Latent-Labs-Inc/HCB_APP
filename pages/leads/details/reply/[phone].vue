@@ -105,7 +105,7 @@ const handleFavorites = () => {
 
 <style scoped>
 li {
-	@apply dark:text-white text-primary py-3 px-6 border-solid border-2 rounded-2xl border-primary dark:border-darkSecondary sm:max-w-xs md:max-w-md lg:max-w-lg;
+	@apply dark:text-white text-primary py-3 px-6 border-solid border-2 rounded-2xl border-primary dark:border-darkSecondary sm:max-w-sm md:max-w-md lg:max-w-lg;
 }
 
 .sent {
