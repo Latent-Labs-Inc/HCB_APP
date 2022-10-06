@@ -28,8 +28,7 @@ const handleSidebar = () => {
 <template>
 	<nav class="">
 		<div class="flex items-center nav">
-			<!-- <NuxtLink v-if="uiStore.width > 450" class="logo px-5 text-xl" to="/"> -->
-			<NuxtLink class="logo px-5 text-xl bg-contain" to="/">
+			<NuxtLink v-if="uiStore.width > 450" class="logo px-5 text-xl" to="/">
 				<img
 					v-if="uiStore.theme === 'light'"
 					class="h-fit w-32 top-0 trans p-2"
@@ -42,9 +41,9 @@ const handleSidebar = () => {
 					alt=""
 				/>
 			</NuxtLink>
-			<!-- <NuxtLink v-else>
-				<img src="~/assets/images/logo.png" alt="" class="bg-contain" />
-			</NuxtLink> -->
+			<NuxtLink v-else>
+				<div class="logo ml-2 p-4">HCB</div>
+			</NuxtLink>
 			<div class="flex flex-auto">
 				<icon-bars class="icon" @click="handleSidebar" />
 				<ul id="nav-mobile" class="nav-ul flex-auto justify-end">
