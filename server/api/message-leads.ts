@@ -124,9 +124,9 @@ export default defineEventHandler(async (event) => {
 		leads.forEach(async (lead) => {
 			if (lead.wireless.length > 0) {
 				await lead.wireless.forEach(async (phone) => {
-					messageCounter++;
 					if (!badNumbers.includes(phone)) {
 						badNumbers.push(phone);
+						messageCounter++;
 						let twilioMessage;
 						try {
 							const res = await client.messages.create({
@@ -181,6 +181,18 @@ export default defineEventHandler(async (event) => {
 							console.log(error);
 						}
 					} else {
+						try {
+							const { data, error } = await supabase
+								.from("leads")
+								.update({ texted: true })
+								.eq("lead_id", lead?.lead_id);
+							if (error) {
+								throw error;
+							}
+							console.log("updated leads to texted true");
+						} catch (error) {
+							console.log(error);
+						}
 						console.log("bad number");
 						badNumberCounter++;
 					}
