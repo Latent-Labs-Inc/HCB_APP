@@ -28,7 +28,7 @@ const handleSidebar = () => {
 <template>
 	<nav class="">
 		<div class="flex items-center nav">
-			<NuxtLink class="logo px-5 text-xl" to="/"
+			<NuxtLink class="logo px-5 text-xl xs:w-1/5" to="/"
 				><img
 					v-if="uiStore.theme === 'light'"
 					class="h-fit w-32 top-0 trans p-2"

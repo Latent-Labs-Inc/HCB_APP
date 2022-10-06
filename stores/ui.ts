@@ -8,9 +8,14 @@ export const useUiStore = defineStore("ui", {
 		appLoading: false,
 		functionLoading: false,
 		initialLoading: false,
+		mobileUser: false,
+		width: null as number,
 	}),
 	getters: {},
 	actions: {
+		setWidth() {
+			this.width = window.innerWidth;
+		},
 		setTheme(theme: string) {
 			document.documentElement.classList.add(theme);
 			localStorage.theme = theme;

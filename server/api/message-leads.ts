@@ -39,6 +39,7 @@ export default defineEventHandler(async (event) => {
 	let leads = [] as Lead[];
 
 	let sentMessages = [] as Message[];
+	let responses = [];
 
 	let messageCounter = 0;
 
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
 	let error;
 
-	let range = 75;
+	let range = 5;
 
 	if (message === null) {
 		error = new Error("Message is required");
@@ -122,7 +123,7 @@ export default defineEventHandler(async (event) => {
 
 		leads.forEach(async (lead) => {
 			if (lead.wireless.length > 0) {
-				lead.wireless.forEach(async (phone) => {
+				await lead.wireless.forEach(async (phone) => {
 					messageCounter++;
 					if (!badNumbers.includes(phone)) {
 						badNumbers.push(phone);
@@ -133,6 +134,7 @@ export default defineEventHandler(async (event) => {
 								from: config.private.TWILIO_PHONE_NUMBER,
 								to: phone,
 							});
+							responses.push(res);
 							console.log(res);
 							twilioMessage = res;
 							if (!!res.errorMessage) {
@@ -198,10 +200,10 @@ export default defineEventHandler(async (event) => {
 				}
 			}
 		});
-		console.log(messageCounter);
-		console.log(badNumberCounter);
-		console.log(sentMessages);
 	}
+	console.log(messageCounter);
+	console.log(badNumberCounter);
+	console.log(sentMessages);
 
-	return { messageCounter, badNumberCounter, sentMessages };
+	return { messageCounter, badNumberCounter, sentMessages: responses };
 });

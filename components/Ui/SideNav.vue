@@ -1,6 +1,13 @@
 <template>
 	<nav class="min-h-screen bg-darkBg dark:bg-black">
-		<ul class="flex flex-col items-center gap-4">
+		<ul
+			class="flex flex-col items-center gap-4"
+			:class="
+				uiStore.width < 440
+					? 'xs:w-96 xs:absolute xs:z-10 xs:bg-black xs:h-full'
+					: ''
+			"
+		>
 			<li class="sidebar-li"><NuxtLink to="/">Home</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/messages">Messages</NuxtLink></li>
 			<li class="sidebar-li"><NuxtLink to="/leads">Leads</NuxtLink></li>
@@ -9,7 +16,11 @@
 	</nav>
 </template>
 
-<script></script>
+<script setup lang="ts">
+import { useUiStore } from "~/stores/ui";
+
+const uiStore = useUiStore();
+</script>
 
 <style scoped>
 * {
