@@ -23,7 +23,7 @@
 						:key="row.id"
 					>
 						<td v-for="key in properties" :key="key">
-							<div v-if="key === 'dropdown'">
+							<div v-if="key === 'dropdown'" class="ml-2">
 								<UiDropdown
 									:dropdownItems="dropdownItems"
 									@itemClicked="handleItemClick($event, row)"

@@ -26,7 +26,11 @@ const uiStore = useUiStore();
 
 const leads = ref([] as Lead[]);
 const mobileCols = ref(["Property Address", "Phone"]);
-const mobileProperties = ref(["propertyAddress.address1", "phone", "dropdown"]);
+const mobileProperties = ref([
+	"propertyAddress.address1",
+	"favoritePhone",
+	"dropdown",
+]);
 const cols = ref([
 	"Property Address",
 	"Property Zip",
