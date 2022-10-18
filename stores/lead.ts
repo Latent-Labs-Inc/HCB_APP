@@ -26,7 +26,8 @@ export const useLeadStore = defineStore("lead", {
 				const { data, error } = await $supabase
 					.from("leads")
 					.select("*")
-					.eq("favorite", true);
+					.eq("favorite", true)
+					.order("modified_at", { ascending: false });
 				if (error) {
 					throw error;
 				}

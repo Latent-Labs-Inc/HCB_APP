@@ -10,11 +10,11 @@
 			</div>
 			<UiTable
 				class=""
-				:cols="cols"
-				:grid-cols="'grid-cols-5'"
+				:cols="uiStore.width < 440 ? mobileCols : cols"
+				:grid-cols="uiStore.width < 440 ? 'grid-cols-3' : 'grid-cols-5'"
 				:dropdown-items="dropdownItems"
 				:table-data="tableData"
-				:properties="properties"
+				:properties="uiStore.width < 440 ? mobileProperties : properties"
 				@item-clicked="handleItemClick"
 				:key="forceUpdate"
 			/>
@@ -35,6 +35,9 @@ const router = useRouter();
 const uiStore = useUiStore();
 
 const cols = ref(["Property Address", "Phone Number", "Last Message", "Date"]);
+
+const mobileCols = ref(["Last Message", "Phone Number"]);
+const mobileProperties = ref(["message", "from", "dropdown"]);
 
 const properties = ref([
 	"propertyAddress.address1",
