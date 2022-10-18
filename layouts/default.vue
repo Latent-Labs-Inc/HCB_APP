@@ -41,6 +41,14 @@ import { useAuthStore } from "../stores/auth";
 
 const { $supabase } = useNuxtApp();
 const uiStore = useUiStore();
+const router = useRouter();
+
+router.afterEach(() => {
+	console.log("name changed");
+	if (uiStore.width < 440) {
+		uiStore.toggleSidebar(false);
+	}
+});
 
 $supabase.auth.onAuthStateChange(async (event, session) => {
 	if (event === "SIGNED_OUT") {
