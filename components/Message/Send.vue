@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="mx-5 flex flex-col gap-5 p-8">
+		<div class="mx-5 flex flex-col gap-5 px-8">
 			<transition name="fade" mode="out-in">
 				<textarea
 					v-if="usingTemplate"
