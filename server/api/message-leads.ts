@@ -1,6 +1,7 @@
 import twilio from "twilio";
 import { createClient } from "@supabase/supabase-js";
-import { Lead, Message, Filter } from "../../types/types";
+import { Lead, Message, Filter, TwilioResponse } from "../../types/types";
+import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -127,7 +128,7 @@ export default defineEventHandler(async (event) => {
 					if (!badNumbers.includes(phone)) {
 						badNumbers.push(phone);
 						messageCounter++;
-						let twilioMessage;
+						let twilioMessage: MessageInstance;
 						try {
 							const res = await client.messages.create({
 								body: message,
@@ -135,7 +136,6 @@ export default defineEventHandler(async (event) => {
 								to: phone,
 							});
 							responses.push(res);
-							console.log(res);
 							twilioMessage = res;
 							if (!!res.errorMessage) {
 								throw res.errorMessage;
@@ -147,14 +147,14 @@ export default defineEventHandler(async (event) => {
 						let sentMessage: Message = {
 							lead_id: lead.lead_id,
 							user_id: user_id,
-							message,
+							message: twilioMessage.body,
 							to: phone,
 							from: config.private.TWILIO_PHONE_NUMBER,
 							sid: twilioMessage.sid,
 							status: twilioMessage.status,
 							created_at: twilioMessage.dateCreated,
 							sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
-							updated_at: twilioMessage.dateUpdated,
+							updated_at: twilioMessage.dateUpdated || new Date(),
 							direction: twilioMessage.direction,
 							errorCode: twilioMessage.errorCode,
 							errorMessage: twilioMessage.errorMessage,

@@ -151,3 +151,26 @@ export interface Item {
 	id: string;
 	label: string;
 }
+
+export interface TwilioResponse {
+	body: string;
+	numSegments: string;
+	direction: string;
+	from: string;
+	to: string;
+	dateUpdated: Date;
+	price: null | string;
+	errorMessage: null | string;
+	uri: string;
+	accountSid: string;
+	numMedia: string;
+	status: string;
+	messagingServiceSid: null | string;
+	sid: string;
+	dateSent: Date;
+	dateCreated: Date;
+	errorCode: number;
+	priceUnit: string;
+	apiVersion: string;
+	subresourceUris: {};
+}
