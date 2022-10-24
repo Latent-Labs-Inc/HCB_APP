@@ -17,8 +17,10 @@
 					</p>
 					<p v-else>{{ key.camel2title() }}: {{ leadDetails[key] }}</p>
 				</div>
+				<div v-if="leadDetails.favoritePhone" class="flex">
+					<button @click="handleReply" class="mx-auto px-12">Reply</button>
+				</div>
 			</div>
-			<div class="grid sm:grid-cols-3 lg:grid-cols-4 gap-6 pl-10" v-else></div>
 		</div>
 	</div>
 </template>
@@ -27,6 +29,7 @@
 import { useLeadStore } from "~/stores/lead";
 import { Lead } from "~/types/types";
 
+const router = useRouter();
 String.prototype.toTitle = function () {
 	return this.replace(/(^|\s)\S/g, function (t) {
 		return t.toUpperCase();
@@ -70,11 +73,13 @@ const keys = ref([
 ]);
 
 const fetchLeadDetails = async () => {
-	console.log("leadId", leadId.value);
 	leadDetails.value = await leadStore.fetchLeadById(leadId.value);
-	console.log(leadDetails.value);
 };
 onMounted(async () => {
 	await fetchLeadDetails();
 });
+
+const handleReply = () => {
+	router.push(`/leads/details/reply/${leadDetails.value.favoritePhone}`);
+};
 </script>

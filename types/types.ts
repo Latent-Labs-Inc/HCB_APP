@@ -60,6 +60,8 @@ export interface Lead {
 	prAddress?: Address;
 	mailingAddress?: Address;
 	legalDescription?: string;
+	favorite?: boolean;
+	favoritePhone?: string;
 }
 
 export interface IncomingMessage {
