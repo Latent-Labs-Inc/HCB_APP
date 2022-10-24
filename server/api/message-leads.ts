@@ -145,7 +145,7 @@ export default defineEventHandler(async (event) => {
 						}
 						let sentMessage: Message;
 
-						if (!!twilioMessage?.body) {
+						if (twilioMessage.errorMessage) {
 							sentMessage = {
 								lead_id: lead.lead_id,
 								user_id: user_id,
@@ -154,12 +154,12 @@ export default defineEventHandler(async (event) => {
 									: "ERROR MESSAGE FAILED",
 								to: phone,
 								from: config.private.TWILIO_PHONE_NUMBER,
-								sid: twilioMessage.sid,
-								status: twilioMessage.status,
-								created_at: twilioMessage.dateCreated,
+								sid: !!twilioMessage.sid ? twilioMessage.sid : useUuid(),
+								status: "ERROR",
+								created_at: twilioMessage.dateCreated || new Date(),
 								sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
 								updated_at: twilioMessage.dateUpdated || new Date(),
-								direction: twilioMessage.direction,
+								direction: twilioMessage.direction || "outbound-api",
 								errorCode: twilioMessage.errorCode,
 								errorMessage: twilioMessage.errorMessage,
 								propertyAddress: lead.propertyAddress,
