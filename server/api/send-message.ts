@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
 		sentMessage = {
 			message: message,
-			to: to,
+			to,
 			from: config.private.TWILIO_PHONE_NUMBER,
 			user_id,
 			sent_at: new Date(),

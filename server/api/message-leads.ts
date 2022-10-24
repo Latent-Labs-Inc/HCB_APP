@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
 	let error;
 
-	let range = 5;
+	let range = 100;
 
 	if (message === null) {
 		error = new Error("Message is required");
@@ -143,23 +143,46 @@ export default defineEventHandler(async (event) => {
 						} catch (error) {
 							console.log(error);
 						}
+						let sentMessage: Message;
+						if (!!twilioMessage.body) {
+							sentMessage = {
+								lead_id: lead.lead_id,
+								user_id: user_id,
+								message: !!twilioMessage.body
+									? twilioMessage.body
+									: "ERROR MESSAGE FAILED",
+								to: phone,
+								from: config.private.TWILIO_PHONE_NUMBER,
+								sid: twilioMessage.sid,
+								status: twilioMessage.status,
+								created_at: twilioMessage.dateCreated,
+								sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
+								updated_at: twilioMessage.dateUpdated || new Date(),
+								direction: twilioMessage.direction,
+								errorCode: twilioMessage.errorCode,
+								errorMessage: twilioMessage.errorMessage,
+								propertyAddress: lead.propertyAddress,
+							};
+						} else {
+							sentMessage = {
+								lead_id: lead.lead_id,
+								user_id: user_id,
+								message: "ERROR MESSAGE FAILED",
+								to: phone,
+								from: config.private.TWILIO_PHONE_NUMBER,
+								sid: twilioMessage.sid,
+								status: twilioMessage.status,
+								created_at: twilioMessage.dateCreated,
+								sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
+								updated_at: twilioMessage.dateUpdated || new Date(),
+								direction: twilioMessage.direction,
+								errorCode: twilioMessage.errorCode,
+								errorMessage: twilioMessage.errorMessage,
+								propertyAddress: lead.propertyAddress,
+							};
+						}
 
-						let sentMessage: Message = {
-							lead_id: lead.lead_id,
-							user_id: user_id,
-							message: twilioMessage.body,
-							to: phone,
-							from: config.private.TWILIO_PHONE_NUMBER,
-							sid: twilioMessage.sid,
-							status: twilioMessage.status,
-							created_at: twilioMessage.dateCreated,
-							sent_at: !!twilioMessage.dateSent ? twilioMessage.dateSent : new Date(),
-							updated_at: twilioMessage.dateUpdated || new Date(),
-							direction: twilioMessage.direction,
-							errorCode: twilioMessage.errorCode,
-							errorMessage: twilioMessage.errorMessage,
-							propertyAddress: lead.propertyAddress,
-						};
+						console.log(sentMessage);
 
 						sentMessages.push(sentMessage);
 

@@ -90,10 +90,6 @@ const items = ref(props.tableData);
 
 const pageLength = ref(10);
 
-watch(props.tableData, (newVal) => {
-	console.log(newVal);
-});
-
 const {
 	page,
 	pages,

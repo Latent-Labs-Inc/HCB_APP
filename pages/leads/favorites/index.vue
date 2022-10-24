@@ -32,8 +32,8 @@ const mobileProperties = ref([
 	"dropdown",
 ]);
 const cols = ref([
-	"Property Address",
-	"Property Zip",
+	"Lead Address",
+	"Lead Zip",
 	"First Name",
 	"LastName",
 	"Phone",
@@ -70,10 +70,13 @@ const dropdownItems = ref([
 
 const handleItemClick = (item: Item, lead) => {
 	if (item.id === "unfavorite") {
+		leadStore.setSelectedLeadId(lead.lead_id);
 		leadStore.unfavorite(lead.lead_id);
 	} else if (item.id === "reply") {
+		leadStore.setSelectedLeadId(lead.lead_id);
 		router.push(`/leads/details/reply/${lead.favoritePhone}`);
 	} else if (item.id === "details") {
+		leadStore.setSelectedLeadId(lead.lead_id);
 		router.push(`/leads/details/${lead.lead_id}`);
 	}
 };
