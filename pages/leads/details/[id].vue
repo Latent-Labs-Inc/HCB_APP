@@ -17,9 +17,9 @@
 					</p>
 					<p v-else>{{ key.camel2title() }}: {{ leadDetails[key] }}</p>
 				</div>
-				<div v-if="leadDetails.favoritePhone" class="flex">
-					<button @click="handleReply" class="mx-auto px-12">Reply</button>
-				</div>
+			</div>
+			<div v-if="!!leadDetails?.favoritePhone" class="flex mt-4">
+				<button @click="handleReply" class="mx-auto px-12">Reply</button>
 			</div>
 		</div>
 	</div>
@@ -80,6 +80,7 @@ onMounted(async () => {
 });
 
 const handleReply = () => {
+	leadStore.setSelectedLeadId(leadId.value);
 	router.push(`/leads/details/reply/${leadDetails.value.favoritePhone}`);
 };
 </script>

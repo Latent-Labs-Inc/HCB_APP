@@ -25,12 +25,11 @@ export default defineEventHandler(async (event) => {
 			.from("leads")
 			.select("*")
 			.eq("lead_id", lead_id)
-			.eq("user_id", user_id)
-			.single();
+			.eq("user_id", user_id);
 		if (error) {
 			throw error;
 		}
-		lead = data;
+		lead = data[0];
 	} catch (error) {
 		console.log(error);
 	}
@@ -48,13 +47,13 @@ export default defineEventHandler(async (event) => {
 
 		sentMessage = {
 			message: message,
-			to,
+			to: to,
 			from: config.private.TWILIO_PHONE_NUMBER,
 			user_id,
 			sent_at: new Date(),
 			created_at: new Date(),
 			updated_at: new Date(),
-			sid: res.sid,
+			sid: res.sid || useUuid(),
 			status: res.status,
 			errorCode: res.errorCode,
 			errorMessage: res.errorMessage,
