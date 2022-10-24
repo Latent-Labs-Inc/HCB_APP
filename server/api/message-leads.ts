@@ -168,7 +168,7 @@ export default defineEventHandler(async (event) => {
 							sentMessage = {
 								lead_id: lead.lead_id,
 								user_id: user_id,
-								message: "ERROR MESSAGE FAILED",
+								message: twilioMessage.body,
 								to: phone,
 								from: config.private.TWILIO_PHONE_NUMBER,
 								sid: twilioMessage.sid,
