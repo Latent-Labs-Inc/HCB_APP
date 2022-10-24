@@ -144,7 +144,8 @@ export default defineEventHandler(async (event) => {
 							console.log(error);
 						}
 						let sentMessage: Message;
-						if (!!twilioMessage.body) {
+
+						if (!!twilioMessage?.body) {
 							sentMessage = {
 								lead_id: lead.lead_id,
 								user_id: user_id,
