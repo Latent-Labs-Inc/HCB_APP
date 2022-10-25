@@ -66,8 +66,9 @@ const setTableData = async () => {
 			tableData.value.push(message);
 		}
 	});
+
 	tableData.value.forEach((msg) => {
-		msg.sent_at = new Date(msg.sent_at).toLocaleString();
+		msg.sent_at = new Date(msg.sent_at).toLocaleDateString("en-us", {});
 	});
 	uiStore.toggleFunctionLoading(false);
 };
