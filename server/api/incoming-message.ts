@@ -25,11 +25,14 @@ export default defineEventHandler(async (event) => {
 	const contactPhoneNumbers = ["+18134084221"];
 
 	contactPhoneNumbers.forEach(async (number) => {
-		const res = await client.messages.create({
-			body: `New message from ${body.From} to ${body.To} with message: ${body.Body}`,
-			from: config.private.TWILIO_PHONE_NUMBER,
-			to: number,
-		});
+		let regex = /stop|no|harassment|fuck/gi;
+		if (!body.Body.match(regex)) {
+			const res = await client.messages.create({
+				body: `New message from ${body.From} to ${body.To} with message: ${body.Body}`,
+				from: config.private.TWILIO_PHONE_NUMBER,
+				to: number,
+			});
+		}
 	});
 
 	let user_id = null;
