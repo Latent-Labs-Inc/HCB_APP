@@ -19,7 +19,15 @@
 <script setup lang="ts">
 import { useUiStore } from "~/stores/ui";
 
+const router = useRouter();
 const uiStore = useUiStore();
+
+router.afterEach(() => {
+	console.log("name changed");
+	if (uiStore.width < 440) {
+		uiStore.toggleSidebar(false);
+	}
+});
 </script>
 
 <style scoped>

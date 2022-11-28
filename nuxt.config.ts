@@ -9,7 +9,6 @@ export default defineNuxtConfig({
 		],
 	},
 	css: ["@/assets/css/tailwind.css"],
-
 	build: {
 		transpile: ["chart.js"],
 		postcss: {
@@ -27,14 +26,6 @@ export default defineNuxtConfig({
 				autoInstall: true,
 			}),
 		],
-	},
-	pageTransition: {
-		name: "fade",
-		mode: "out-in",
-	},
-	layoutTransition: {
-		name: "fade",
-		mode: "out-in",
 	},
 	runtimeConfig: {
 		// The private keys which are only available within server-side

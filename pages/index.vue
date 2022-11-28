@@ -28,15 +28,6 @@
 				<MessageReceived />
 			</div>
 		</div>
-		<!-- <UiTable
-			:cols="cols"
-			:gridCols="gridCols"
-			:tableData="tableData"
-			:properties="properties"
-			:dropdownItems="dropdownItems"
-			@itemClicked="handleItemClick"
-			:pageLength="10"
-		/> -->
 	</div>
 </template>
 
@@ -56,91 +47,6 @@ const {
 	chartOptions: leadOptions,
 	datasetIdKey: leadId,
 } = await useChartDataLeads();
-
-// const cols = ref(["Name", "Email", "Phone", "Order", "Patient"]);
-
-// const gridCols = ref("grid-cols-6");
-
-// const tableData = ref([
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// 	{
-// 		name: "John Doe",
-// 		email: "jimm@jimmm",
-// 		phone: "",
-// 		order: "",
-// 		patient: "",
-// 	},
-// ]);
-// const properties = ref([
-// 	"name",
-// 	"email",
-// 	"phone",
-// 	"order",
-// 	"patient",
-// 	"dropdown",
-// ]);
-// const dropdownItems = ref([
-// 	{
-// 		id: "1",
-// 		label: "Edit",
-// 	},
-// 	{
-// 		id: "2",
-// 		label: "Delete",
-// 	},
-// ]);
-
-// const handleItemClick = (item, row) => {
-// 	console.log(item, row);
-// };
 </script>
 
 <style scoped>
