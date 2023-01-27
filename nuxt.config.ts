@@ -1,24 +1,15 @@
-import { defineNuxtConfig } from "nuxt";
-import Icons from "unplugin-icons/vite";
+import Icons from 'unplugin-icons/vite';
 
 export default defineNuxtConfig({
-	head: {
-		link: [
-			// { rel: "icon", type: "image/png", href: "/favicon.png" },
-			{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
-		],
-	},
-	css: ["@/assets/css/tailwind.css"],
+	modules: [
+		'@nuxtjs/tailwindcss',
+		'unplugin-icons/nuxt',
+		'@pinia/nuxt',
+		'@nuxtjs/supabase',
+	],
+	css: ['@/assets/css/tailwind.css'],
 	build: {
-		transpile: ["chart.js"],
-		postcss: {
-			postcssOptions: {
-				plugins: {
-					tailwindcss: {},
-					autoprefixer: {},
-				},
-			},
-		},
+		transpile: ['chart.js'],
 	},
 	vite: {
 		plugins: [
@@ -40,6 +31,4 @@ export default defineNuxtConfig({
 			SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 		},
 	},
-	buildModules: [["@nuxtjs/tailwindcss", { config: "@/tailwind.config.js" }]],
-	modules: ["@nuxtjs/tailwindcss", "unplugin-icons/nuxt", "@pinia/nuxt"],
 });
