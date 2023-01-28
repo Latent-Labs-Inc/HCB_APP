@@ -9,7 +9,10 @@
 						<UiRadio v-model.trim="leadProvider" :radio-types="providerTypes" />
 					</div>
 					<transition name="fade" mode="out-in">
-						<div class="flex justify-center gap-4" v-if="leadProvider === 'other'">
+						<div
+							class="flex justify-center gap-4"
+							v-if="leadProvider === 'other'"
+						>
 							<label for="">Other: </label>
 							<input type="text" v-model="otherProviderInput" />
 						</div>
@@ -28,7 +31,10 @@
 						<div v-if="!templateSelected.template_id">
 							<div class="">
 								<p class="mx-auto text-center mb-5 text-lg">Use Template?</p>
-								<UiRadio v-model.trim="isTemplate" :radio-types="templateRadio" />
+								<UiRadio
+									v-model.trim="isTemplate"
+									:radio-types="templateRadio"
+								/>
 							</div>
 							<MessageTemplateSearch
 								v-if="isTemplate === 'yes'"
@@ -39,7 +45,9 @@
 						</div>
 						<div v-else class="flex flex-col gap-4">
 							<p>Selected Message: {{ templateSelected.message }}</p>
-							<button class="mx-auto" @click="handleChange">Change Message</button>
+							<button class="mx-auto" @click="handleChange">
+								Change Message
+							</button>
 						</div>
 					</transition>
 					<div class="">
@@ -54,10 +62,10 @@
 						<p class="text-xl text-center">Sent {{ sentMessages }} Messages</p>
 						<p class="text-xl text-center">
 							Lead Provider:
-							{{ leadProvider === "other" ? otherProviderInput : leadProvider }}
+							{{ leadProvider === 'other' ? otherProviderInput : leadProvider }}
 						</p>
 						<p class="text-xl text-center">
-							Lead Type: {{ leadType === "other" ? otherTypeInput : leadType }}
+							Lead Type: {{ leadType === 'other' ? otherTypeInput : leadType }}
 						</p>
 					</div>
 					<button @click="handleContinue">Send More</button>
@@ -68,97 +76,99 @@
 </template>
 
 <script setup lang="ts">
-import { Template } from "~~/types/types";
-import { useLeadStore } from "~/stores/lead";
-import { useUiStore } from "~/stores/ui";
-import { useAuthStore } from "~~/stores/auth";
+import { Template } from '~~/types/types';
+import { useLeadStore } from '~/stores/lead';
+import { useUiStore } from '~/stores/ui';
+import { useAuthStore } from '~~/stores/auth';
 
 const authStore = useAuthStore();
 const leadStore = useLeadStore();
 const uiStore = useUiStore();
 const router = useRouter();
 
-const leadProvider = ref("all");
-const isTemplate = ref("no");
+const leadProvider = ref('all');
+const isTemplate = ref('no');
 const templateRadio = ref([
-	{ label: "Yes", id: "yes" },
-	{ label: "No", id: "no" },
+	{ label: 'Yes', id: 'yes' },
+	{ label: 'No', id: 'no' },
 ]);
 const useTable = ref(false);
 
-const otherProviderInput = ref("");
+const otherProviderInput = ref('');
 
 const providerTypes = [
 	{
-		label: "All",
-		id: "all",
+		label: 'All',
+		id: 'all',
 	},
 	{
-		label: "PropStream",
-		id: "propStream",
+		label: 'PropStream',
+		id: 'propStream',
 	},
 	{
-		label: "Foreclosure Daily",
-		id: "foreclosureDaily",
+		label: 'Foreclosure Daily',
+		id: 'foreclosureDaily',
 	},
 	{
-		label: "Fiverr",
-		id: "fiverr",
+		label: 'Fiverr',
+		id: 'fiverr',
 	},
 	{
-		label: "Other",
-		id: "other",
+		label: 'Other',
+		id: 'other',
 	},
 ];
 
-const leadType = ref("all");
+const leadType = ref('all');
 
 const templateSelected = ref({} as Template);
 
-const otherTypeInput = ref("");
+const otherTypeInput = ref('');
 const sentMessages = ref<number>(0);
 
 const leadTypes = [
 	{
-		label: "All",
-		id: "all",
+		label: 'All',
+		id: 'all',
 	},
 	{
-		label: "Foreclosure",
-		id: "foreclosure",
+		label: 'Foreclosure',
+		id: 'foreclosure',
 	},
 	{
-		label: "Probate",
-		id: "probate",
+		label: 'Probate',
+		id: 'probate',
 	},
 	{
-		label: "Divorce",
-		id: "divorce",
+		label: 'Divorce',
+		id: 'divorce',
 	},
 	{
-		label: "High Equity",
-		id: "highEquity",
+		label: 'High Equity',
+		id: 'highEquity',
 	},
 	{
-		label: "Other",
-		id: "other",
+		label: 'Other',
+		id: 'other',
 	},
 ];
 
 const msgInvalid = ref(false);
 
-const handleMessage = async ($event) => {
+const handleMessage = async (event) => {
 	const message =
-		isTemplate.value === "yes" ? templateSelected.value.message : $event;
+		isTemplate.value === 'yes' ? templateSelected.value.message : event;
 	console.log(message);
 	if (!!message) {
 		uiStore.toggleFunctionLoading(true);
-		const res = await $fetch("/api/message-leads", {
-			method: "POST",
+		const res = await $fetch('/api/message-leads', {
+			method: 'POST',
 			body: {
 				message: !!message ? message : null,
 				leadProvider: leadProvider.value,
-				otherProvider: !!otherProviderInput.value ? otherProviderInput.value : null,
+				otherProvider: !!otherProviderInput.value
+					? otherProviderInput.value
+					: null,
 				leadType: leadType.value,
 				otherType: !!otherTypeInput.value ? otherTypeInput.value : null,
 				user_id: authStore.user_id,
@@ -182,7 +192,7 @@ const handleContinue = () => {
 };
 
 watch(leadProvider, (newType) => {
-	if (newType === "other") {
+	if (newType === 'other') {
 		leadStore.setLeadProvider(otherProviderInput.value);
 	} else {
 		leadStore.setLeadProvider(newType);
@@ -190,7 +200,7 @@ watch(leadProvider, (newType) => {
 });
 
 watch(leadType, (newType) => {
-	if (newType === "other") {
+	if (newType === 'other') {
 		leadStore.setLeadType(otherTypeInput.value);
 	} else {
 		leadStore.setLeadType(newType);

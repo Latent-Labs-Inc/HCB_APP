@@ -1,12 +1,14 @@
 <template>
 	<div class="flex flex-col gap-8">
 		<transition name="fade" mode="out-in">
-			<UiSearchInline
-				label="Templates by Name"
-				v-model.trim="input"
+			<div
+				class="flex gap-4 justify-center pt-4 items-center"
 				v-if="isTemplate === 'yes' ? true : false"
-				@search="handleSearch"
-			/>
+			>
+				<label for="">Template Name</label>
+				<input class="py-1 px-3" v-model.trim="input" type="text" />
+				<button @click="handleSearch">Search</button>
+			</div>
 		</transition>
 		<transition name="fade" mode="out-in">
 			<div v-if="useTable">
@@ -36,27 +38,28 @@
 </template>
 
 <script setup lang="ts">
-import { Template, Item } from "~/types/types";
-
+import { Template, Item } from '~/types/types';
+import { useUiStore } from '~~/stores/ui';
+const uiStore = useUiStore();
 const props = defineProps<{
 	isTemplate: string;
 	useTable: boolean;
 }>();
 
 const emits = defineEmits<{
-	(e: "selected", template: Template): void;
+	(e: 'selected', template: Template): void;
 }>();
 
-const input = ref("");
-const templateLabels = ref(["Name", "Message"]);
+const input = ref('');
+const templateLabels = ref(['Name', 'Message']);
 
-const templatePropertiesTable = ref(["name", "message", "dropdown"]);
+const templatePropertiesTable = ref(['name', 'message', 'dropdown']);
 
-const templatePropertiesList = ref(["name", "message"]);
+const templatePropertiesList = ref(['name', 'message']);
 
 const dropdown = ref([
-	{ label: "Edit", id: "edit" },
-	{ label: "Delete", id: "delete" },
+	{ label: 'Edit', id: 'edit' },
+	{ label: 'Delete', id: 'delete' },
 ] as Item[]);
 
 const templates = ref([] as Template[]);
@@ -64,10 +67,10 @@ const templates = ref([] as Template[]);
 const forceUpdate = ref(0);
 
 const handleDropdown = (item: Item, row: Template) => {
-	if (item.id === "edit") {
-		console.log("edit");
-	} else if (item.id === "delete") {
-		console.log("delete");
+	if (item.id === 'edit') {
+		console.log('edit');
+	} else if (item.id === 'delete') {
+		console.log('delete');
 	}
 };
 
@@ -76,22 +79,24 @@ watch(templates, () => {
 });
 
 const handleSearch = async () => {
+	uiStore.toggleFunctionLoading(true);
 	try {
 		const { $supabase } = useNuxtApp();
 		const { data, error } = await $supabase
-			.from("templates")
-			.select("*")
-			.like("name", `%${input.value}%`);
+			.from('templates')
+			.select('*')
+			.like('name', `%${input.value}%`);
 		templates.value = data as Template[];
-		console.log(data);
 		if (error) throw error;
 	} catch (error) {
 		console.log(error);
+	} finally {
+		uiStore.toggleFunctionLoading(false);
 	}
 };
 
 const handleSelected = (item: Template) => {
 	console.log(item);
-	emits("selected", item);
+	emits('selected', item);
 };
 </script>

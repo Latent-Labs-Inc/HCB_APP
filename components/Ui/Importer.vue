@@ -32,10 +32,17 @@
 					<label for="change-file" class="cursor-pointer reverse"
 						>Select New File</label
 					>
-					<input type="file" @change="handleFile" id="change-file" class="hidden" />
+					<input
+						type="file"
+						@change="handleFile"
+						id="change-file"
+						class="hidden"
+					/>
 				</div>
 				<div>
-					<UiButton class="btn" @click="uploadData">Upload {{ label }} </UiButton>
+					<UiButton class="btn" @click="uploadData"
+						>Upload {{ label }}
+					</UiButton>
 				</div>
 			</div>
 		</div>
@@ -43,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { useUiStore } from "~~/stores/ui";
+import { useUiStore } from '~~/stores/ui';
 
 const props = defineProps<{
 	label: string;
@@ -54,29 +61,29 @@ const props = defineProps<{
 const uiStore = useUiStore();
 const router = useRouter();
 const selectedFile = ref<any>(null);
-const fileType = ref<"xlsx" | "csv">(null);
+const fileType = ref<'xlsx' | 'csv' | null>(null);
 const fileWasImported = ref(false);
-const fileName = ref("");
+const fileName = ref<null | string>(null);
 const modalActive = ref(false);
-const msg = ref("");
+const msg = ref('');
 const dragActive = ref(false);
 
 const handleFile = (e) => {
-	console.log("running handle file");
+	console.log('running handle file');
 	if (e.target.files.length === 1) {
 		const type = e.target.files[0].type;
-		if (type === "text/csv") {
-			fileType.value = "csv";
+		if (type === 'text/csv') {
+			fileType.value = 'csv';
 			selectedFile.value = e.target.files[0];
 			fileWasImported.value = true;
 			fileName.value = e.target.files[0].name;
 		} else {
 			modalActive.value = true;
-			msg.value = "Please make sure you are submitting an .csv file";
+			msg.value = 'Please make sure you are submitting an .csv file';
 		}
 	} else {
 		modalActive.value = true;
-		msg.value = "Please make sure you are submitting one file";
+		msg.value = 'Please make sure you are submitting one file';
 	}
 };
 
@@ -97,36 +104,36 @@ const dropFile = (e) => {
 	const file = e.dataTransfer.files[0];
 	if (e.dataTransfer.files.length === 1) {
 		const type = file.type;
-		if (type === "text/csv") {
-			fileType.value = "csv";
+		if (type === 'text/csv') {
+			fileType.value = 'csv';
 			selectedFile.value = file;
 			fileWasImported.value = true;
 			fileName.value = file.name;
 		} else {
 			modalActive.value = true;
-			msg.value = "Please make sure you are submitting an .csv file";
+			msg.value = 'Please make sure you are submitting an .csv file';
 		}
 	} else {
 		modalActive.value = true;
-		msg.value = "Please make sure you are submitting one file";
+		msg.value = 'Please make sure you are submitting one file';
 	}
 };
 
 const uploadData = async () => {
 	uiStore.toggleAppLoading(true);
-	console.log("running upload data");
-	if (fileType.value === "csv") {
+	console.log('running upload data');
+	if (fileType.value === 'csv') {
 		const reader = new FileReader();
 		reader.readAsText(selectedFile.value);
 
 		reader.onload = async (e) => {
 			const data = e.target.result;
 
-			var array = data.toString().split("\r");
+			var array = data.toString().split('\r');
 
 			let result = [];
 
-			let headers = array[0].split(",");
+			let headers = array[0].split(',');
 
 			console.log(headers);
 
@@ -134,26 +141,26 @@ const uploadData = async () => {
 				let obj = {};
 
 				let str = array[i];
-				let s = "";
+				let s = '';
 
 				let flag = 0;
 				for (let ch of str) {
 					if (ch === '"' && flag === 0) {
 						flag = 1;
 					} else if (ch === '"' && flag == 1) flag = 0;
-					if (ch === ", " && flag === 0) ch = "|";
+					if (ch === ', ' && flag === 0) ch = '|';
 					if (ch !== '"') s += ch;
 				}
 
 				// Split the string using pipe delimiter |
 				// and store the values in a properties array
-				let properties = s.split("|");
-				let values = properties[0].split(",");
+				let properties = s.split('|');
+				let values = properties[0].split(',');
 
 				headers.forEach((header, index) => {
 					if (!!header) {
-						obj[header] = values[index]?.includes("\n")
-							? values[index].replace("\n", "")
+						obj[header] = values[index]?.includes('\n')
+							? values[index].replace('\n', '')
 							: values[index];
 					}
 				});
