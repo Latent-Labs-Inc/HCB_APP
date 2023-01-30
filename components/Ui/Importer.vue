@@ -1,17 +1,15 @@
 <template>
 	<div>
-		<UiBaseModal
+		<UiAlert
+			class="mx-auto w-3/4"
 			:show="modalActive"
-			title="Invalid File Type"
-			:actions="true"
-			@confirm="clearFile"
-			@cancel="clearFile"
-		>
-			<p class="msg">{{ msg }}</p>
-		</UiBaseModal>
+			:message="'Invalid File Type'"
+			@close="clearFile"
+			:type="'error'"
+		/>
 		<div class="flex justify-center items-center">
 			<div
-				class="import-box"
+				class="import-box w-full"
 				v-if="!fileWasImported"
 				@dragenter.prevent="toggleDrag"
 				@dragleave.prevent="toggleDrag"
@@ -19,18 +17,24 @@
 				@drop.prevent="dropFile"
 				:class="{ 'active-dropzone': dragActive }"
 			>
-				<p>Drag and Drop: {{ label }} File</p>
+				<p>Drag and Drop{{ label ? `: ${label}` : '' }}</p>
 				<p>Or</p>
 				<div class="flex">
-					<label for="file" class="btn cursor-pointer">Choose File</label>
-					<input type="file" id="file" @change="handleFile" class="hidden" />
+					<label
+						:for="id"
+						class="text-base px-4 py-1 dark:bg-darkPrimary text-white bg-primary hover:bg-secondary rounded-full hover:dark:bg-black cursor-pointer trans"
+						>Choose File</label
+					>
+					<input type="file" :id="id" @change="handleFile" class="hidden" />
 				</div>
 			</div>
 			<div class="flex flex-col gap-5 justify-center items-center" v-else>
 				<p class="mt-4">File: {{ fileName }}</p>
 				<div class="flex justify-center">
-					<label for="change-file" class="cursor-pointer reverse"
-						>Select New File</label
+					<label
+						for="change-file"
+						class="text-base px-4 py-1 dark:bg-black text-white bg-primary hover:bg-secondary rounded-full hover:dark:bg-darkPrimary cursor-pointer trans"
+						>New File</label
 					>
 					<input
 						type="file"
@@ -40,9 +44,12 @@
 					/>
 				</div>
 				<div>
-					<UiButton class="btn" @click="uploadData"
-						>Upload {{ label }}
-					</UiButton>
+					<p
+						class="text-base px-4 py-1 dark:bg-darkPrimary text-white bg-primary hover:bg-secondary rounded-full hover:dark:bg-darkBg cursor-pointer trans"
+						@click="uploadData"
+					>
+						Upload File
+					</p>
 				</div>
 			</div>
 		</div>
@@ -50,142 +57,86 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~~/stores/auth';
 import { useUiStore } from '~~/stores/ui';
 
-const props = defineProps<{
-	label: string;
-	redirect: string;
-	composable: (aoa) => void;
-}>();
+const authStore = useAuthStore();
 
 const uiStore = useUiStore();
-const router = useRouter();
-const selectedFile = ref<any>(null);
-const fileType = ref<'xlsx' | 'csv' | null>(null);
+const selectedFile = ref<null | File>();
 const fileWasImported = ref(false);
-const fileName = ref<null | string>(null);
-const modalActive = ref(false);
+const fileName = ref('');
 const msg = ref('');
+const selectedFileType = ref('');
+const modalActive = ref(false);
+
 const dragActive = ref(false);
 
-const handleFile = (e) => {
-	console.log('running handle file');
+const props = defineProps<{
+	fileTypes: string[];
+	fileError: string;
+	label?: string;
+	id: string;
+}>();
+
+const emits = defineEmits<{
+	(e: 'file-added', file: File): void;
+}>();
+
+const checkFileType = (e: any) => {
 	if (e.target.files.length === 1) {
 		const type = e.target.files[0].type;
-		if (type === 'text/csv') {
-			fileType.value = 'csv';
+		console.log(type);
+		const fileTypes = props.fileTypes;
+		if (fileTypes.includes(type)) {
+			selectedFileType.value = type;
 			selectedFile.value = e.target.files[0];
 			fileWasImported.value = true;
 			fileName.value = e.target.files[0].name;
 		} else {
 			modalActive.value = true;
-			msg.value = 'Please make sure you are submitting an .csv file';
+			msg.value = props.fileError;
 		}
 	} else {
 		modalActive.value = true;
 		msg.value = 'Please make sure you are submitting one file';
 	}
 };
+const handleFile = (e: any) => {
+	checkFileType(e);
+};
 
 const clearFile = () => {
 	selectedFile.value = null;
 	fileWasImported.value = false;
-	fileName.value = null;
+	fileName.value = '';
 	modalActive.value = false;
-	msg.value = null;
+	msg.value = '';
 };
 
 const toggleDrag = () => {
 	dragActive.value = !dragActive.value;
 };
 
-const dropFile = (e) => {
+const dropFile = (e: any) => {
 	toggleDrag();
 	const file = e.dataTransfer.files[0];
-	if (e.dataTransfer.files.length === 1) {
-		const type = file.type;
-		if (type === 'text/csv') {
-			fileType.value = 'csv';
-			selectedFile.value = file;
-			fileWasImported.value = true;
-			fileName.value = file.name;
-		} else {
-			modalActive.value = true;
-			msg.value = 'Please make sure you are submitting an .csv file';
-		}
-	} else {
-		modalActive.value = true;
-		msg.value = 'Please make sure you are submitting one file';
-	}
+	checkFileType(file);
 };
 
 const uploadData = async () => {
-	uiStore.toggleAppLoading(true);
-	console.log('running upload data');
-	if (fileType.value === 'csv') {
-		const reader = new FileReader();
-		reader.readAsText(selectedFile.value);
-
-		reader.onload = async (e) => {
-			const data = e.target.result;
-
-			var array = data.toString().split('\r');
-
-			let result = [];
-
-			let headers = array[0].split(',');
-
-			console.log(headers);
-
-			for (let i = 1; i < array.length - 1; i++) {
-				let obj = {};
-
-				let str = array[i];
-				let s = '';
-
-				let flag = 0;
-				for (let ch of str) {
-					if (ch === '"' && flag === 0) {
-						flag = 1;
-					} else if (ch === '"' && flag == 1) flag = 0;
-					if (ch === ', ' && flag === 0) ch = '|';
-					if (ch !== '"') s += ch;
-				}
-
-				// Split the string using pipe delimiter |
-				// and store the values in a properties array
-				let properties = s.split('|');
-				let values = properties[0].split(',');
-
-				headers.forEach((header, index) => {
-					if (!!header) {
-						obj[header] = values[index]?.includes('\n')
-							? values[index].replace('\n', '')
-							: values[index];
-					}
-				});
-				// For each header, if the value contains
-				// multiple comma separated data, then we
-				// store it in the form of array otherwise
-				// directly the value is stored
-
-				// Add the generated object to our
-				// result array
-				result.push(obj);
-			}
-
-			await props.composable(result);
-		};
-		router.push(`${props.redirect}`);
-		uiStore.toggleAppLoading(false);
+	uiStore.toggleFunctionLoading(true);
+	if (selectedFile.value) {
+		emits('file-added', selectedFile.value);
 	}
 	clearFile();
+	uiStore.toggleFunctionLoading(false);
 };
 </script>
 
 <style scoped>
 .import-box {
-	@apply flex flex-col border-dashed border border-primary dark:border-darkPrimary justify-center items-center self-center h-40 text-center m-4 w-4/6;
+	@apply flex flex-col border-dashed border border-primary dark:border-darkPrimary justify-center items-center self-center h-fit text-center p-4;
 	border: dashed 2.5px var();
 }
 

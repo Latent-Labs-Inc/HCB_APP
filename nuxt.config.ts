@@ -18,6 +18,17 @@ export default defineNuxtConfig({
 			}),
 		],
 	},
+	supabase: {
+		url: process.env.SUPABASE_URL,
+		key: process.env.SUPABASE_KEY,
+		serviceKey: process.env.SUPABASE_SERVICE_KEY,
+		client: {
+			auth: {
+				autoRefreshToken: true,
+				persistSession: true,
+			},
+		},
+	},
 	runtimeConfig: {
 		// The private keys which are only available within server-side
 		public: {

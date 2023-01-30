@@ -8,7 +8,7 @@ export interface FormElement {
 
 export interface Profile {
 	user_id: string;
-	type: "salesRep" | "practice" | "admin";
+	type: 'salesRep' | 'practice' | 'admin';
 	email: string;
 	username: string;
 	admin: boolean;
@@ -175,4 +175,33 @@ export interface TwilioResponse {
 	priceUnit: string;
 	apiVersion: string;
 	subresourceUris: {};
+}
+
+export interface FD_Probate {
+	'Filing Date': string;
+	'Attorney Address': string;
+	'Attorney Bar No': string;
+	'Attorney City': string;
+	'Attorney Email ID': string;
+	'Attorney First Name': string;
+	'Attorney Last Name': string;
+	'Attorney Middle Name': string;
+	'Attorney Ph Number': string;
+	'Attorney State': string;
+	'Attorney Zip': string;
+	'First Name (Deceased)': string;
+	'Last Name': string;
+	'Middle Name': string;
+	'PR Address': string;
+	'PR City': string;
+	'PR First Name': string;
+	'PR Last Name': string;
+	'PR Middle Name': string;
+	'PR Ph Number': string;
+	'PR State': string;
+	'PR Zip': string;
+	'Property Address': string;
+	'Property City': string;
+	'Property State': string;
+	'Property Zip': string;
 }
