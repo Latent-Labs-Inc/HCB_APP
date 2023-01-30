@@ -1,8 +1,7 @@
 <template>
 	<nav class="min-h-screen bg-darkBg dark:bg-black">
-		<div class="h-4"></div>
 		<ul
-			class="grid items-center gap-4"
+			class="grid items-center gap-4 mt-4"
 			:class="
 				uiStore.width < 440
 					? 'xs:w-96 xs:absolute xs:z-10 xs:bg-black xs:h-full'
@@ -33,10 +32,6 @@ router.afterEach(() => {
 </script>
 
 <style scoped>
-* {
-	margin: 0;
-	padding: 0;
-}
 .sidebar-li {
 	@apply py-1 px-6 text-center trans;
 }
