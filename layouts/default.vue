@@ -11,7 +11,7 @@
 			<UiNav class="dark:bg-darkBg dark:text-darkSecondary" />
 			<div class="flex dark:bg-black h-full w-full">
 				<transition name="sidebar" mode="out-in">
-					<UiSideNav v-if="uiStore.sidebar" class="w-48" />
+					<UiSideNav v-if="uiStore.sidebar" />
 				</transition>
 				<transition name="fade" mode="out-in">
 					<div
@@ -36,15 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import { useUiStore } from "../stores/ui";
-import { useAuthStore } from "../stores/auth";
+import { useUiStore } from '../stores/ui';
+import { useAuthStore } from '../stores/auth';
 
 const { $supabase } = useNuxtApp();
 const uiStore = useUiStore();
 const router = useRouter();
 
 $supabase.auth.onAuthStateChange(async (event, session) => {
-	if (event === "SIGNED_OUT") {
+	if (event === 'SIGNED_OUT') {
 		useClearState();
 	}
 });

@@ -32,13 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { useUiStore } from "~/stores/ui";
+import { useUiStore } from '~/stores/ui';
 
 await useLoadContent();
 
 const uiStore = useUiStore();
-
-const { $supabase } = useNuxtApp();
 
 const { chartData, chartOptions, datasetIdKey } = await useChartDataMarketed();
 

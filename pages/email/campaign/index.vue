@@ -32,7 +32,7 @@
 					<UiBaseList
 						:colKeyPairs="colKeyPairs"
 						:data="data"
-						gridCols="grid-cols-6"
+						gridCols="grid-cols-5"
 						itemName="'Probate'"
 						:flip="true"
 					/>
@@ -88,6 +88,7 @@ const handleFile = (file: File) => {
 					uiStore.toggleFunctionLoading(true);
 					const { error } = await client
 						.from('probates')
+						// @ts-ignore
 						.insert(formattedProbates);
 					if (error) throw error;
 				} catch (error) {
@@ -105,7 +106,6 @@ const handleFile = (file: File) => {
 
 const colKeyPairs = reactive({
 	'Attorney Email': 'attorney_email',
-	'Attorney Name': 'attorney_first',
 	'Property Address': 'address1',
 	'Property City': 'city',
 	'Property State': 'state',

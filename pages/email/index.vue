@@ -9,16 +9,18 @@
 </template>
 
 <script setup lang="ts">
-import IconUpload from '~icons/fa-solid/upload';
+// @ts-ignore
+import IcBaselineEmail from '~icons/ic/baseline-email';
+// @ts-ignore
 import IconMail from '~icons/fa-solid/inbox';
 
 const router = useRouter();
 
 const actionProps = [
 	{
-		id: 'uploadEmails',
-		name: 'Upload Emails',
-		icon: IconUpload,
+		id: 'startCampaign',
+		name: 'Start Email Campaign',
+		icon: IcBaselineEmail,
 	},
 	{
 		id: 'viewEmails',
@@ -28,8 +30,8 @@ const actionProps = [
 ];
 
 const handleAction = (action: string) => {
-	if (action === 'uploadEmails') {
-		router.push('/email/upload');
+	if (action === 'startCampaign') {
+		router.push('/email/campaign');
 	} else if (action === 'viewEmails') {
 		router.push('/email/view');
 	}

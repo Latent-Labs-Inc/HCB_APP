@@ -1,9 +1,9 @@
 <template>
-	<div class="dark:text-white text-primary">
-		<div class="grid my-2 md:w-11/12 mx-auto">
+	<div class="dark:text-white text-primary w-full text-xs">
+		<div class="grid my-2">
 			<table class="w-full">
 				<thead
-					class="grid px-2 py-4 sm:p-2 items-center sm:gap-2"
+					class="grid px-2 py-4 sm:p-2 items-center sm:gap-2 text-sm"
 					:class="[gridCols]"
 				>
 					<td v-for="(_, key) in colKeyPairs" :key="key">
@@ -23,17 +23,18 @@
 							]"
 							@click="handleSelected(row)"
 						>
-							<td v-for="(value, key) in colKeyPairs" :key="key">
-								<div v-if="colKeyPairs[key].includes('.')">
-									<div>
-										{{
-											row[colKeyPairs[key].split('.')[0]][
-												colKeyPairs[key].split('.')[1]
-											]
-										}}
-									</div>
+							<td class="py-1" v-for="(value, key) in colKeyPairs" :key="key">
+								<div
+									class="overflow-x-scroll"
+									v-if="colKeyPairs[key].includes('.')"
+								>
+									{{
+										row[colKeyPairs[key].split('.')[0]][
+											colKeyPairs[key].split('.')[1]
+										]
+									}}
 								</div>
-								<div v-else>
+								<div class="overflow-x-scroll" v-else>
 									{{ row[colKeyPairs[key]] }}
 								</div>
 							</td>
