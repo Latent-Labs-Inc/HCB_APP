@@ -178,7 +178,7 @@ export interface TwilioResponse {
 }
 
 export interface FD_Probate {
-	'Filing Date': string;
+	'File Date': string;
 	'Attorney Address': string;
 	'Attorney Bar No': string;
 	'Attorney City': string;

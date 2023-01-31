@@ -6,7 +6,7 @@ export const useProbateFormatter = async (probates: FD_Probate[]) => {
 		const formattedProbate = {
 			user_id: useAuthStore().user_id,
 			id: useUuid(),
-			filing_date: probate['Filing Date'].split('/').reverse().join('-'),
+			filing_date: probate['File Date'],
 			deceased_first: probate['First Name (Deceased)'],
 			deceased_last: probate['Last Name'],
 			address1: probate['Property Address'],
