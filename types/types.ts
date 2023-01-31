@@ -205,3 +205,32 @@ export interface FD_Probate {
 	'Property State': string;
 	'Property Zip': string;
 }
+
+export interface FormattedProbates {
+	user_id: string;
+	id: string;
+	filing_date: string;
+	deceased_first: string;
+	deceased_last: string;
+	address1: string;
+	city: string;
+	state: string;
+	zip: string;
+	pr_first: string;
+	pr_last: string;
+	pr_address1: string;
+	pr_city: string;
+	pr_state: string;
+	pr_zip: string;
+	pr_phone: string;
+	attorney_first: string;
+	attorney_last: string;
+	attorney_address1: string;
+	attorney_city: string;
+	attorney_state: string;
+	attorney_zip: string;
+	attorney_phone: string;
+	attorney_email: string;
+	created_at: Date;
+	modified_at: Date;
+}
