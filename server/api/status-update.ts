@@ -1,6 +1,6 @@
-import { IncomingMessage, TwilioIncoming } from "~/types/types";
-import twilio from "twilio";
-import { createClient } from "@supabase/supabase-js";
+import { IncomingMessage, TwilioIncoming } from '~/types/types';
+import twilio from 'twilio';
+import { createClient } from '@supabase/supabase-js';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -15,14 +15,14 @@ export default defineEventHandler(async (event) => {
 
 	const client = twilio(accountSid, authToken);
 
-	const body = await useBody(event);
+	const body = await readBody(event);
 
 	try {
 		console.log(body);
 		const { data, error } = await supabase
-			.from("sent_messages")
+			.from('sent_messages')
 			.update({ status: body.MessageStatus })
-			.eq("sid", body.MessageSid);
+			.eq('sid', body.MessageSid);
 		if (!!error) {
 			throw error;
 		}

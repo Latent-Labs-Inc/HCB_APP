@@ -83,8 +83,8 @@ const handleFile = (file: File) => {
 			} = Papa.parse(csv as string, { header: true });
 			let formattedProbates = await useProbateFormatter(results.data);
 			data.value.push(...formattedProbates);
-			let repeats = [];
-			let unique = [];
+			let repeats = [] as string[];
+			let unique = [] as string[];
 			for (let i = 0; i < formattedProbates.length; i++) {
 				if (unique.includes(formattedProbates[i].attorney_email)) {
 					repeats.push(formattedProbates[i].attorney_email);
