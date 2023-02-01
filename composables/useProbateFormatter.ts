@@ -2,7 +2,7 @@ import { FD_Probate } from '~/types/types';
 import { useAuthStore } from '~~/stores/auth';
 
 export const useProbateFormatter = async (probates: FD_Probate[]) => {
-	const formattedProbates = probates.map((probate) => {
+	let formattedProbates = probates.map((probate) => {
 		const formattedProbate = {
 			user_id: useAuthStore().user_id,
 			id: useUuid(),
@@ -33,5 +33,12 @@ export const useProbateFormatter = async (probates: FD_Probate[]) => {
 		};
 		return formattedProbate;
 	});
+
+	formattedProbates = formattedProbates.filter((probate) => {
+		if (probate.attorney_email) {
+			return probate;
+		}
+	});
+
 	return formattedProbates;
 };

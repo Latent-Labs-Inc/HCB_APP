@@ -81,8 +81,18 @@ const handleFile = (file: File) => {
 				errors: any[];
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
-			const formattedProbates = await useProbateFormatter(results.data);
+			let formattedProbates = await useProbateFormatter(results.data);
 			data.value.push(...formattedProbates);
+			let repeats = [];
+			let unique = [];
+			for (let i = 0; i < formattedProbates.length; i++) {
+				if (unique.includes(formattedProbates[i].attorney_email)) {
+					repeats.push(formattedProbates[i].attorney_email);
+				} else {
+					unique.push(formattedProbates[i].attorney_email);
+				}
+			}
+			console.log('unique', unique);
 			if (supabaseType.value) {
 				try {
 					uiStore.toggleFunctionLoading(true);
