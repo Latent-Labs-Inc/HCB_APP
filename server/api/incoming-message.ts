@@ -1,6 +1,6 @@
-import { IncomingMessage, TwilioIncoming } from "~/types/types";
-import twilio from "twilio";
-import { createClient } from "@supabase/supabase-js";
+import { IncomingMessage, TwilioIncoming } from '~/types/types';
+import twilio from 'twilio';
+import { createClient } from '@supabase/supabase-js';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -15,14 +15,14 @@ export default defineEventHandler(async (event) => {
 
 	const client = twilio(accountSid, authToken);
 
-	const body: TwilioIncoming = await useBody(event);
+	const body: TwilioIncoming = await readBody(event);
 	const { MessagingResponse } = twilio.twiml;
 
 	const twiml = new MessagingResponse();
 
-	twiml.message("Thank you for your reply!");
+	twiml.message('Thank you for your reply!');
 
-	const contactPhoneNumbers = ["+18134084221"];
+	const contactPhoneNumbers = ['+18134084221'];
 
 	contactPhoneNumbers.forEach(async (number) => {
 		let regex = /stop|no|harassment|fuck/gi;
@@ -35,15 +35,15 @@ export default defineEventHandler(async (event) => {
 		}
 	});
 
-	let user_id = null;
+	let user_id: string | null = null;
 
 	try {
 		// getting user id from phone number
 		const { data } = await supabase
-			.from("profiles")
-			.select("*")
-			.contains("phoneNumbers", [body.To]);
-		user_id = !!data[0] ? data[0].user_id : null;
+			.from('profiles')
+			.select('*')
+			.contains('phoneNumbers', [body.To]);
+		user_id = !!data[0] ? data![0].user_id : null;
 	} catch (error) {
 		console.log(error);
 	}
@@ -54,10 +54,10 @@ export default defineEventHandler(async (event) => {
 	if (!!user_id) {
 		try {
 			const { data, error } = await supabase
-				.from("leads")
-				.select("*")
-				.eq("user_id", user_id)
-				.contains("wireless", [body.From]);
+				.from('leads')
+				.select('*')
+				.eq('user_id', user_id)
+				.contains('wireless', [body.From]);
 
 			if (error) {
 				throw error;
@@ -68,14 +68,14 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 	if (leads?.length > 1) {
-		console.log("more than one lead found with that number");
+		console.log('more than one lead found with that number');
 
 		let counter = 0;
 
 		leads.forEach(async (lead) => {
 			const propertyAddress = !!lead.propertyAddress
 				? lead.propertyAddress
-				: { address1: "None Found", city: null, state: null, zip: null };
+				: { address1: 'None Found', city: null, state: null, zip: null };
 			let incoming_message: IncomingMessage = {
 				user_id: !!user_id ? user_id : null,
 				message: body.Body,
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
 				sent_at: new Date().toISOString(),
 				updated_at: new Date().toISOString(),
 				status: body.MessageStatus,
-				direction: "inbound",
+				direction: 'inbound',
 				errorCode: null,
 				errorMessage: null,
 				lead_id: lead.lead_id,
@@ -97,7 +97,7 @@ export default defineEventHandler(async (event) => {
 
 			try {
 				const { error } = await supabase
-					.from("incoming_messages")
+					.from('incoming_messages')
 					.insert(incoming_message);
 			} catch (error) {
 				console.log(error);
@@ -106,7 +106,7 @@ export default defineEventHandler(async (event) => {
 	} else {
 		const propertyAddress = !!leads[0]?.propertyAddress
 			? leads[0].propertyAddress
-			: { address1: "None Found", city: null, state: null, zip: null };
+			: { address1: 'None Found', city: null, state: null, zip: null };
 		let incoming_message: IncomingMessage = {
 			user_id: !!user_id ? user_id : null,
 			message: body.Body,
@@ -117,16 +117,16 @@ export default defineEventHandler(async (event) => {
 			sent_at: new Date().toISOString(),
 			updated_at: new Date().toISOString(),
 			status: body.MessageStatus,
-			direction: "inbound",
-			errorCode: null,
-			errorMessage: null,
+			direction: 'inbound',
+			errorCode: '',
+			errorMessage: '',
 			lead_id: !!leads[0]?.lead_id ? leads[0].lead_id : null,
 			propertyAddress: propertyAddress,
 		};
 
 		try {
 			const { error } = await supabase
-				.from("incoming_messages")
+				.from('incoming_messages')
 				.insert(incoming_message);
 
 			if (error) {
