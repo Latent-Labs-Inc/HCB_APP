@@ -1,40 +1,32 @@
 import twilio from 'twilio';
-import { createClient } from '@supabase/supabase-js';
 import { Lead, Message } from '~/types/types';
+import { serverSupabaseClient } from '#supabase/server';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
 
-	const supabase = createClient(
-		config.public.SUPABASE_URL,
-		config.private.SUPABASE_SERVICE_KEY
-	);
+	const supabase = serverSupabaseClient(event);
 
 	const client = twilio(accountSid, authToken);
 
 	const { message, to, user_id, lead_id } = await readBody(event);
 
-	let sentMessage: Message;
-
-	let lead: Lead;
-
 	try {
+		let sentMessage: Message;
+
+		let lead: Lead;
 		const { data, error } = await supabase
 			.from('leads')
 			.select('*')
 			.eq('lead_id', lead_id)
-			.eq('user_id', user_id);
+			.single();
 		if (error) {
 			throw error;
 		}
-		lead = data[0];
-	} catch (error) {
-		console.log(error);
-	}
+		lead = data;
 
-	try {
 		const res = await client.messages.create({
 			body: message,
 			from: config.private.TWILIO_PHONE_NUMBER,
@@ -44,7 +36,6 @@ export default defineEventHandler(async (event) => {
 		if (!!res.errorMessage) {
 			throw res.errorMessage;
 		}
-
 		sentMessage = {
 			message: message,
 			to: to,
@@ -61,19 +52,19 @@ export default defineEventHandler(async (event) => {
 			lead_id,
 			propertyAddress: lead.propertyAddress,
 		};
-	} catch (error) {
-		console.log(error);
-	}
-
-	try {
-		const { data, error } = await supabase
+		const { error: err } = await supabase
 			.from('sent_messages')
 			.insert(sentMessage);
-		if (error) {
+
+		if (err) {
 			throw error;
 		}
 	} catch (error) {
 		console.log(error);
+		return {
+			statusCode: 500,
+			body: JSON.stringify({ message: 'error' }),
+		};
 	}
 	return {
 		statusCode: 200,

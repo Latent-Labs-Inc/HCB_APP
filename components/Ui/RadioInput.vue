@@ -1,13 +1,13 @@
 <template>
-	<div class="grid">
-		<div>
+	<div class="grid gap-4">
+		<div class="grid justify-center gap-4">
 			<p v-if="question">{{ question }}</p>
-			<p class="text-sm dark:text-gray-400 text-gray-500" v-if="error">
-				*{{ error }}
-			</p>
 		</div>
-		<div class="flex gap-2" :class="row ? 'flex-row' : 'flex-col'">
-			<div class="flex" v-for="option of options">
+		<div
+			class="flex justify-center gap-2"
+			:class="row ? 'flex-row' : 'flex-col'"
+		>
+			<div class="flex justify-center" v-for="option of options">
 				<div
 					class="flex items-center gap-2 cursor-pointer"
 					@click="handleOptionClick(option.value)"
@@ -26,6 +26,9 @@
 				</div>
 			</div>
 		</div>
+		<p class="text-sm dark:text-gray-400 text-gray-500" v-if="error">
+			*{{ error }}
+		</p>
 	</div>
 </template>
 

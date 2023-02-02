@@ -34,6 +34,7 @@ export default defineNuxtConfig({
 		public: {
 			SUPABASE_URL: process.env.SUPABASE_URL,
 			SUPABASE_KEY: process.env.SUPABASE_KEY,
+			SUPABASE_PROJECT_ID: process.env.SUPABASE_PROJECT_ID,
 		},
 		private: {
 			TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
