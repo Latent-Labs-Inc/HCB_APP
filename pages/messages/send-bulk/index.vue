@@ -18,38 +18,30 @@
 					<div class="flex my-auto gap-4 justify-center" v-else>
 						<label class="my-auto" for="">Search</label>
 						<input class="py-0" type="text" />
-						<p class="my-auto px-4 py-2 dark:bg-darkBg bg-primary rounded-lg">
+						<p
+							class="my-auto px-4 py-2 dark:bg-darkBg bg-primary rounded-lg cursor-pointer dark:hover:bg-darkPrimary hover:bg-primary trans"
+							@click="searchLeads"
+						>
 							Search
 						</p>
 					</div>
 				</transition>
 				<button class="mx-auto reverse">Preview Leads</button>
 			</div>
-			<!-- <div class="flex flex-col gap-8" v-else>
-					<div class="flex flex-col gap-8">
-						<p class="text-xl text-center">Sent {{ sentMessages }} Messages</p>
-						<p class="text-xl text-center">
-							Lead Provider:
-							{{ leadProvider === 'other' ? otherProviderInput : leadProvider }}
-						</p>
-						<p class="text-xl text-center">
-							Lead Type: {{ leadType === 'other' ? otherTypeInput : leadType }}
-						</p>
-					</div>
-					<button @click="handleContinue">Send More</button>
-				</div> -->
 		</transition>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Template } from '~~/types/types';
+import { Database } from '~/types/supabase';
 import { useUiStore } from '~/stores/ui';
 import { useAuthStore } from '~~/stores/auth';
 
 const authStore = useAuthStore();
 const uiStore = useUiStore();
 const router = useRouter();
+const client = useSupabaseClient<Database>();
 
 const message = ref('');
 
@@ -110,5 +102,20 @@ const handleSelected = (template: Template) => {
 
 const handleChange = async () => {
 	templateSelected.value = null;
+};
+
+const searchLeads = async () => {
+	let query = client.from('leads').select('*');
+
+	if (radios.value[0].selected !== 'all') {
+		query = query.eq('leadProvider', radios.value[0].selected);
+	}
+	if (radios.value[1].selected !== 'all') {
+		query = query.eq('leadType', radios.value[0].selected);
+	}
+
+	const { data, error } = await query;
+
+	console.log(data, error);
 };
 </script>

@@ -121,6 +121,10 @@ const colKeyPairs = reactive({
 	'Property State': 'state',
 	'Property Zip': 'zip',
 });
+
+const emailTemplate = ref(
+	'Attorney [attorney_name], \n\nHello, my name is [your_name]. I am inquiring about a probate case you are handling for the Personal Representative [pr_first] [pr_last], on [property_address], [property_city], [property_state].\n\nI am very interested in this property. Would you please let the family know that I would like to make arrangements to view the property and make an offer? May I please have their contact information so I may reach out to them? I would also appreciate if you could forward this email to them as well.\n\nJust so you know, should you have any other Probate cases you are handling in the area I may be interested in those as well.\n\nThank you,\n[your_name]'
+);
 </script>
 
 <style scoped></style>
