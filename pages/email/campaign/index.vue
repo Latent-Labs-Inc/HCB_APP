@@ -88,6 +88,7 @@ const handleFile = (file: File) => {
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
 			let formattedProbates = await useProbateFormatter(results.data);
+			// @ts-ignore
 			data.value.push(...formattedProbates);
 			let repeats = [] as string[];
 			let unique = [] as string[];
@@ -128,10 +129,6 @@ const colKeyPairs = reactive({
 	'Property Zip': 'zip',
 });
 
-const emailTemplate = ref(
-	'[attorney_email]\n\nImportant for Personal Rep [pr_name]\n\nDear Attorney [attorney_name],\n\nHello, my name is [your_name]. I am inquiring about a probate case you are handling for the Personal Representative [pr_name], on [address1], [city], [state].\n\nI am very interested in this property. Would you please let the family know that I would like to make arrangements to view the property and make an offer? May I please have their contact information so I may reach out to them? I would also appreciate if you could forward this email to them as well.\n\nJust so you know, should you have any other Probate cases you are handling in the area I may be interested in those as well.\n\nThank you,\n[your_name]\nPhone:(813) 475-0728\nEmail: chad@highestcashbuyer.com\nhttp://highestcashbuyer.com/'
-);
-
 const handleGenerate = async () => {
 	let your_name = 'Chad Dudley';
 	let usedEmails = [] as string[];
@@ -149,18 +146,10 @@ const handleGenerate = async () => {
 		let city = probate.city;
 		let state = probate.state;
 		let zip = probate.zip;
-		let email = emailTemplate.value
-			.replace('[attorney_email]', attorney_email)
-			.replace('[attorney_name]', attorney_name)
-			.replace('[your_name]', your_name)
-			.replace('[your_name]', your_name)
-			.replace('[pr_name]', pr_name)
-			.replace('[pr_name]', pr_name)
-			.replace('[address1]', address1)
-			.replace('[city]', city)
-			.replace('[state]', state)
-			.replace('[zip]', zip);
-		emails.push(email);
+		const email = ref(
+			`${attorney_email}\nImportant for Personal Rep ${pr_name}\nDear Attorney ${attorney_name},\n\nHello, my name is ${your_name}. I am inquiring about a probate case you are handling for the Personal Representative ${pr_name}, on ${address1}, ${city}, ${state}.\n\nI am very interested in this property. Would you please let the family know that I would like to make arrangements to view the property and make an offer? May I please have their contact information so I may reach out to them? I would also appreciate if you could forward this email to them as well.\n\nJust so you know, should you have any other Probate cases you are handling in the area I may be interested in those as well.\n\nThank you,\n${your_name}\nPhone:(813) 475-0728\nEmail: chad@highestcashbuyer.com\nhttp://highestcashbuyer.com/`
+		);
+		emails.push(email.value);
 		usedEmails.push(attorney_email);
 	});
 	// convert emails into a text string file
