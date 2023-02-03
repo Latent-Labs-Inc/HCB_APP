@@ -1,10 +1,10 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 // figure out how to typescript this
 
-export const useUiStore = defineStore("ui", {
+export const useUiStore = defineStore('ui', {
 	state: () => ({
 		sidebar: false,
-		theme: "light",
+		theme: 'light',
 		appLoading: false,
 		functionLoading: false,
 		initialLoading: false,
@@ -25,14 +25,14 @@ export const useUiStore = defineStore("ui", {
 			this.theme = theme;
 		},
 		toggleTheme() {
-			if (this.theme === "dark") {
-				document.documentElement.classList.remove("dark");
-				localStorage.theme = "light";
-				this.theme = "light";
-			} else if (this.theme === "light") {
-				document.documentElement.classList.add("dark");
-				localStorage.theme = "dark";
-				this.theme = "dark";
+			if (this.theme === 'dark') {
+				document.documentElement.classList.remove('dark');
+				localStorage.theme = 'light';
+				this.theme = 'light';
+			} else if (this.theme === 'light') {
+				document.documentElement.classList.add('dark');
+				localStorage.theme = 'dark';
+				this.theme = 'dark';
 			}
 		},
 		toggleSidebar(show?: boolean) {

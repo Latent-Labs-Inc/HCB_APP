@@ -1,7 +1,7 @@
-import { useUiStore } from "~/stores/ui";
-import { useAuthStore } from "~/stores/auth";
-import { useProfileStore } from "~/stores/profile";
-import { useDataStore } from "~/stores/data";
+import { useUiStore } from '~/stores/ui';
+import { useAuthStore } from '~/stores/auth';
+import { useProfileStore } from '~/stores/profile';
+import { useDataStore } from '~/stores/data';
 
 export default async function useLoadContent() {
 	const uiStore = useUiStore();
@@ -13,7 +13,7 @@ export default async function useLoadContent() {
 		uiStore.toggleAppLoading(true);
 		uiStore.toggleSidebar(true);
 		uiStore.setWidth();
-		if (uiStore.width < 440) {
+		if (uiStore.width && uiStore.width < 440) {
 			uiStore.toggleSidebar(false);
 		}
 		await profileStore.fetchProfile();

@@ -1,13 +1,10 @@
 <template>
 	<div>
 		<h3 class="header">Home</h3>
-		<div class="flex flex-col gap-6">
-			<div
-				class="flex gap-4 justify-evenly"
-				:class="uiStore.width < 440 ? 'xs:flex-col' : ''"
-			>
+		<div class="grid gap-6">
+			<div class="grid gap-4 justify-center lg:grid-cols-2">
 				<LeadBarChart
-					class="sm:w-1/3 lg:w-2/5"
+					class=""
 					:chart-data="leadData"
 					:chart-options="leadOptions"
 					:chart-id="'LeadsTotal'"
@@ -15,7 +12,7 @@
 					:height="300"
 				/>
 				<LeadBarChart
-					class="sm:w-1/3 lg:w-2/5"
+					class=""
 					:chart-data="chartData"
 					:chart-options="chartOptions"
 					:chart-id="'LeadsMarketed'"

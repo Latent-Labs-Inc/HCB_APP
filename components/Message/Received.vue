@@ -10,11 +10,11 @@
 			</div>
 			<UiTable
 				class=""
-				:cols="uiStore.width < 440 ? mobileCols : cols"
-				:grid-cols="uiStore.width < 440 ? 'grid-cols-3' : 'grid-cols-5'"
+				:cols="uiStore.width! < 440 ? mobileCols : cols"
+				:grid-cols="uiStore.width! < 440 ? 'grid-cols-3' : 'grid-cols-5'"
 				:dropdown-items="dropdownItems"
 				:table-data="tableData"
-				:properties="uiStore.width < 440 ? mobileProperties : properties"
+				:properties="uiStore.width! < 440 ? mobileProperties : properties"
 				@item-clicked="handleItemClick"
 				:key="forceUpdate"
 			/>
@@ -58,7 +58,8 @@ const tableData = ref([] as IncomingMessage[]);
 
 const setTableData = async () => {
 	uiStore.toggleFunctionLoading(true);
-	const messages: IncomingMessage[] = await messageStore.fetchMessages();
+	const messages: IncomingMessage[] =
+		(await messageStore.fetchMessages()) as IncomingMessage[];
 	messages.forEach((message) => {
 		let regex = /stop|no|harassment|fuck/gi;
 

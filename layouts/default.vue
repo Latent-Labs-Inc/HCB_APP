@@ -48,6 +48,12 @@ $supabase.auth.onAuthStateChange(async (event, session) => {
 		useClearState();
 	}
 });
+if (process.client) {
+	window.addEventListener('resize', () => {
+		uiStore.setWidth();
+		console.log('resize');
+	});
+}
 </script>
 
 <style scoped>
