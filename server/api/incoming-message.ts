@@ -1,5 +1,5 @@
 import { IncomingMessage, TwilioIncoming, Lead, Address } from '~/types/types';
-import { Database } from '~/types/supabase';
+import { Database, Json } from '~/types/supabase';
 import twilio from 'twilio';
 import { serverSupabaseClient } from '#supabase/server';
 
@@ -36,7 +36,6 @@ export default defineEventHandler(async (event) => {
 			.select('*')
 			.contains('phoneNumbers', [body.To])
 			.single();
-
 		if (data) {
 			user_id = data.user_id;
 		}
@@ -54,11 +53,12 @@ export default defineEventHandler(async (event) => {
 			if (error || !leads) {
 				throw error;
 			}
+
 			leads.forEach(async (lead) => {
 				const propertyAddress = !!lead.propertyAddress
 					? lead.propertyAddress
 					: { address1: 'None Found', city: '', state: '', zip: '' };
-				let incoming_message: IncomingMessage = {
+				let incoming_message = {
 					user_id: user_id!,
 					message: body.Body,
 					from: body.From,
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
 					errorCode: '',
 					errorMessage: '',
 					lead_id: lead.lead_id,
-					propertyAddress: propertyAddress as unknown as Address,
+					propertyAddress: propertyAddress as unknown as Json,
 				};
 				try {
 					const { error } = await supabase

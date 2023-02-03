@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
 		try {
 			await supabase
 				.from('leads')
+				// @ts-ignore
 				.update({ texted: true })
 				.eq('lead_id', lead.lead_id);
 		} catch (error) {
