@@ -83,27 +83,28 @@ const emits = defineEmits<{
 	(e: 'file-added', file: File): void;
 }>();
 
-const checkFileType = (e: any) => {
-	if (e.target.files.length === 1) {
-		const type = e.target.files[0].type;
-		console.log(type);
-		const fileTypes = props.fileTypes;
-		if (fileTypes.includes(type)) {
-			selectedFileType.value = type;
-			selectedFile.value = e.target.files[0];
-			fileWasImported.value = true;
-			fileName.value = e.target.files[0].name;
-		} else {
-			modalActive.value = true;
-			msg.value = props.fileError;
-		}
+const checkFileType = (file: File) => {
+	const type = file.type;
+	console.log('file type', type);
+	const fileTypes = props.fileTypes;
+	if (fileTypes.includes(type)) {
+		selectedFileType.value = type;
+		selectedFile.value = file;
+		fileWasImported.value = true;
+		fileName.value = file.name;
 	} else {
 		modalActive.value = true;
-		msg.value = 'Please make sure you are submitting one file';
+		msg.value = props.fileError;
 	}
 };
 const handleFile = (e: any) => {
-	checkFileType(e);
+	if (e.target.files.length === 1) {
+		const file = e.target.files[0];
+		checkFileType(file);
+	} else {
+		modalActive.value = true;
+		msg.value = 'Please select only one file';
+	}
 };
 
 const clearFile = () => {
@@ -118,9 +119,9 @@ const toggleDrag = () => {
 	dragActive.value = !dragActive.value;
 };
 
-const dropFile = (e: any) => {
+const dropFile = (e: DragEvent) => {
 	toggleDrag();
-	const file = e.dataTransfer.files[0];
+	const file = e.dataTransfer!.files[0];
 	checkFileType(file);
 };
 
