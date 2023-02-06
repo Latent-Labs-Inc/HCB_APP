@@ -5,9 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
-	return {
-		body: 'supabase client working',
-	};
+
 	// not creating the supabase instance because it is not able to do it without the event
 	const supabase = createClient(
 		config.public.SUPABASE_URL,
