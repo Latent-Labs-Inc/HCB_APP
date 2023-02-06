@@ -12,6 +12,11 @@ export default defineEventHandler(async (event) => {
 		config.private.SUPABASE_SERVICE_KEY
 	);
 
+	return {
+		body: 'supabase client working',
+		supabase,
+	};
+
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
 
