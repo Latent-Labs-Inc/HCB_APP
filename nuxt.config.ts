@@ -41,6 +41,7 @@ export default defineNuxtConfig({
 			TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
 			TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
 			SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
+			SECRET: process.env.SECRET,
 		},
 	},
 });
