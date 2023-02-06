@@ -6,11 +6,11 @@ import { serverSupabaseServiceRole } from '#supabase/server';
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 
-	const supabase = serverSupabaseServiceRole<Database>(event);
-
 	return {
 		data: 'created supabase instance',
 	};
+
+	const supabase = serverSupabaseServiceRole<Database>(event);
 
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
