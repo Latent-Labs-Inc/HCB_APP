@@ -1,16 +1,16 @@
 import { TwilioIncoming } from '~/types/types';
 import { Database, Json } from '~/types/supabase';
 import twilio from 'twilio';
-import { serverSupabaseServiceRole } from '#supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 
-	return {
-		data: 'created supabase instance',
-	};
-
-	const supabase = serverSupabaseServiceRole<Database>(event);
+	// not creating the supabase instance because it is not able to do it without the event
+	const supabase = createClient(
+		config.public.SUPABASE_URL,
+		config.private.SUPABASE_SERVICE_KEY
+	);
 
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
