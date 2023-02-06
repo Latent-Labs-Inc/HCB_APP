@@ -7,6 +7,10 @@ export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 
 	// not creating the supabase instance because it is not able to do it without the event
+
+	return {
+		data: createClient,
+	};
 	const supabase = createClient(
 		config.public.SUPABASE_URL,
 		config.private.SUPABASE_SERVICE_KEY
