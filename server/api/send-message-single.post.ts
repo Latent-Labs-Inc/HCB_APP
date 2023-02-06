@@ -1,7 +1,6 @@
 import twilio from 'twilio';
-import { serverSupabaseClient } from '#supabase/server';
-import { Lead, Message, Filter, TwilioResponse } from '../../types/types';
-import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
+import { serverSupabaseServiceRole } from '#supabase/server';
+import { Database } from '~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { phone, message } = (await readBody(event)) as {
@@ -9,7 +8,9 @@ export default defineEventHandler(async (event) => {
 		message: string;
 	};
 
-	console.log(phone, message);
+	const supabase = serverSupabaseServiceRole<Database>(event);
+
+	console.log('Sending message to', phone);
 
 	const config = useRuntimeConfig();
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
