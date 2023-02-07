@@ -109,6 +109,7 @@ export default defineEventHandler(async (event) => {
 			user_id,
 			leads,
 			from: body.From,
+			insertedMessage,
 		};
 	} catch (error) {
 		return {
