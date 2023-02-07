@@ -5,12 +5,12 @@ export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
 
 	if (body.AccountSid === config.private.TWILIO_ACCOUNT_SID) {
-		await $fetch('/api/incoming-message', {
+		const data = await $fetch('/api/incoming-message', {
 			method: 'POST',
 			body,
 		});
 		return {
-			data: null,
+			data,
 			message: 'OK',
 			error: null,
 		};

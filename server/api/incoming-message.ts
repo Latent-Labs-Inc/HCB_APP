@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 	contactPhoneNumbers.forEach(async (number) => {
 		let regex = /stop|no|harassment|fuck/gi;
 		if (!body.Body.match(regex)) {
-			const res = await client.messages.create({
+			await client.messages.create({
 				body: `New message from ${body.From} to ${body.To} with message: ${body.Body}`,
 				from: config.private.TWILIO_PHONE_NUMBER,
 				to: number,
