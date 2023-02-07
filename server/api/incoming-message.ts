@@ -23,6 +23,9 @@ export default defineEventHandler(async (event) => {
 	const contactPhoneNumbers = ['+18134084221'];
 
 	let supabaseError: Error | null = null;
+	let insertedMessage:
+		| Database['public']['Tables']['incoming_messages']['Row']
+		| null = null;
 
 	contactPhoneNumbers.forEach(async (number) => {
 		let regex = /stop|no|harassment|fuck/gi;
@@ -83,12 +86,15 @@ export default defineEventHandler(async (event) => {
 			};
 
 			try {
-				const { error } = await supabase
+				const { data, error } = await supabase
 					.from('incoming_messages')
-					.insert(incoming_message);
+					.insert(incoming_message)
+					.returns();
+
 				if (error) {
 					throw error;
 				}
+				insertedMessage = data[0];
 				supabaseError = error;
 			} catch (error) {
 				supabaseError = error as Error;
