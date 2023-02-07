@@ -19,7 +19,11 @@
 							<textarea v-model.trim="message" v-if="!radios[2].selected" />
 							<div class="flex my-auto gap-4 justify-center" v-else>
 								<label class="my-auto" for="">Search</label>
-								<input class="py-0" type="text" v-model.trim="templateInput" />
+								<input
+									class="py-0 h-8 my-auto"
+									type="text"
+									v-model.trim="templateInput"
+								/>
 								<p
 									class="my-auto px-4 py-2 dark:bg-darkBg bg-primary rounded-lg cursor-pointer dark:hover:bg-darkPrimary hover:bg-primary trans"
 									@click="searchTemplates"
@@ -185,7 +189,7 @@ const searchLeads = async (action: 'search' | 'toggle') => {
 		showLeads.value = !showLeads.value;
 		return;
 	} else {
-		let query = client.from('leads').select('*').eq('texted', false);
+		let query = client.from('leads').select('*').eq('texted', false).limit(100);
 
 		if (radios.value[0].selected !== 'all') {
 			query = query.eq('leadProvider', radios.value[0].selected);
@@ -199,7 +203,6 @@ const searchLeads = async (action: 'search' | 'toggle') => {
 			console.log(error);
 			return;
 		}
-		console.log(data);
 		// @ts-ignore
 		leads.value = data;
 		showLeads.value = true;

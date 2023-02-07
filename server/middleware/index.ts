@@ -10,7 +10,5 @@ export default defineEventHandler((event) => {
 			status: 403,
 			data: 'Forbidden',
 		};
-	} else {
-		console.log('OK');
 	}
 });
