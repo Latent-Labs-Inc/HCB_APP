@@ -66,15 +66,10 @@
 					/>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<UiBaseList
+					<LeadBaseList
 						v-if="showLeads"
 						:data="leads"
-						:gridCols="'grid-cols-5'"
-						:colKeyPairs="leadColKeyPairs"
-						:showAdd="false"
-						:itemName="'Lead'"
-						:flip="true"
-						@selected="handleSelected('lead', $event)"
+						@selected="handleSelected"
 					/>
 				</transition>
 			</div>
@@ -106,13 +101,6 @@ const sentMessages = ref<number>(0);
 const leads = ref([] as Lead[]);
 const showLeads = ref(false);
 
-const leadColKeyPairs = reactive({
-	'Lead Provider': 'leadProvider',
-	'Lead Type': 'leadType',
-	Address: 'propertyAddress.address1',
-	City: 'propertyAddress.city',
-	'Phone Numbers': 'wireless',
-});
 const templateColKeyPairs = reactive({
 	Name: 'name',
 	Message: 'message',
@@ -185,27 +173,38 @@ const searchTemplates = async () => {
 };
 
 const searchLeads = async (action: 'search' | 'toggle') => {
-	if (action === 'toggle') {
-		showLeads.value = !showLeads.value;
-		return;
-	} else {
-		let query = client.from('leads').select('*').eq('texted', false).limit(100);
-
-		if (radios.value[0].selected !== 'all') {
-			query = query.eq('leadProvider', radios.value[0].selected);
-		}
-		if (radios.value[1].selected !== 'all') {
-			query = query.eq('leadType', radios.value[1].selected);
-		}
-
-		const { data, error } = await query;
-		if (error) {
-			console.log(error);
+	uiStore.toggleFunctionLoading(true);
+	try {
+		if (action === 'toggle') {
+			showLeads.value = !showLeads.value;
 			return;
+		} else {
+			let query = client
+				.from('leads')
+				.select('*')
+				.eq('texted', false)
+				.limit(100);
+
+			if (radios.value[0].selected !== 'all') {
+				query = query.eq('leadProvider', radios.value[0].selected);
+			}
+			if (radios.value[1].selected !== 'all') {
+				query = query.eq('leadType', radios.value[1].selected);
+			}
+
+			const { data, error } = await query;
+			if (error) {
+				console.log(error);
+				return;
+			}
+			// @ts-ignore
+			leads.value = data;
+			showLeads.value = true;
 		}
-		// @ts-ignore
-		leads.value = data;
-		showLeads.value = true;
+	} catch (error) {
+		console.log(error);
+	} finally {
+		uiStore.toggleFunctionLoading(false);
 	}
 };
 
@@ -214,7 +213,7 @@ const sendTexts = async () => {
 		alert('Please select leads to send messages to');
 		return;
 	}
-	if (templateSelected.value && !templateSelected.value.message) {
+	if (!templateSelected.value) {
 		alert('Please select a template with a message');
 		return;
 	}
