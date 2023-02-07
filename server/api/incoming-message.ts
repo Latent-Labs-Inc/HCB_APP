@@ -48,10 +48,13 @@ export default defineEventHandler(async (event) => {
 					throw error;
 				}
 
+				console.log(leads);
+
 				leads.forEach(async (lead) => {
 					const propertyAddress = !!lead.propertyAddress
 						? lead.propertyAddress
 						: { address1: 'None Found', city: '', state: '', zip: '' };
+
 					let incoming_message = {
 						user_id: user_id!,
 						message: body.Body,
@@ -68,6 +71,7 @@ export default defineEventHandler(async (event) => {
 						lead_id: lead.lead_id,
 						propertyAddress: propertyAddress as unknown as Json,
 					};
+
 					try {
 						const { error } = await supabase
 							.from('incoming_messages')
