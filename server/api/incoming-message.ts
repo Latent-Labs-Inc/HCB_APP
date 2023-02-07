@@ -99,6 +99,8 @@ export default defineEventHandler(async (event) => {
 			statusCode: 200,
 			body: 'success',
 			supabaseError,
+			user_id,
+			leads,
 		};
 	} catch (error) {
 		return {
