@@ -1,34 +1,7 @@
-<script setup lang="ts">
-import { useUiStore } from "../../stores/ui";
-import { useAuthStore } from "../../stores/auth";
-import IconMoon from "~icons/fa-solid/moon";
-import IconSun from "~icons/fa-solid/sun";
-import IconBars from "~icons/fa-solid/bars";
-
-const uiStore = useUiStore();
-const authStore = useAuthStore();
-
-onBeforeMount(async () => {
-	await authStore.checkRefresh();
-});
-
-const handleSignOut = async () => {
-	uiStore.toggleFunctionLoading(true);
-	await authStore.signOut();
-	uiStore.toggleSidebar(false);
-	uiStore.toggleFunctionLoading(false);
-};
-const handleSidebar = () => {
-	if (authStore.isLoggedIn) {
-		uiStore.toggleSidebar();
-	}
-};
-</script>
-
 <template>
 	<nav class="">
 		<div class="flex items-center nav">
-			<NuxtLink v-if="uiStore.width > 450" class="logo px-5 text-xl" to="/">
+			<NuxtLink v-if="uiStore.width! > 450" class="logo px-5 text-xl" to="/">
 				<img
 					v-if="uiStore.theme === 'light'"
 					class="h-fit w-32 top-0 trans p-2"
@@ -64,7 +37,7 @@ const handleSidebar = () => {
 					<li class="nav-li trans" @click="handleSignOut">
 						<client-only>
 							<NuxtLink to="/auth">{{
-								authStore.isLoggedIn ? "Sign Out" : "Sign In"
+								authStore.isLoggedIn ? 'Sign Out' : 'Sign In'
 							}}</NuxtLink>
 						</client-only>
 					</li>
@@ -73,6 +46,32 @@ const handleSidebar = () => {
 		</div>
 	</nav>
 </template>
+
+<script setup lang="ts">
+import { useUiStore } from '../../stores/ui';
+import { useAuthStore } from '../../stores/auth';
+// @ts-ignore
+import IconMoon from '~icons/fa-solid/moon';
+// @ts-ignore
+import IconSun from '~icons/fa-solid/sun';
+// @ts-ignore
+import IconBars from '~icons/fa-solid/bars';
+
+const uiStore = useUiStore();
+const authStore = useAuthStore();
+
+const handleSignOut = async () => {
+	uiStore.toggleFunctionLoading(true);
+	await authStore.signOut();
+	uiStore.toggleSidebar(false);
+	uiStore.toggleFunctionLoading(false);
+};
+const handleSidebar = () => {
+	if (authStore.isLoggedIn) {
+		uiStore.toggleSidebar();
+	}
+};
+</script>
 
 <style scoped>
 .logo {
@@ -88,7 +87,6 @@ const handleSidebar = () => {
 }
 
 .nav-li {
-	padding: 20px;
-	@apply hover:text-secondary hover:dark:text-darkPrimary cursor-pointer trans;
+	@apply hover:text-secondary hover:dark:text-darkPrimary cursor-pointer trans p-2;
 }
 </style>

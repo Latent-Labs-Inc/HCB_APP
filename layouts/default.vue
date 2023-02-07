@@ -13,23 +13,25 @@
 				<transition name="sidebar" mode="out-in">
 					<UiSideNav v-if="uiStore.sidebar" />
 				</transition>
-				<transition name="fade" mode="out-in">
-					<div
-						v-if="!uiStore.appLoading"
-						class="max-h-full dark:bg-black trans max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl mx-auto flex-grow"
-					>
-						<client-only>
-							<transition name="route-fade" mode="out-in" appear>
-								<div :key="$route.path" class="w-full">
-									<slot />
-								</div>
-							</transition>
-						</client-only>
-					</div>
-					<div v-else class="flex flex-grow mt-40 justify-center trans">
-						<UiBaseSpinner />
-					</div>
-				</transition>
+				<ClientOnly>
+					<transition name="fade" mode="out-in">
+						<div
+							v-if="!uiStore.appLoading"
+							class="max-h-full dark:bg-black trans max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl mx-auto flex-grow"
+						>
+							<client-only>
+								<transition name="route-fade" mode="out-in" appear>
+									<div :key="$route.path" class="w-full">
+										<slot />
+									</div>
+								</transition>
+							</client-only>
+						</div>
+						<div v-else class="flex flex-grow mt-40 justify-center trans">
+							<UiBaseSpinner />
+						</div>
+					</transition>
+				</ClientOnly>
 			</div>
 		</div>
 	</div>
@@ -38,12 +40,13 @@
 <script setup lang="ts">
 import { useUiStore } from '../stores/ui';
 import { useAuthStore } from '../stores/auth';
+import { Database } from '~/types/supabase';
 
-const { $supabase } = useNuxtApp();
+const supabase = useSupabaseClient<Database>();
 const uiStore = useUiStore();
 const router = useRouter();
 
-$supabase.auth.onAuthStateChange(async (event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
 	if (event === 'SIGNED_OUT') {
 		useClearState();
 	}

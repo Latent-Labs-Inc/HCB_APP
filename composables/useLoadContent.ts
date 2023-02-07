@@ -9,18 +9,22 @@ export default async function useLoadContent() {
 	const profileStore = useProfileStore();
 	const dataStore = useDataStore();
 
-	if (authStore.isLoggedIn && !authStore.initialized) {
-		uiStore.toggleAppLoading(true);
-		uiStore.toggleSidebar(true);
-		uiStore.setWidth();
-		if (uiStore.width && uiStore.width < 440) {
-			uiStore.toggleSidebar(false);
-		}
-		await profileStore.fetchProfile();
-		await dataStore.callFetchChartData();
+	uiStore.toggleAppLoading(true);
+	uiStore.toggleSidebar(true);
+	uiStore.setWidth();
 
-		setTimeout(() => {
-			uiStore.toggleAppLoading(false);
-		}, 1000);
+	if (uiStore.width && uiStore.width < 440) {
+		uiStore.toggleSidebar(false);
 	}
+
+	await profileStore.fetchProfile();
+	await dataStore.callFetchChartData();
+
+	authStore.initialized = true;
+
+	console.log('content loaded');
+
+	setTimeout(() => {
+		uiStore.toggleAppLoading(false);
+	}, 1000);
 }

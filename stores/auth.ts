@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useUiStore } from './ui';
 import { User, Session } from '@supabase/gotrue-js/src/lib/types';
+import { Database } from '~/types/supabase';
 // figure out how to set the expires in field in the session
 
 export const useAuthStore = defineStore('auth', () => {
@@ -22,9 +23,11 @@ export const useAuthStore = defineStore('auth', () => {
 	const getUser = computed(() => {
 		return user.value;
 	});
+
 	const isLoggedIn = computed(() => {
 		return user.value && user.value.id !== undefined;
 	});
+
 	const isError = computed(() => {
 		return authError.value !== '';
 	});
@@ -158,6 +161,7 @@ export const useAuthStore = defineStore('auth', () => {
 	};
 	const checkRefresh = async () => {
 		const PROJECT_ID = useRuntimeConfig().public.SUPABASE_PROJECT_ID;
+
 		try {
 			const supabaseAuthToken: {
 				currentSession: {
@@ -175,6 +179,7 @@ export const useAuthStore = defineStore('auth', () => {
 					session.value = data.session;
 					user.value = data.session.user;
 					expiresIn.value = data.session.expires_in;
+
 					setTimer();
 					await getProfile();
 				}
