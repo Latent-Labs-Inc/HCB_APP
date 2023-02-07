@@ -22,8 +22,6 @@ export default async function useLoadContent() {
 
 	authStore.initialized = true;
 
-	console.log('content loaded');
-
 	setTimeout(() => {
 		uiStore.toggleAppLoading(false);
 	}, 1000);

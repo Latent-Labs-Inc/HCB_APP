@@ -1,22 +1,24 @@
-import { IncomingMessage, TwilioIncoming } from '~/types/types';
-import twilio from 'twilio';
+import { TwilioIncoming } from '~/types/types';
 import { serverSupabaseServiceRole } from '#supabase/server';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
+	const body: TwilioIncoming = await readBody(event);
 
 	const supabase = serverSupabaseServiceRole<Database>(event);
 
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
-	const authToken = config.private.TWILIO_AUTH_TOKEN;
-
-	const client = twilio(accountSid, authToken);
-
-	const body: TwilioIncoming = await readBody(event);
+	if (body.AccountSid !== accountSid) {
+		console.log('Invalid Twilio AccountSid');
+		return {
+			data: null,
+			message: 'Invalid Twilio AccountSid',
+			error: 'Invalid Twilio AccountSid',
+		};
+	}
 
 	try {
-		console.log(body);
 		const { data, error } = await supabase
 			.from('sent_messages')
 			.update({ status: body.MessageStatus })

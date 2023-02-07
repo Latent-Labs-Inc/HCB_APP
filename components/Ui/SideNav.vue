@@ -59,7 +59,6 @@ const router = useRouter();
 const uiStore = useUiStore();
 
 router.afterEach(() => {
-	console.log('name changed');
 	if (uiStore.width! < 440) {
 		uiStore.toggleSidebar(false);
 	}

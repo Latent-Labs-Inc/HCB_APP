@@ -5,14 +5,21 @@ import { serverSupabaseServiceRole } from '#supabase/server';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
+	const body: TwilioIncoming = await readBody(event);
 
 	const supabase = serverSupabaseServiceRole<Database>(event);
+
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
+	if (body.AccountSid !== accountSid) {
+		console.log('Invalid Twilio AccountSid');
+		return {
+			data: null,
+			message: 'Invalid Twilio AccountSid',
+			error: 'Invalid Twilio AccountSid',
+		};
+	}
 	const authToken = config.private.TWILIO_AUTH_TOKEN;
-
 	const client = twilio(accountSid, authToken);
-
-	const body: TwilioIncoming = await readBody(event);
 
 	const contactPhoneNumbers = ['+18134084221'];
 
