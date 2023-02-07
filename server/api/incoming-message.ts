@@ -101,6 +101,7 @@ export default defineEventHandler(async (event) => {
 			supabaseError,
 			user_id,
 			leads,
+			from: body.From,
 		};
 	} catch (error) {
 		return {
