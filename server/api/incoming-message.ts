@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 				: { address1: 'None Found', city: '', state: '', zip: '' };
 
 			let incoming_message = {
-				user_id: user_id!,
+				user_id: user_id,
 				message: body.Body,
 				from: body.From,
 				to: body.To,
@@ -89,6 +89,7 @@ export default defineEventHandler(async (event) => {
 				if (error) {
 					throw error;
 				}
+				supabaseError = error;
 			} catch (error) {
 				supabaseError = error as Error;
 				console.log(error);
