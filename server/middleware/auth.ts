@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
 	const user = await serverSupabaseUser(event);
 	const allowedRoutes = [
 		'/api/public/twilio-incoming',
+		'/api/public/twilio-status-update',
 		'/api/incoming-message',
 		'/api/status-update',
 	];

@@ -1,7 +1,7 @@
 import twilio from 'twilio';
-import { Lead, Message } from '~/types/types';
+import { Lead } from '~/types/types';
 import { serverSupabaseClient } from '#supabase/server';
-import { Database } from '~/types/supabase';
+import { Database, Json } from '~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig();
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
 	const { message, to, lead_id } = await readBody(event);
 
 	try {
-		let sentMessage: Message;
+		let sentMessage: Database['public']['Tables']['sent_messages']['Row'];
 
 		let lead: Lead;
 		const { data, error } = await supabase
@@ -48,16 +48,16 @@ export default defineEventHandler(async (event) => {
 				to: to,
 				from: config.private.TWILIO_PHONE_NUMBER,
 				user_id,
-				sent_at: new Date(),
-				created_at: new Date(),
-				updated_at: new Date(),
+				sent_at: new Date().toISOString(),
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
 				sid: res.sid || useUuid(),
 				status: res.status,
-				errorCode: res.errorCode,
+				errorCode: res.errorCode.toString(),
 				errorMessage: res.errorMessage,
 				direction: res.direction,
 				lead_id,
-				propertyAddress: lead.propertyAddress,
+				propertyAddress: lead.propertyAddress as unknown as Json,
 			};
 			const { error: err } = await supabase
 				.from('sent_messages')
