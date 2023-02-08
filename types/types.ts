@@ -1,3 +1,5 @@
+import { Database } from './supabase';
+
 export interface FormElement {
 	id: string;
 	title: string;
@@ -38,31 +40,7 @@ export interface Address {
 	locationIdentifier?: string;
 	countrySubDivisionCode?: string;
 }
-export interface Lead {
-	user_id: string;
-	lead_id: string;
-	leadType: string;
-	leadProvider: string;
-	propertyAddress: Address;
-	ownerFirstName: string;
-	ownerLastName: string;
-	wireless: string[];
-	landline: string[];
-	email: string[];
-	created_at: Date;
-	modified_at: Date;
-	texted: boolean;
-	emailed: boolean;
-	mailed: boolean;
-	fileDate: Date;
-	prFirstName?: string;
-	prLastName?: string;
-	prAddress?: Address;
-	mailingAddress?: Address;
-	legalDescription?: string;
-	favorite?: boolean;
-	favoritePhone?: string;
-}
+export type Lead = Database['public']['Tables']['leads']['Row'];
 
 export interface IncomingMessage {
 	user_id: string;

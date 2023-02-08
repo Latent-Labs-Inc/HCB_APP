@@ -38,6 +38,14 @@
 <script setup lang="ts">
 import { useLeadStore } from '~/stores/lead';
 import Papa from 'papaparse';
+import { Lead } from '~~/types/types';
+import { useAuthStore } from '~~/stores/auth';
+import { Database } from '~~/types/supabase';
+import { useUiStore } from '~~/stores/ui';
+
+const client = useSupabaseClient<Database>();
+const authStore = useAuthStore();
+const uiStore = useUiStore();
 
 const leadProvider = ref('propStream');
 
@@ -112,6 +120,40 @@ watch(otherLeadTypeInput, (newType) => {
 	leadStore.setLeadType(newType);
 });
 
+interface FD_Contact {
+	Cell: string;
+	'Cell 2': string;
+	'Cell 3': string;
+	'Cell 4': string;
+	City: string;
+	'Company Name': string;
+	DNC: string;
+	'DNC 2': string;
+	'DNC 3': string;
+	'DNC 4': string;
+	'Email 1': string;
+	'Email 2': string;
+	'Email 3': string;
+	'Email 4': string;
+	'First Name': string;
+	Landline: string;
+	'Landline 2': string;
+	'Landline 3': string;
+	'Landline 4': string;
+	'Last Name': string;
+	'Mail Address Same': string;
+	'Mail City': string;
+	'Mail State': string;
+	'Mail Street Address': string;
+	'Mail Zip': string;
+	Phone: string;
+	State: string;
+	Status: string;
+	'Street Address': string;
+	Type: string;
+	Zip: string;
+}
+
 const handleFile = (file: File) => {
 	const reader = new FileReader();
 	reader.onload = async (e) => {
@@ -120,7 +162,77 @@ const handleFile = (file: File) => {
 			header: true,
 			skipEmptyLines: true,
 		});
+		const data = parsed.data as FD_Contact[];
+		// remove all leads with a company name
+		const contactLeads = data.filter((contact) => {
+			return contact['Company Name'] === '';
+		});
+
+		// convert contact leads to lead type
+		const leads: Lead[] = contactLeads.map((contact) => {
+			const lead: Lead = {
+				leadProvider: leadProvider.value,
+				leadType: leadType.value,
+				user_id: useAuthStore().user_id!,
+				lead_id: useUuid(),
+				propertyAddress: {
+					street: contact['Street Address'],
+					city: contact.City,
+					state: contact.State,
+					zip: contact.Zip,
+				},
+				ownerFirstName: contact['First Name'],
+				ownerLastName: contact['Last Name'],
+				wireless: [
+					contact.Cell,
+					contact['Cell 2'],
+					contact['Cell 3'],
+					contact['Cell 4'],
+				],
+				landline: [
+					contact.Landline,
+					contact['Landline 2'],
+					contact['Landline 3'],
+					contact['Landline 4'],
+				],
+				email: [
+					contact['Email 1'],
+					contact['Email 2'],
+					contact['Email 3'],
+					contact['Email 4'],
+				],
+				created_at: new Date().toDateString(),
+				modified_at: new Date().toDateString(),
+				texted: false,
+				emailed: false,
+				mailed: false,
+				mailingAddress: {
+					street: contact['Mail Street Address'],
+					city: contact['Mail City'],
+					state: contact['Mail State'],
+					zip: contact['Mail Zip'],
+				},
+				favorite: false,
+				favoritePhone: '',
+				fileDate: new Date().toDateString(),
+				prAddress: {},
+				prFirstName: '',
+				prLastName: '',
+			};
+			return lead;
+		});
+		try {
+			const { data: insertedLeads, error } = await client
+				.from('leads')
+				.insert(leads);
+			if (error) throw error;
+		} catch (error) {
+			console.log(error);
+		} finally {
+			uiStore.toggleFunctionLoading(false);
+		}
 	};
+	uiStore.toggleFunctionLoading(true);
 	reader.readAsText(file);
 };
 </script>

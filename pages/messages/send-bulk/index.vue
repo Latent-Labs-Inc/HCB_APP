@@ -247,7 +247,7 @@ const sendTexts = async () => {
 
 		setTimeout(() =>
 			leads.value.forEach((lead) => {
-				lead.wireless.forEach((wireless) => {
+				lead.wireless!.forEach((wireless) => {
 					sentMessages.value++;
 				});
 			}, 3000)
