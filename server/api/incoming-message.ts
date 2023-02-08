@@ -43,15 +43,10 @@ export default defineEventHandler(async (event) => {
 			.select('*')
 			.contains('phoneNumbers', [body.To])
 			.single();
+
 		if (err) throw err;
 
 		const user_id = data.user_id;
-
-		if (!user_id)
-			return {
-				statusCode: 500,
-				body: 'user not found',
-			};
 
 		const { data: lead, error } = await supabase
 			.from('leads')
@@ -59,6 +54,7 @@ export default defineEventHandler(async (event) => {
 			.eq('user_id', user_id)
 			.contains('wireless', [body.From])
 			.single();
+
 		if (error || !lead) {
 			throw error || 'No leads found';
 		}
@@ -98,32 +94,12 @@ export default defineEventHandler(async (event) => {
 		} catch (error) {
 			supabaseError = error as Error;
 			console.log(error);
+			return {
+				statusCode: 500,
+				body: error,
+				supabaseError,
+			};
 		}
-
-		// leads.forEach(async (lead) => {
-		// 	const propertyAddress = !!lead.propertyAddress
-		// 		? lead.propertyAddress
-		// 		: { address1: 'None Found', city: '', state: '', zip: '' };
-
-		// 	let incoming_message = {
-		// 		user_id: user_id,
-		// 		message: body.Body,
-		// 		from: body.From,
-		// 		to: body.To,
-		// 		sid: body.MessageSid,
-		// 		created_at: new Date().toISOString(),
-		// 		sent_at: new Date().toISOString(),
-		// 		updated_at: new Date().toISOString(),
-		// 		status: body.MessageStatus,
-		// 		direction: 'inbound',
-		// 		errorCode: '',
-		// 		errorMessage: '',
-		// 		lead_id: lead.lead_id,
-		// 		propertyAddress: propertyAddress as unknown as Json,
-		// 	};
-
-		// 	messages.push(incoming_message);
-		// });
 
 		return {
 			statusCode: 200,
