@@ -83,13 +83,11 @@ export default defineEventHandler(async (event) => {
 		try {
 			const { data, error } = await supabase
 				.from('incoming_messages')
-				.insert(incoming_message)
-				.returns();
-
+				.insert(incoming_message);
 			if (error) {
 				throw error;
 			}
-			insertedMessage = data[0] ? 'success' : 'failed';
+
 			supabaseError = error;
 		} catch (error) {
 			supabaseError = error as Error;
@@ -98,6 +96,7 @@ export default defineEventHandler(async (event) => {
 				statusCode: 500,
 				body: error,
 				supabaseError,
+				data,
 			};
 		}
 
