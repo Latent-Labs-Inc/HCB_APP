@@ -2,10 +2,11 @@ import twilio from 'twilio';
 
 import { serverSupabaseClient } from '#supabase/server';
 import { Lead, TwilioResponse } from '~~/types/types';
+import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { leads, user_id, message } = await readBody(event);
-	const supabase = serverSupabaseClient(event);
+	const supabase = serverSupabaseClient<Database>(event);
 	const config = useRuntimeConfig();
 
 	const accountSid = config.private.TWILIO_ACCOUNT_SID;
@@ -17,29 +18,57 @@ export default defineEventHandler(async (event) => {
 	let error = null as Error | null;
 
 	let messageCounter = 0;
-	leads.forEach(async (lead: Lead) => {
+
+	// create a promise for each lead that does not resolve until all the messages are sent
+	const promises = leads.map(async (lead: Lead) => {
 		lead.wireless.forEach(async (wireless: string) => {
 			try {
-				const twilioResponse = await client.messages.create({
-					body: message,
-					from: twilioNumber,
-					to: wireless,
-				});
-				if (twilioResponse.errorMessage)
-					throw new Error(twilioResponse.errorMessage);
-				messageCounter++;
-				console.log(messageCounter);
+				// check if number is in badNumbers
+				const { data, error } = await supabase
+					.from('bad_numbers')
+					.select('*')
+					.eq('number', wireless);
+				if (error) throw error;
+				if (data.length > 0) {
+					console.log('bad_number');
+					return;
+				} else {
+					const twilioResponse = await client.messages.create({
+						body: message,
+						from: twilioNumber,
+						to: wireless,
+					});
+					if (twilioResponse.errorMessage)
+						throw new Error(twilioResponse.errorMessage);
+					messageCounter++;
+					console.log(messageCounter);
+				}
 			} catch (error) {
 				console.log(error);
 				error = error;
+			} finally {
+				// update the number to the list of badNumbers to prevent double texts
+				try {
+					const { data, error } = await supabase
+
+						.from('bad_numbers')
+						.insert({ user_id, number: wireless });
+					if (error) throw error;
+				} catch (error) {
+					console.log(error);
+					error = error;
+				}
 			}
 		});
+		// update the lead to texted in db
 		try {
-			await supabase
+			const { data, error } = await supabase
+
 				.from('leads')
 				// @ts-ignore
 				.update({ texted: true })
 				.eq('lead_id', lead.lead_id);
+			if (error) throw error;
 		} catch (error) {
 			console.log(error);
 			error = error;
@@ -48,8 +77,13 @@ export default defineEventHandler(async (event) => {
 				error,
 			};
 		}
+		console.log('finished lead');
 	});
 
+	// wait for all the promises to resolve
+	await Promise.all(promises);
+
+	console.log('returned the number of messages sent');
 	return {
 		data: messageCounter,
 		error,

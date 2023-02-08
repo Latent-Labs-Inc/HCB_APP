@@ -196,7 +196,7 @@ const searchLeads = async (action: 'search' | 'toggle') => {
 				.from('leads')
 				.select('*')
 				.eq('texted', false)
-				.limit(100);
+				.limit(50);
 
 			if (radios.value[0].selected !== 'all') {
 				query = query.eq('leadProvider', radios.value[0].selected);
@@ -232,6 +232,7 @@ const sendTexts = async () => {
 	}
 	uiStore.toggleFunctionLoading(true);
 	try {
+		// get the amount of messages sent by the amount of wireless numbers in the leads array
 		const { data, error } = await $fetch('/api/bulk-send-messages', {
 			method: 'POST',
 			body: {
@@ -243,7 +244,27 @@ const sendTexts = async () => {
 			},
 		});
 		if (error) throw error;
-		sentMessages.value = data;
+
+		setTimeout(() =>
+			leads.value.forEach((lead) => {
+				lead.wireless.forEach((wireless) => {
+					sentMessages.value++;
+				});
+			}, 3000)
+		);
+
+		// const { data, error } = await client
+		// 	.from('leads')
+		// 	.update({
+		// 		texted: true,
+		// 	})
+		// 	.in(
+		// 		'lead_id',
+		// 		leads.value.map((lead) => lead.lead_id)
+		// 	);
+		// if (error) throw error;
+		// console.log(data);
+		// sentMessages.value = leads.value.length;
 	} catch (error) {
 		console.log(error);
 	} finally {
