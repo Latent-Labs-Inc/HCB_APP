@@ -27,14 +27,13 @@ export default defineEventHandler(async (event) => {
 				});
 				if (twilioResponse.errorMessage)
 					throw new Error(twilioResponse.errorMessage);
-				console.log(twilioResponse);
 				messageCounter++;
+				console.log(messageCounter);
 			} catch (error) {
 				console.log(error);
 				error = error;
 			}
 		});
-
 		try {
 			await supabase
 				.from('leads')
@@ -44,6 +43,10 @@ export default defineEventHandler(async (event) => {
 		} catch (error) {
 			console.log(error);
 			error = error;
+			return {
+				data: messageCounter,
+				error,
+			};
 		}
 	});
 

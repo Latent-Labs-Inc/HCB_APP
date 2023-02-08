@@ -26,8 +26,7 @@
 
 	button,
 	.btn {
-		border: 1px;
-		@apply focus:ring-darkBg border-solid border-darkSecondary py-2 px-4 rounded-full trans text-white bg-primary hover:bg-secondary hover:text-white  dark:hover:text-darkSecondary dark:hover:bg-black dark:bg-darkPrimary  trans;
+		@apply focus:ring-darkBg py-2 px-4 rounded-full trans text-white bg-primary hover:bg-secondary hover:text-white  dark:hover:text-darkSecondary dark:hover:bg-black dark:bg-darkPrimary  trans;
 	}
 	input {
 		border: 1px solid #ccc;
