@@ -155,6 +155,7 @@ interface FD_Contact {
 }
 
 const handleFile = (file: File) => {
+	uiStore.toggleFunctionLoading(true);
 	const reader = new FileReader();
 	reader.onload = async (e) => {
 		const csv = e.target?.result;
@@ -224,7 +225,7 @@ const handleFile = (file: File) => {
 		try {
 			const { data: insertedLeads, error } = await client
 				.from('leads')
-				.insert(leads);
+				.upsert(leads, { onConflict: 'propertyAddress' });
 			if (error) throw error;
 		} catch (error) {
 			console.log(error);
@@ -232,7 +233,7 @@ const handleFile = (file: File) => {
 			uiStore.toggleFunctionLoading(false);
 		}
 	};
-	uiStore.toggleFunctionLoading(true);
+
 	reader.readAsText(file);
 };
 </script>
