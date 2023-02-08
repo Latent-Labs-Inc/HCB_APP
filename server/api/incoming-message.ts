@@ -81,22 +81,22 @@ export default defineEventHandler(async (event) => {
 		};
 
 		try {
-			const { data, error } = await supabase
+			const { data: message, error } = await supabase
 				.from('incoming_messages')
 				.insert(incoming_message);
 			if (error) {
-				throw error;
+				throw { error, message };
 			}
 
 			supabaseError = error;
-		} catch (error) {
-			supabaseError = error as Error;
+		} catch (error: any) {
+			supabaseError = error.error as Error;
 			console.log(error);
 			return {
 				statusCode: 500,
 				body: error,
 				supabaseError,
-				data,
+				data: error.message,
 			};
 		}
 
