@@ -9,6 +9,20 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      attorney_emails: {
+        Row: {
+          email: string
+          user_id: string
+        }
+        Insert: {
+          email: string
+          user_id: string
+        }
+        Update: {
+          email?: string
+          user_id?: string
+        }
+      }
       bad_numbers: {
         Row: {
           number: string
@@ -369,6 +383,9 @@ export interface Database {
       }
     }
     Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
       [_ in never]: never
     }
   }

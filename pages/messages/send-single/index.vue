@@ -2,19 +2,18 @@
 	<div class="grid gap-4">
 		<h3 class="header">Send Text</h3>
 		<div class="grid gap-4 dark:text-white">
-			<div class="flex gap-4 my-auto mx-auto">
-				<label for="">Phone Number:</label>
+			<div class="flex flex-col gap-4 my-auto mx-auto">
+				<label class="text-center" for="">Phone Number</label>
 				<input
 					class="px-2 py-1 outline-none border-none focus:outline-none focus:border-none bg-darkSecondary dark:bg-darkBg dark:text-white"
 					type="text"
 					v-model.trim="phone"
 				/>
 			</div>
-			<div class="flex gap-4 my-auto mx-auto items-center">
-				<label for="">Message:</label>
+			<div class="flex flex-col gap-4 my-auto items-center">
+				<label class="text-center" for="">Message</label>
 				<textarea
-					class="dark:bg-darkBg bg-darkSecondary rounded-md outline-none py-2 px-4 dark:text-white"
-					:cols="50"
+					class="dark:bg-darkBg bg-darkSecondary rounded-md outline-none py-2 px-4 dark:text-white w-80 sm:w-4/5"
 					:rows="5"
 					v-model.trim="message"
 				/>

@@ -42,6 +42,11 @@ export default defineNuxtConfig({
 			TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
 			SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
 			SECRET: process.env.SECRET,
+			EMAIL_USER: process.env.EMAIL_USER,
+			EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+			EMAIL_HOST: process.env.EMAIL_HOST,
+			EMAIL_PORT: process.env.EMAIL_PORT,
+			EMAIL_FROM: process.env.EMAIL_FROM,
 		},
 	},
 });

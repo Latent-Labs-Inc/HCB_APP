@@ -1,19 +1,19 @@
 <template>
 	<div class="grid gap-4">
 		<h3 class="header">Upload Email</h3>
-		<div class="grid gap-6">
-			<h4 class="mx-auto text-white">Select Type</h4>
+		<div class="grid gap-4">
 			<UiRadioInput
 				class="mx-auto"
 				:options="options"
 				:selected="type"
+				:question="'Select Type?'"
 				@option-clicked="handleOption"
 				:row="true"
 			/>
-			<h4 class="mx-auto text-white">Upload to Supabase?</h4>
 			<UiRadioInput
 				class="mx-auto"
 				:options="supabaseOptions"
+				:question="'Add to Supabase?'"
 				:selected="supabaseType"
 				@option-clicked="handleSupabaseOption"
 				:row="true"
@@ -99,7 +99,6 @@ const handleFile = (file: File) => {
 					unique.push(formattedProbates[i].attorney_email);
 				}
 			}
-			console.log('unique', unique);
 			if (supabaseType.value) {
 				try {
 					uiStore.toggleFunctionLoading(true);

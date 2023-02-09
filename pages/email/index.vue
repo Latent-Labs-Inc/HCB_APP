@@ -12,7 +12,7 @@
 // @ts-ignore
 import IcBaselineEmail from '~icons/ic/baseline-email';
 // @ts-ignore
-import IconMail from '~icons/fa-solid/inbox';
+import IcBaselineMarkunreadMailbox from '~icons/ic/baseline-markunread-mailbox';
 
 const router = useRouter();
 
@@ -20,20 +20,20 @@ const actionProps = [
 	{
 		id: 'startCampaign',
 		name: 'Start Email Campaign',
-		icon: IcBaselineEmail,
+		icon: IcBaselineMarkunreadMailbox,
 	},
 	{
-		id: 'viewEmails',
-		name: 'View Emails',
-		icon: IconMail,
+		id: 'sendSingle',
+		name: 'Send Single Email',
+		icon: IcBaselineEmail,
 	},
 ];
 
 const handleAction = (action: string) => {
 	if (action === 'startCampaign') {
 		router.push('/email/campaign');
-	} else if (action === 'viewEmails') {
-		router.push('/email/view');
+	} else if (action === 'sendSingle') {
+		router.push('/email/single');
 	}
 };
 </script>
