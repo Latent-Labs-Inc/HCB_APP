@@ -31,9 +31,9 @@
 				<div class="grid" v-else>
 					<p
 						class="px-2 py-1 cursor-pointer mx-auto hover:dark:bg-black dark:bg-darkBg rounded-md trans bg-darkSecondary hover:bg-white"
-						@click="handleGenerate"
+						@click="handleEmail"
 					>
-						Generate Email Templates
+						Send Emails
 					</p>
 					<UiBaseList
 						:colKeyPairs="colKeyPairs"
@@ -128,42 +128,39 @@ const colKeyPairs = reactive({
 	'Property Zip': 'zip',
 });
 
-const handleGenerate = async () => {
-	let your_name = 'Chad Dudley';
+const handleEmail = async () => {
 	let usedEmails = [] as string[];
-	let emails = [] as string[];
+	let emailObjects = [] as {
+		attorneyEmail: string;
+		attorneyName: string;
+		prName: string;
+		address1: string;
+		city: string;
+		state: string;
+		zip: string;
+	}[];
 	data.value.forEach((probate) => {
 		if (!probate.attorney_email) return console.log('no email', probate);
 		if (!probate.attorney_last) return console.log('no attorney last', probate);
 		if (!probate.pr_last || !probate.pr_first)
 			return console.log('no pr name', probate);
 		if (usedEmails.includes(probate.attorney_email)) return;
-		let attorney_email = probate.attorney_email;
-		let attorney_name = probate.attorney_last;
-		let pr_name = probate.pr_first + ' ' + probate.pr_last;
-		let address1 = probate.address1;
-		let city = probate.city;
-		let state = probate.state;
-		let zip = probate.zip;
-		const email = ref(
-			`${attorney_email}\nImportant for Personal Rep ${pr_name}\nDear Attorney ${attorney_name},\n\nHello, my name is ${your_name}. I am inquiring about a probate case you are handling for the Personal Representative ${pr_name}, on ${address1}, ${city}, ${state}.\n\nI am very interested in this property. Would you please let the family know that I would like to make arrangements to view the property and make an offer? May I please have their contact information so I may reach out to them? I would also appreciate if you could forward this email to them as well.\n\nJust so you know, should you have any other Probate cases you are handling in the area I may be interested in those as well.\n\nThank you,\n${your_name}\nPhone:(813) 475-0728\nEmail: chad@highestcashbuyer.com\nhttp://highestcashbuyer.com/`
-		);
-		emails.push(email.value);
-		usedEmails.push(attorney_email);
-	});
-	// convert emails into a text string file
-	let emailString = emails.join('\n\n');
-	let file = new File([emailString], 'emails.txt', {
-		type: 'text/plain',
-	});
-	// download the file
-	let url = window.URL.createObjectURL(file);
 
-	let a = document.createElement('a');
-	a.href = url;
-	a.download = file.name;
-	a.click();
-	window.URL.revokeObjectURL(url);
+		const emailObject = {
+			attorneyEmail: probate.attorney_email,
+			attorneyName: probate.attorney_last,
+			prName: probate.pr_first + ' ' + probate.pr_last,
+			address1: probate.address1,
+			city: probate.city,
+			state: probate.state,
+			zip: probate.zip,
+		};
+
+		emailObjects.push(emailObject);
+
+		usedEmails.push(probate.attorney_email);
+	});
+	console.log(emailObjects);
 };
 </script>
 

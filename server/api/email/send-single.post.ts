@@ -5,7 +5,18 @@ import path from 'path';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
-	const body: {
+	const {
+		to,
+		message,
+		subject,
+		attorneyName,
+		address1,
+		address2,
+		city,
+		state,
+		zip,
+		prName,
+	} = (await readBody(event)) as {
 		to: string;
 		message: string;
 		subject: string;
@@ -16,11 +27,9 @@ export default defineEventHandler(async (event) => {
 		state: string;
 		zip: string;
 		prName: string;
-	} = await readBody(event);
+	};
 
 	const config = useRuntimeConfig().private;
-
-	const __dirname = path.resolve();
 
 	let transporter = nodemailer.createTransport({
 		host: config.EMAIL_HOST,
@@ -51,21 +60,21 @@ export default defineEventHandler(async (event) => {
 	try {
 		const info = await transporter.sendMail({
 			from: config.EMAIL_FROM,
-			to: body.to,
-			subject: body.subject,
+			to: to,
+			subject: subject,
 			// @ts-ignore
 			template: 'email.attorney',
 			context: {
-				name: body.attorneyName,
-				text: body.message,
-				address1: body.address1,
-				address2: body.address2 ? body.address2 : '',
-				city: body.city,
-				state: body.state,
-				zip: body.zip,
-				prName: body.prName,
+				attorneyName,
+				address1,
+				address2: address2 ? address2 : '',
+				city,
+				state,
+				zip,
+				prName,
 			},
 		});
+
 		// @ts-ignore
 		console.log('Message sent: %s', info.messageId);
 
