@@ -31,7 +31,7 @@
 	input {
 		border: 1px solid #ccc;
 		border-radius: 3px;
-		@apply border shadow-sm border-slate-300 placeholder-slate-400 text-primary dark:text-darkSecondary focus:outline-primary dark:bg-darkBg dark:focus:outline-darkPrimary;
+		@apply border shadow-sm border-slate-300 placeholder-slate-400 text-primary dark:text-darkSecondary focus:outline-primary dark:bg-darkBg dark:focus:outline-darkPrimary  px-2;
 	}
 	label {
 		@apply text-lg font-semibold items-start text-primary dark:text-darkSecondary;
