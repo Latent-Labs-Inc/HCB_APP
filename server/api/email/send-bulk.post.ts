@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig().private;
 
 	const user_id = event.context.auth.user.id;
-	console.log(event.context);
 
 	const client = serverSupabaseClient<Database>(event);
 
@@ -67,7 +66,7 @@ export default defineEventHandler(async (event) => {
 		} = emailObject;
 		const mailOptions = {
 			from: config.EMAIL_USER,
-			to: 'lukelongo0421@gmail.com',
+			to: attorneyEmail,
 			subject: subject,
 			template: 'email.attorney',
 			context: {
@@ -121,14 +120,14 @@ export default defineEventHandler(async (event) => {
 					'inserting into attorney_emails table',
 					emailObject.attorneyEmail
 				);
-				// try {
-				// 	const { data, error } = await client
-				// 		.from('attorney_emails')
-				// 		.insert([{ email: emailObject.attorneyEmail, user_id }]);
-				// 	if (error) throw error;
-				// } catch (error) {
-				// 	console.log(error);
-				// }
+				try {
+					const { data, error } = await client
+						.from('attorney_emails')
+						.insert([{ email: emailObject.attorneyEmail, user_id }]);
+					if (error) throw error;
+				} catch (error) {
+					console.log(error);
+				}
 			}
 		}
 		return logs;
