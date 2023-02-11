@@ -3,18 +3,7 @@ import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 import path from 'path';
 import { Database } from '~~/types/supabase';
-
-interface EmailObject {
-	attorneyEmail: string;
-	subject: string;
-	attorneyName: string;
-	prName: string;
-	address1: string;
-	city: string;
-	state: string;
-	zip: string;
-}
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { EmailObject } from '~~/types/types';
 
 export default defineEventHandler(async (event) => {
 	const emailObjects = (await readBody(event)) as EmailObject[];
@@ -50,8 +39,6 @@ export default defineEventHandler(async (event) => {
 			extName: '.hbs',
 		})
 	);
-
-	// can you create a send email function that takes in an email object and returns a promise
 
 	const sendEmail = async (emailObject: EmailObject) => {
 		const {

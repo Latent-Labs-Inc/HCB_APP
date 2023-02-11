@@ -212,3 +212,14 @@ export interface FormattedProbates {
 	created_at: Date;
 	modified_at: Date;
 }
+
+export interface EmailObject {
+	attorneyEmail: string;
+	subject: string;
+	attorneyName: string;
+	prName: string;
+	address1: string;
+	city: string;
+	state: string;
+	zip: string;
+}
