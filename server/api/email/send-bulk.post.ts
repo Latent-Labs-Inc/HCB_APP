@@ -15,10 +15,14 @@ interface EmailObject {
 	zip: string;
 }
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default defineEventHandler(async (event) => {
 	const emailObjects = (await readBody(event)) as EmailObject[];
 
 	const config = useRuntimeConfig().private;
+
+	const user_id = event.context.auth.user.id;
+	console.log(event.context);
 
 	const client = serverSupabaseClient<Database>(event);
 
@@ -48,52 +52,88 @@ export default defineEventHandler(async (event) => {
 		})
 	);
 
-	const sendEmails = async (emailObjects: EmailObject[]) => {
-		let logs = [] as {
-			id: string | null;
-			error: string | null;
-			email: string;
-		}[];
-		emailObjects.forEach(async (emailObject) => {
-			try {
-				wait(300);
-				const info = await transporter.sendMail({
-					from: config.EMAIL_FROM,
-					to: 'lukelongo0421@gmail.com',
-					subject: emailObject.subject,
-					// @ts-ignore
-					template: 'email.attorney',
-					context: {
-						attorneyName: emailObject.attorneyName,
-						address1: emailObject.address1,
-						city: emailObject.city,
-						state: emailObject.state,
-						zip: emailObject.zip,
-						prName: emailObject.prName,
-					},
-				});
+	// can you create a send email function that takes in an email object and returns a promise
 
-				// @ts-ignore
-				console.log('Message sent: %s', info.messageId);
-				logs.push({
-					// @ts-ignore
-					id: info.messageId,
-					error: null,
-					email: emailObject.attorneyEmail,
-				});
-			} catch (error) {
-				console.log(error);
-				logs.push({
-					id: null,
-					error: error as string,
-					email: emailObject.attorneyEmail,
-				});
-			}
+	const sendEmail = async (emailObject: EmailObject) => {
+		const {
+			attorneyEmail,
+			subject,
+			attorneyName,
+			prName,
+			address1,
+			city,
+			state,
+			zip,
+		} = emailObject;
+		const mailOptions = {
+			from: config.EMAIL_USER,
+			to: 'lukelongo0421@gmail.com',
+			subject: subject,
+			template: 'email.attorney',
+			context: {
+				attorneyName,
+				prName,
+				address1,
+				city,
+				state,
+				zip,
+			},
+		};
+		return new Promise<{
+			error: Error | null;
+			email: string;
+			data: string | null;
+		}>((resolve, reject) => {
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					console.log(error);
+					reject({
+						error,
+						email: emailObject.attorneyEmail,
+						data: null,
+					});
+				} else {
+					console.log('Email sent: ' + info.response);
+					resolve({
+						error: null,
+						email: emailObject.attorneyEmail,
+						data: info.response,
+					});
+				}
+			});
 		});
+	};
+
+	const sendEmails = async (emailObjects: EmailObject[]) => {
+		let logs: {
+			error: Error | null;
+			email: string;
+			data: string | null;
+		}[] = [];
+		for (let i = 0; i < emailObjects.length; i++) {
+			const emailObject = emailObjects[i];
+			const log = await sendEmail(emailObject);
+			logs.push(log);
+			if (!log.error) {
+				// insert into the attorney_emails table
+				console.log('no log error');
+				console.log(
+					'inserting into attorney_emails table',
+					emailObject.attorneyEmail
+				);
+				// try {
+				// 	const { data, error } = await client
+				// 		.from('attorney_emails')
+				// 		.insert([{ email: emailObject.attorneyEmail, user_id }]);
+				// 	if (error) throw error;
+				// } catch (error) {
+				// 	console.log(error);
+				// }
+			}
+		}
 		return logs;
 	};
 
-	// now you will pass an array of emails to reference against the supabase table and see if they are included in the table or not
 	let logs;
 	try {
 		const emails = emailObjects.map((emailObject) => emailObject.attorneyEmail);
@@ -104,7 +144,7 @@ export default defineEventHandler(async (event) => {
 		let attorneyEmails = data as { email: string; user_id: string }[];
 		if (error) throw error;
 		if (!attorneyEmails) {
-			// now you will send the emails
+			// send emails
 			logs = await sendEmails(emailObjects);
 		} else {
 			// filter out the emails that are already in the table
