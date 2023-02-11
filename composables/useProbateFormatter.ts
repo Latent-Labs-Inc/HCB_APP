@@ -4,7 +4,7 @@ import { useAuthStore } from '~~/stores/auth';
 export const useProbateFormatter = async (probates: FD_Probate[]) => {
 	let formattedProbates = probates.map((probate) => {
 		const formattedProbate = {
-			user_id: useAuthStore().user_id,
+			user_id: useAuthStore().user_id as string,
 			id: useUuid(),
 			filing_date: probate['File Date'],
 			deceased_first: probate['First Name (Deceased)'],

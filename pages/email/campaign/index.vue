@@ -19,7 +19,7 @@
 				:row="true"
 			/>
 			<transition name="fade" mode="out-in">
-				<div class="mx-auto w-96" v-if="data.length === 0">
+				<div class="mx-auto w-96" v-if="contacts.length === 0">
 					<UiImporter
 						:fileTypes="['text/csv']"
 						:fileError="'Please select a .csv file'"
@@ -37,7 +37,7 @@
 					</p>
 					<UiBaseList
 						:colKeyPairs="colKeyPairs"
-						:data="data"
+						:data="contacts"
 						gridCols="grid-cols-5"
 						itemName="'Probate'"
 						:flip="true"
@@ -52,9 +52,10 @@
 import { useUiStore } from '~/stores/ui';
 import Papa from 'papaparse';
 import { FD_Probate, FormattedProbates } from '~/types/types';
+import { Database } from '~/types/supabase';
 
 const uiStore = useUiStore();
-const client = useSupabaseClient();
+const client = useSupabaseClient<Database>();
 
 const type = ref<'personalReps' | 'attorneys'>('attorneys');
 
@@ -74,7 +75,7 @@ const handleSupabaseOption = (value: string | boolean) => {
 	supabaseType.value = value as boolean;
 };
 
-const data = ref<FormattedProbates[]>([]);
+const contacts = ref<FormattedProbates[]>([]);
 
 const handleFile = (file: File) => {
 	if (type.value === 'attorneys') {
@@ -88,8 +89,8 @@ const handleFile = (file: File) => {
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
 			let formattedProbates = await useProbateFormatter(results.data);
-			// @ts-ignore
-			data.value.push(...formattedProbates);
+
+			contacts.value.push(...formattedProbates);
 			let repeats = [] as string[];
 			let unique = [] as string[];
 			for (let i = 0; i < formattedProbates.length; i++) {
@@ -132,6 +133,7 @@ const handleEmail = async () => {
 	let usedEmails = [] as string[];
 	let emailObjects = [] as {
 		attorneyEmail: string;
+		subject: string;
 		attorneyName: string;
 		prName: string;
 		address1: string;
@@ -139,28 +141,38 @@ const handleEmail = async () => {
 		state: string;
 		zip: string;
 	}[];
-	data.value.forEach((probate) => {
+
+	contacts.value.forEach((probate) => {
 		if (!probate.attorney_email) return console.log('no email', probate);
 		if (!probate.attorney_last) return console.log('no attorney last', probate);
 		if (!probate.pr_last || !probate.pr_first)
 			return console.log('no pr name', probate);
 		if (usedEmails.includes(probate.attorney_email)) return;
-
 		const emailObject = {
 			attorneyEmail: probate.attorney_email,
 			attorneyName: probate.attorney_last,
+			subject: `Important for ${probate.pr_first + ' ' + probate.pr_last}`,
 			prName: probate.pr_first + ' ' + probate.pr_last,
 			address1: probate.address1,
 			city: probate.city,
 			state: probate.state,
 			zip: probate.zip,
 		};
-
 		emailObjects.push(emailObject);
-
 		usedEmails.push(probate.attorney_email);
 	});
-	console.log(emailObjects);
+
+	try {
+		uiStore.toggleFunctionLoading(true);
+		const { data, error } = await $fetch('/api/email/send-bulk', {
+			method: 'POST',
+			body: emailObjects,
+		});
+	} catch (error) {
+		console.log(error);
+	} finally {
+		uiStore.toggleFunctionLoading(false);
+	}
 };
 </script>
 
