@@ -107,14 +107,14 @@ export default defineEventHandler(async (event) => {
 					'inserting into attorney_emails table',
 					emailObject.attorneyEmail
 				);
-				try {
-					const { data, error } = await client
-						.from('attorney_emails')
-						.insert([{ email: emailObject.attorneyEmail, user_id }]);
-					if (error) throw error;
-				} catch (error) {
-					console.log(error);
-				}
+				// try {
+				// 	const { data, error } = await client
+				// 		.from('attorney_emails')
+				// 		.insert([{ email: emailObject.attorneyEmail, user_id }]);
+				// 	if (error) throw error;
+				// } catch (error) {
+				// 	console.log(error);
+				// }
 			}
 		}
 		return logs;

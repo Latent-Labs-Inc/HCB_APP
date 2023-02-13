@@ -22,7 +22,7 @@ const colKeyPairs = reactive({
 	'First Name': 'input_first_name',
 	'Last Name': 'input_last_name',
 	Address: 'input_address_1',
-	Zip: 'input_zip',
+	Zip: 'input_zip_code',
 });
 </script>
 

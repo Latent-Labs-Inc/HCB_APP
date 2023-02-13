@@ -2,24 +2,28 @@
 	<div class="grid gap-4">
 		<h3 class="header">Upload Email</h3>
 		<div class="grid gap-4">
-			<UiRadioInput
-				class="mx-auto"
-				:options="options"
-				:question="'Select Type of Email'"
-				:selected="type"
-				@option-clicked="handleOption"
-				:row="true"
-			/>
-			<UiRadioInput
-				class="mx-auto"
-				:options="skipTraceOptions"
-				:question="'Select Source of Skip Tracing'"
-				:selected="skipTrace"
-				@option-clicked="handleSkipOptions"
-				:row="true"
-			/>
 			<transition name="fade" mode="out-in">
-				<div class="mx-auto w-96 mt-8" v-if="areContacts">
+				<div class="grid gap-4" v-if="!areContacts">
+					<UiRadioInput
+						class="mx-auto"
+						:options="options"
+						:question="'Select Type of Email'"
+						:selected="type"
+						@option-clicked="handleOption"
+						:row="true"
+					/>
+					<UiRadioInput
+						class="mx-auto"
+						:options="skipTraceOptions"
+						:question="'Select Source of Skip Tracing'"
+						:selected="skipTrace"
+						@option-clicked="handleSkipOptions"
+						:row="true"
+					/>
+				</div>
+			</transition>
+			<transition name="fade" mode="out-in">
+				<div class="mx-auto w-96 mt-8" v-if="!areContacts">
 					<UiImporter
 						:fileTypes="['text/csv']"
 						:fileError="'Please select a .csv file'"
@@ -29,12 +33,20 @@
 					/>
 				</div>
 				<div class="grid" v-else>
-					<p
-						class="px-2 py-1 cursor-pointer mx-auto hover:dark:bg-black dark:bg-darkBg rounded-md trans bg-darkSecondary hover:bg-white"
-						@click="handleEmail"
-					>
-						Send Emails
-					</p>
+					<div class="flex">
+						<p
+							class="px-2 py-1 cursor-pointer mx-auto hover:dark:bg-black dark:bg-darkBg rounded-md trans bg-darkSecondary hover:bg-white"
+							@click="clearContacts"
+						>
+							Clear Contacts
+						</p>
+						<p
+							class="px-2 py-1 cursor-pointer mx-auto hover:dark:bg-black dark:bg-darkPrimary rounded-md trans bg-darkSecondary hover:bg-white"
+							@click="handleEmail"
+						>
+							Send Emails
+						</p>
+					</div>
 					<transition name="fade" mode="out-in">
 						<ListAttorneys :data="attorneys" v-if="type === 'attorneys'" />
 						<ListPropstream
@@ -387,6 +399,14 @@ const handleEmail = async () => {
 		}
 	} else if (type.value === 'cashOffer') {
 	}
+};
+
+const clearContacts = () => {
+	// clear all the arrays of contacts
+	clearSkipProbateContacts.value = [];
+	propstreamContacts.value = [];
+	attorneys.value = [];
+	clearSkipRegularContacts.value = [];
 };
 </script>
 
