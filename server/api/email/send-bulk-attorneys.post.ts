@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 		} = emailObject;
 		const mailOptions = {
 			from: config.EMAIL_USER,
-			to: 'lukelongo0421@gmail.com',
+			to: 'lukelongo0421@gmail.co',
 			subject: subject,
 			template: 'email.attorney',
 			context: {
