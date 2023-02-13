@@ -19,7 +19,7 @@
 				:row="true"
 			/>
 			<transition name="fade" mode="out-in">
-				<div class="mx-auto w-96 mt-8" v-if="contacts.length === 0">
+				<div class="mx-auto w-96 mt-8" v-if="areContacts">
 					<UiImporter
 						:fileTypes="['text/csv']"
 						:fileError="'Please select a .csv file'"
@@ -35,13 +35,21 @@
 					>
 						Send Emails
 					</p>
-					<UiBaseList
-						:colKeyPairs="colKeyPairs"
-						:data="contacts"
-						gridCols="grid-cols-5"
-						itemName="'Probate'"
-						:flip="true"
-					/>
+					<transition name="fade" mode="out-in">
+						<ListAttorneys :data="attorneys" v-if="type === 'attorneys'" />
+						<ListPropstream
+							:data="propstreamContacts"
+							v-else-if="skipTrace === 'propstream'"
+						/>
+						<ListClearSkipProbate
+							:data="clearSkipProbateContacts"
+							v-else-if="skipTrace === 'clearSkip_probate'"
+						/>
+						<ListClearSkipRegular
+							:data="clearSkipRegularContacts"
+							v-else-if="skipTrace === 'clearSkip_regular'"
+						/>
+					</transition>
 				</div>
 			</transition>
 		</div>
@@ -63,14 +71,14 @@ import { Database } from '~/types/supabase';
 const uiStore = useUiStore();
 const client = useSupabaseClient<Database>();
 
-const type = ref<'personalReps' | 'attorneys' | 'standard'>('attorneys');
+const type = ref<'probates' | 'attorneys' | 'cashOffer'>('attorneys');
 const skipTrace = ref<'propstream' | 'clearSkip_probate' | 'clearSkip_regular'>(
 	'propstream'
 );
 
 const options = [
-	{ value: 'standard', label: 'Standard' },
-	{ value: 'personalReps', label: 'Personal Reps' },
+	{ value: 'cashOffer', label: 'Cash Offer' },
+	{ value: 'probates', label: 'Probates' },
 	{ value: 'attorneys', label: 'Attorneys' },
 ];
 
@@ -81,7 +89,7 @@ const skipTraceOptions = [
 ];
 
 const handleOption = (value: string | boolean) => {
-	type.value = value as 'personalReps' | 'attorneys' | 'standard';
+	type.value = value as 'probates' | 'attorneys' | 'cashOffer';
 };
 
 const handleSkipOptions = (value: string | boolean) => {
@@ -92,12 +100,20 @@ const handleSkipOptions = (value: string | boolean) => {
 };
 
 // will need to change this to support more than just the attorneys
-const contacts = ref<
-	| FormattedProbates[]
-	| PropSkipTrace[]
-	| ClearSkipProbate[]
-	| ClearSkipRegular[]
->([]);
+const areContacts = computed(() => {
+	// check if there are contacts in any of the arrays
+	return (
+		attorneys.value.length > 0 ||
+		propstreamContacts.value.length > 0 ||
+		clearSkipProbateContacts.value.length > 0 ||
+		clearSkipRegularContacts.value.length > 0
+	);
+});
+
+const clearSkipProbateContacts = ref<ClearSkipProbate[]>([]);
+const propstreamContacts = ref<PropSkipTrace[]>([]);
+const clearSkipRegularContacts = ref<ClearSkipRegular[]>([]);
+const attorneys = ref<FormattedProbates[]>([]);
 
 const handleFile = (file: File) => {
 	if (type.value === 'attorneys') {
@@ -111,7 +127,7 @@ const handleFile = (file: File) => {
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
 			let formattedProbates = await useProbateFormatter(results.data);
-			contacts.value.push(...(formattedProbates as any[]));
+			attorneys.value.push(...(formattedProbates as any[]));
 			let repeats = [] as string[];
 			let unique = [] as string[];
 			for (let i = 0; i < formattedProbates.length; i++) {
@@ -122,7 +138,7 @@ const handleFile = (file: File) => {
 				}
 			}
 		};
-	} else if (type.value === 'personalReps') {
+	} else {
 		const reader = new FileReader();
 		reader.readAsText(file);
 		reader.onload = async (e) => {
@@ -133,29 +149,13 @@ const handleFile = (file: File) => {
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
 			// map the data to the same key but convert the keys to lowercase and replace all the spaces with underscores
-			let formattedData = formatData(results.data);
-			console.log(formattedData);
-		};
-	} else if (type.value === 'standard') {
-		const reader = new FileReader();
-		reader.readAsText(file);
-		reader.onload = async (e) => {
-			const csv = e.target!.result;
-			const results: {
-				data: any[];
-				errors: any[];
-				meta: any;
-			} = Papa.parse(csv as string, { header: true });
-			// map the data to the same key but convert the keys to lowercase and replace all the spaces with underscores
-			let formattedData = formatData(results.data);
-			console.log(formattedData);
+			formatData(results.data);
 		};
 	}
 };
 
 const formatData = (data: any[]) => {
 	// I can choose to set up a basic interface for this and then use that to map the data to the correct keys and then push it to the contacts array and then use that to display the data
-	let formattedContacts = [] as any[];
 	if (skipTrace.value === 'propstream') {
 		let formattedData = data.map((contact) => {
 			let formattedContact = {} as PropSkipTrace;
@@ -175,10 +175,15 @@ const formatData = (data: any[]) => {
 			}
 			return formattedContact;
 		});
-		// remove all that do not have an email
-		formattedData = formattedData.filter((contact) => contact.email_1);
-
-		formattedContacts.push(...formattedData);
+		// remove all that do not have an email or first name or last name
+		formattedData = formattedData.filter(
+			(contact) =>
+				contact.email_1 !== null &&
+				contact.first_name !== null &&
+				contact.last_name !== null
+		);
+		// now push the data to the propstream contacts array
+		propstreamContacts.value.push(...formattedData);
 	} else if (skipTrace.value === 'clearSkip_regular') {
 		let formattedData = data.map((contact) => {
 			let formattedContact = {} as ClearSkipRegular;
@@ -198,10 +203,15 @@ const formatData = (data: any[]) => {
 			}
 			return formattedContact;
 		});
-		// remove all that do not have an email
-		formattedData = formattedData.filter((contact) => contact.email_email1);
-
-		formattedContacts.push(...formattedData);
+		// remove all that do not have an email or first name or last name
+		formattedData = formattedData.filter(
+			(contact) =>
+				contact.email_email1 !== null &&
+				contact.pr_first_name !== null &&
+				contact.pr_last_name !== null
+		);
+		// now push the data to the clearskip regular contacts array
+		clearSkipRegularContacts.value.push(...formattedData);
 	} else if (skipTrace.value === 'clearSkip_probate') {
 		let formattedData = data.map((contact) => {
 			let formattedContact = {} as ClearSkipProbate;
@@ -221,37 +231,33 @@ const formatData = (data: any[]) => {
 			}
 			return formattedContact;
 		});
-		// remove all that do not have an email
-		formattedData = formattedData.filter((contact) => contact.rel1_email_1);
+		// remove all that do not have an email or first name or last name
+		formattedData = formattedData.filter(
+			(contact) =>
+				contact.rel1_email_1 !== null &&
+				contact.rel1_first_name !== null &&
+				contact.rel1_last_name !== null
+		);
 
-		formattedContacts.push(...formattedData);
+		// now push the data to the clearSkip probate contacts array
+		clearSkipProbateContacts.value.push(...formattedData);
 	}
-
-	return formattedContacts;
 };
-
-const colKeyPairs = reactive({
-	'Attorney Email': 'attorney_email',
-	'Property Address': 'address1',
-	'Property City': 'city',
-	'Property State': 'state',
-	'Property Zip': 'zip',
-});
 
 const handleEmail = async () => {
 	let usedEmails = [] as string[];
-	let emailObjects = [] as {
-		attorneyEmail: string;
-		subject: string;
-		attorneyName: string;
-		prName: string;
-		address1: string;
-		city: string;
-		state: string;
-		zip: string;
-	}[];
 	if (type.value === 'attorneys') {
-		let formattedContacts = contacts.value as FormattedProbates[];
+		let emailObjects = [] as {
+			attorneyEmail: string;
+			subject: string;
+			attorneyName: string;
+			prName: string;
+			address1: string;
+			city: string;
+			state: string;
+			zip: string;
+		}[];
+		let formattedContacts = attorneys.value as FormattedProbates[];
 		formattedContacts.forEach((contact) => {
 			if (!contact.attorney_email) return console.log('no email', contact);
 			if (!contact.attorney_last)
@@ -283,8 +289,103 @@ const handleEmail = async () => {
 		} finally {
 			uiStore.toggleFunctionLoading(false);
 		}
-	} else if (type.value === 'personalReps') {
-	} else if (type.value === 'standard') {
+	} else if (type.value === 'probates') {
+		if (skipTrace.value === 'clearSkip_probate') {
+			let formattedContacts =
+				clearSkipProbateContacts.value as ClearSkipProbate[];
+			// will want to get all the rel emails and send them an email
+			// check if there is an email for all of the rel keys
+			const getRelativeEmails = (contact: ClearSkipProbate) => {
+				let relatives = [] as {
+					emails: string[];
+					first_name: string;
+					last_name: string;
+				}[];
+				if (contact.rel1_email_1) {
+					// check if there are additional emails for rel1
+					// if so add them to the array
+					let emails = [contact.rel1_email_1];
+					if (contact.rel1_email_2) emails.push(contact.rel1_email_2);
+					if (contact.rel1_email_3) emails.push(contact.rel1_email_3);
+					relatives.push({
+						emails,
+						first_name: contact.rel1_first_name,
+						last_name: contact.rel1_last_name,
+					});
+				}
+				if (contact.rel2_email_1) {
+					// check if there are additional emails for rel1
+					// if so add them to the array
+					let emails = [contact.rel2_email_1];
+					if (contact.rel2_email_2) emails.push(contact.rel2_email_2);
+					if (contact.rel2_email_3) emails.push(contact.rel2_email_3);
+					relatives.push({
+						emails,
+						first_name: contact.rel2_first_name,
+						last_name: contact.rel2_last_name,
+					});
+				}
+				if (contact.rel3_email_1) {
+					// check if there are additional emails for rel1
+					// if so add them to the array
+					let emails = [contact.rel3_email_1];
+					if (contact.rel3_email_2) emails.push(contact.rel3_email_2);
+					if (contact.rel3_email_3) emails.push(contact.rel3_email_3);
+					relatives.push({
+						emails,
+						first_name: contact.rel3_first_name,
+						last_name: contact.rel3_last_name,
+					});
+				}
+				if (contact.rel4_email_1) {
+					// check if there are additional emails for rel1
+					// if so add them to the array
+					let emails = [contact.rel4_email_1];
+					if (contact.rel4_email_2) emails.push(contact.rel4_email_2);
+					if (contact.rel4_email_3) emails.push(contact.rel4_email_3);
+					relatives.push({
+						emails,
+						first_name: contact.rel4_first_name,
+						last_name: contact.rel4_last_name,
+					});
+				}
+				if (contact.rel5_email_1) {
+					// check if there are additional emails for rel1
+					// if so add them to the array
+					let emails = [contact.rel5_email_1];
+					if (contact.rel5_email_2) emails.push(contact.rel5_email_2);
+					if (contact.rel5_email_3) emails.push(contact.rel5_email_3);
+					relatives.push({
+						emails,
+						first_name: contact.rel5_first_name,
+						last_name: contact.rel5_last_name,
+					});
+				}
+				// remove duplicates
+				relatives = relatives.filter((rel, index, self) => {
+					return (
+						index ===
+						self.findIndex(
+							(t) =>
+								t.first_name === rel.first_name && t.last_name === rel.last_name
+						)
+					);
+				});
+				return relatives;
+			};
+			let rels = [] as {
+				emails: string[];
+				first_name: string;
+				last_name: string;
+			}[];
+			formattedContacts.forEach((contact) => {
+				rels = getRelativeEmails(contact);
+			});
+			// now we have all the relatives
+			// we need to send an email to each relative
+			console.log(rels);
+		}
+	} else if (type.value === 'cashOffer') {
 	}
 };
 </script>
