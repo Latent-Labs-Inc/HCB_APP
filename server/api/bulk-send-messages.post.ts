@@ -61,7 +61,6 @@ export default defineEventHandler(async (event) => {
 		// update the lead to texted in db
 		try {
 			const { data, error } = await supabase
-
 				.from('leads')
 				// @ts-ignore
 				.update({ texted: true })
@@ -75,7 +74,6 @@ export default defineEventHandler(async (event) => {
 				error,
 			};
 		}
-		console.log('finished lead');
 	});
 
 	// you can choose to await all the promises here or not, I am choosing not to
