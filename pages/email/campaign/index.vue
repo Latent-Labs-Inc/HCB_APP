@@ -80,6 +80,7 @@ import {
 	RelEmailObject,
 } from '~/types/types';
 import { Database } from '~/types/supabase';
+import { cp } from 'fs';
 
 const uiStore = useUiStore();
 const client = useSupabaseClient<Database>();
@@ -393,22 +394,26 @@ const handleEmail = async () => {
 				// get the relatives for each contact
 				let relatives = getRelativeEmails(contact);
 				// now we have all the relatives and we will create an email object for each relative
+				// create a function that capitalizes the first letter of the string
+
+				const capitalizeFirstLetter = (string: string) => {
+					return string.charAt(0).toUpperCase() + string.slice(1);
+				};
+
 				relatives.forEach((rel) => {
 					// create an email object for each relative
 					rel.emails.forEach((email) => {
 						// convert the first letter of the first name to uppercase
-						let first_name =
-							rel.first_name.charAt(0).toUpperCase() + rel.first_name.slice(1);
-						let last_name =
-							rel.last_name.charAt(0).toUpperCase() + rel.last_name.slice(1);
+						let first_name = capitalizeFirstLetter(rel.first_name);
+						let last_name = capitalizeFirstLetter(rel.last_name);
 						let relName = `${first_name} ${last_name}`;
 						let emailObject: RelEmailObject = {
 							relEmail: email,
-							subject: `Important for ${first_name} ${last_name}`,
+							subject: `Important for ${relName}`,
 							relName,
-							address1: contact.input_address_1,
-							city: contact.input_city,
-							state: contact.input_state,
+							address1: capitalizeFirstLetter(contact.input_address_1),
+							city: capitalizeFirstLetter(contact.input_city),
+							state: capitalizeFirstLetter(contact.input_state),
 							zip: contact.input_zip_code,
 						};
 						emailObjects.push(emailObject);

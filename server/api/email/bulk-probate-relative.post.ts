@@ -2,6 +2,7 @@ import { serverSupabaseClient } from '#supabase/server';
 import { Database } from '~~/types/supabase';
 import { useCreateTransporter } from '~~/server/utils/useCreateTransporter';
 import { RelEmailObject } from '~~/types/types';
+import useUuid from '~~/server/utils/useUuid';
 
 export default defineEventHandler(async (event) => {
 	const client = serverSupabaseClient<Database>(event);
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
 		try {
 			const mailOptions = {
 				from: config.EMAIL_USER,
-				to: 'lukelongo0421@gmail.com',
+				to: emailObject.relEmail,
 				subject: emailObject.subject,
 				template: 'email.probate-relative',
 				context: {
@@ -53,7 +54,49 @@ export default defineEventHandler(async (event) => {
 			});
 		} catch (error) {
 			console.log(error);
+			return {
+				error: error as Error,
+				email: emailObject.relEmail,
+				data: null,
+			};
 		}
+	};
+
+	const sendEmails = async (emailObjects: RelEmailObject[]) => {
+		let logs: {
+			error: Error | null;
+			email: string;
+			data: string | null;
+		}[] = [];
+		for (let i = 0; i < emailObjects.length; i++) {
+			const emailObject = emailObjects[i];
+			const log = await sendEmail(emailObject);
+			logs.push(log);
+			if (!log.error) {
+				// insert into the attorney_emails table
+				try {
+					const { error: insertError } = await client
+						.from('email_campaigns')
+						.insert({
+							id: useUuid(),
+							email: emailObject.relEmail,
+							user_id,
+							sent_at: new Date().toISOString(),
+							address_1: emailObject.address1,
+							city: emailObject.city,
+							state: emailObject.state,
+							zip: emailObject.zip,
+							rel_name: emailObject.relName,
+							type: 'probateRelative',
+						});
+
+					if (insertError) throw insertError;
+				} catch (error) {
+					console.log(error);
+				}
+			}
+		}
+		return logs;
 	};
 
 	// will want to double check the emails table to make sure we do not double email anyone
@@ -66,33 +109,19 @@ export default defineEventHandler(async (event) => {
 				emailObjects.map((obj) => obj.relEmail)
 			);
 		if (error) throw error;
-		// now we have the emails already sent, so we will filter out the ones that have already been sent from the emailObjects array
+		// filter out all the emails from the emailObjects that are already in the emails table
 		const filteredEmailObjects =
 			data.length > 0
-				? emailObjects.filter((obj) =>
-						data.find((email) => email.email === obj.relEmail)
+				? emailObjects.filter(
+						(obj) => !data.some((d) => d.email === obj.relEmail)
 				  )
 				: emailObjects;
-		// now we will send the emails, we can do the promise method or we can
-		const results = await Promise.all(
-			filteredEmailObjects.map((obj) => sendEmail(obj))
-		);
-		// now we will insert the emails into the emails table
-		const { error: insertError } = await client.from('email_campaigns').insert(
-			filteredEmailObjects.map((obj) => ({
-				id: useUuid(),
-				email: obj.relEmail,
-				user_id,
-				address_1: obj.address1,
-				city: obj.city,
-				state: obj.state,
-				zip: obj.zip,
-				type: 'probate',
-				sent_at: new Date().toISOString(),
-			}))
-		);
-		if (insertError) throw insertError;
 
+		// now we will send the emails, we can do the promise method or we can not depending on the user experience
+
+		const results = await sendEmails(filteredEmailObjects);
+
+		// now we will insert the emails into the emails table
 		return {
 			data: results,
 			error: null,

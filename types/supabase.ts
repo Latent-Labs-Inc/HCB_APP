@@ -43,6 +43,7 @@ export interface Database {
           city: string
           email: string
           id: string
+          rel_name: string
           sent_at: string
           state: string
           type: string
@@ -54,6 +55,7 @@ export interface Database {
           city: string
           email: string
           id: string
+          rel_name: string
           sent_at: string
           state: string
           type: string
@@ -65,6 +67,7 @@ export interface Database {
           city?: string
           email?: string
           id?: string
+          rel_name?: string
           sent_at?: string
           state?: string
           type?: string
