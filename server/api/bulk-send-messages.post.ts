@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
 	// create a promise for each lead that does not resolve until all the messages are sent
 	const promises = leads.map(async (lead: Lead) => {
-		lead.wireless.forEach(async (wireless: string) => {
+		lead.wireless!.forEach(async (wireless: string) => {
 			try {
 				// check if number is in badNumbers
 				const { data, error } = await supabase
@@ -42,22 +42,20 @@ export default defineEventHandler(async (event) => {
 						throw new Error(twilioResponse.errorMessage);
 					messageCounter++;
 					console.log(messageCounter);
+					// update the number to the list of badNumbers to prevent double texts
+					try {
+						const { data, error } = await supabase
+							.from('bad_numbers')
+							.insert({ user_id, number: wireless });
+						if (error) throw error;
+					} catch (error) {
+						console.log(error);
+						error = error;
+					}
 				}
 			} catch (error) {
 				console.log(error);
 				error = error;
-			} finally {
-				// update the number to the list of badNumbers to prevent double texts
-				try {
-					const { data, error } = await supabase
-
-						.from('bad_numbers')
-						.insert({ user_id, number: wireless });
-					if (error) throw error;
-				} catch (error) {
-					console.log(error);
-					error = error;
-				}
 			}
 		});
 		// update the lead to texted in db
@@ -80,10 +78,9 @@ export default defineEventHandler(async (event) => {
 		console.log('finished lead');
 	});
 
-	// wait for all the promises to resolve
-	await Promise.all(promises);
+	// you can choose to await all the promises here or not, I am choosing not to
+	Promise.all(promises);
 
-	console.log('returned the number of messages sent');
 	return {
 		data: messageCounter,
 		error,
