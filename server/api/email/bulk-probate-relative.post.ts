@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
 
 		// now we will send the emails, we can do the promise method or we can not depending on the user experience
 
-		const results = await sendEmails(filteredEmailObjects);
+		const results = sendEmails(filteredEmailObjects);
 
 		// now we will insert the emails into the emails table
 		return {
