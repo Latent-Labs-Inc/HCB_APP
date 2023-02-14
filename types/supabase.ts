@@ -37,6 +37,41 @@ export interface Database {
           user_id?: string
         }
       }
+      email_campaigns: {
+        Row: {
+          address_1: string
+          city: string
+          email: string
+          id: string
+          sent_at: string
+          state: string
+          type: string
+          user_id: string
+          zip: string
+        }
+        Insert: {
+          address_1: string
+          city: string
+          email: string
+          id: string
+          sent_at: string
+          state: string
+          type: string
+          user_id: string
+          zip: string
+        }
+        Update: {
+          address_1?: string
+          city?: string
+          email?: string
+          id?: string
+          sent_at?: string
+          state?: string
+          type?: string
+          user_id?: string
+          zip?: string
+        }
+      }
       incoming_messages: {
         Row: {
           created_at: string | null

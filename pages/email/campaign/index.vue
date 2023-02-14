@@ -416,7 +416,7 @@ const handleEmail = async () => {
 				});
 			});
 			// we need to send an email to each relative
-
+			console.log(emailObjects);
 			try {
 				uiStore.toggleFunctionLoading(true);
 				// send the emails
@@ -424,10 +424,13 @@ const handleEmail = async () => {
 					'/api/email/bulk-probate-relative',
 					{
 						method: 'POST',
-						body: emailObjects,
+						body: { emailObjects },
 					}
 				);
+				if (error) throw error;
+				console.log(data);
 			} catch (error) {
+				console.log(error);
 			} finally {
 				uiStore.toggleFunctionLoading(false);
 			}

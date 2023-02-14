@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
 	const { emailObjects } = (await readBody(event)) as {
 		emailObjects: RelEmailObject[];
 	};
+
 	const user_id = event.context.auth.user.id;
 	const config = useRuntimeConfig().private;
 
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
 		try {
 			const mailOptions = {
 				from: config.EMAIL_USER,
-				to: emailObject.relEmail,
+				to: 'lukelongo0421@gmail.com',
 				subject: emailObject.subject,
 				template: 'email.probate-relative',
 				context: {
@@ -58,7 +59,7 @@ export default defineEventHandler(async (event) => {
 	// will want to double check the emails table to make sure we do not double email anyone
 	try {
 		const { data, error } = await client
-			.from('emails')
+			.from('email_campaigns')
 			.select('*')
 			.in(
 				'email',
@@ -66,14 +67,41 @@ export default defineEventHandler(async (event) => {
 			);
 		if (error) throw error;
 		// now we have the emails already sent, so we will filter out the ones that have already been sent from the emailObjects array
-		const filteredEmailObjects = emailObjects.filter(
-			(obj) => !data.find((email) => email.email === obj.relEmail)
-		);
+		const filteredEmailObjects =
+			data.length > 0
+				? emailObjects.filter((obj) =>
+						data.find((email) => email.email === obj.relEmail)
+				  )
+				: emailObjects;
 		// now we will send the emails, we can do the promise method or we can
 		const results = await Promise.all(
 			filteredEmailObjects.map((obj) => sendEmail(obj))
 		);
+		// now we will insert the emails into the emails table
+		const { error: insertError } = await client.from('email_campaigns').insert(
+			filteredEmailObjects.map((obj) => ({
+				id: useUuid(),
+				email: obj.relEmail,
+				user_id,
+				address_1: obj.address1,
+				city: obj.city,
+				state: obj.state,
+				zip: obj.zip,
+				type: 'probate',
+				sent_at: new Date().toISOString(),
+			}))
+		);
+		if (insertError) throw insertError;
+
+		return {
+			data: results,
+			error: null,
+		};
 	} catch (error) {
 		console.log(error);
+		return {
+			data: null,
+			error,
+		};
 	}
 });
