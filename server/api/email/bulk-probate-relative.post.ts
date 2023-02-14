@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 		try {
 			const mailOptions = {
 				from: config.EMAIL_USER,
-				to: emailObject.relEmail,
+				to: 'lukelongo0421@gmail.com',
 				subject: emailObject.subject,
 				template: 'email.probate-relative',
 				context: {
