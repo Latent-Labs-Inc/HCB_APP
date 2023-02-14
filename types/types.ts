@@ -453,3 +453,12 @@ export interface EmailObject {
 	state: string;
 	zip: string;
 }
+export interface RelEmailObject {
+	relEmail: string;
+	subject: string;
+	relName: string;
+	address1: string;
+	city: string;
+	state: string;
+	zip: string;
+}

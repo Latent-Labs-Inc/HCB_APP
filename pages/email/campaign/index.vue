@@ -77,6 +77,7 @@ import {
 	PropSkipTrace,
 	ClearSkipProbate,
 	ClearSkipRegular,
+	RelEmailObject,
 } from '~/types/types';
 import { Database } from '~/types/supabase';
 
@@ -210,7 +211,7 @@ const formatData = (data: any[]) => {
 					continue;
 				}
 				formattedContact[formattedKey as keyof ClearSkipRegular] = contact[key]
-					? contact[key]
+					? contact[key].toLowerCase()
 					: null;
 			}
 			return formattedContact;
@@ -238,7 +239,7 @@ const formatData = (data: any[]) => {
 					continue;
 				}
 				formattedContact[formattedKey as keyof ClearSkipProbate] = contact[key]
-					? contact[key]
+					? contact[key].toLowerCase()
 					: null;
 			}
 			return formattedContact;
@@ -305,6 +306,8 @@ const handleEmail = async () => {
 		if (skipTrace.value === 'clearSkip_probate') {
 			let formattedContacts =
 				clearSkipProbateContacts.value as ClearSkipProbate[];
+
+			let emailObjects = [] as RelEmailObject[];
 			// will want to get all the rel emails and send them an email
 			// check if there is an email for all of the rel keys
 			const getRelativeEmails = (contact: ClearSkipProbate) => {
@@ -385,17 +388,49 @@ const handleEmail = async () => {
 				});
 				return relatives;
 			};
-			let rels = [] as {
-				emails: string[];
-				first_name: string;
-				last_name: string;
-			}[];
+
 			formattedContacts.forEach((contact) => {
-				rels = getRelativeEmails(contact);
+				// get the relatives for each contact
+				let relatives = getRelativeEmails(contact);
+				// now we have all the relatives and we will create an email object for each relative
+				relatives.forEach((rel) => {
+					// create an email object for each relative
+					rel.emails.forEach((email) => {
+						// convert the first letter of the first name to uppercase
+						let first_name =
+							rel.first_name.charAt(0).toUpperCase() + rel.first_name.slice(1);
+						let last_name =
+							rel.last_name.charAt(0).toUpperCase() + rel.last_name.slice(1);
+						let relName = `${first_name} ${last_name}`;
+						let emailObject: RelEmailObject = {
+							relEmail: email,
+							subject: `Important for ${first_name} ${last_name}`,
+							relName,
+							address1: contact.input_address_1,
+							city: contact.input_city,
+							state: contact.input_state,
+							zip: contact.input_zip_code,
+						};
+						emailObjects.push(emailObject);
+					});
+				});
 			});
-			// now we have all the relatives
 			// we need to send an email to each relative
-			console.log(rels);
+
+			try {
+				uiStore.toggleFunctionLoading(true);
+				// send the emails
+				const { data, error } = await $fetch(
+					'/api/email/bulk-probate-relative',
+					{
+						method: 'POST',
+						body: emailObjects,
+					}
+				);
+			} catch (error) {
+			} finally {
+				uiStore.toggleFunctionLoading(false);
+			}
 		}
 	} else if (type.value === 'cashOffer') {
 	}

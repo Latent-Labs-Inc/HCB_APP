@@ -177,7 +177,8 @@ const handleFile = (file: File) => {
 				user_id: useAuthStore().user_id!,
 				lead_id: useUuid(),
 				propertyAddress: {
-					street: contact['Street Address'],
+					address1: contact['Street Address'],
+					address2: '',
 					city: contact.City,
 					state: contact.State,
 					zip: contact.Zip,
@@ -225,7 +226,7 @@ const handleFile = (file: File) => {
 		try {
 			const { data: insertedLeads, error } = await client
 				.from('leads')
-				.upsert(leads, { onConflict: 'propertyAddress' });
+				.insert(leads);
 			if (error) throw error;
 		} catch (error) {
 			console.log(error);
