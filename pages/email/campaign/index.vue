@@ -141,6 +141,160 @@ const handleFile = (file: File) => {
 	}
 };
 
+const formatClearSkipProbate = (contacts: ClearSkipProbate[]) => {
+	let formattedContacts = clearSkipProbateContacts.value as ClearSkipProbate[];
+
+	let emailObjects = [] as RelEmailObject[];
+	// will want to get all the rel emails and send them an email
+	// check if there is an email for all of the rel keys
+	const getRelativeEmails = (contact: ClearSkipProbate) => {
+		let relatives = [] as {
+			emails: string[];
+			first_name: string;
+			last_name: string;
+		}[];
+		if (contact.rel1_email_1) {
+			// check if there are additional emails for rel1
+			// if so add them to the array
+			let emails = [contact.rel1_email_1];
+			if (contact.rel1_email_2) emails.push(contact.rel1_email_2);
+			if (contact.rel1_email_3) emails.push(contact.rel1_email_3);
+			relatives.push({
+				emails,
+				first_name: contact.rel1_first_name,
+				last_name: contact.rel1_last_name,
+			});
+		}
+		if (contact.rel2_email_1) {
+			// check if there are additional emails for rel1
+			// if so add them to the array
+			let emails = [contact.rel2_email_1];
+			if (contact.rel2_email_2) emails.push(contact.rel2_email_2);
+			if (contact.rel2_email_3) emails.push(contact.rel2_email_3);
+			relatives.push({
+				emails,
+				first_name: contact.rel2_first_name,
+				last_name: contact.rel2_last_name,
+			});
+		}
+		if (contact.rel3_email_1) {
+			// check if there are additional emails for rel1
+			// if so add them to the array
+			let emails = [contact.rel3_email_1];
+			if (contact.rel3_email_2) emails.push(contact.rel3_email_2);
+			if (contact.rel3_email_3) emails.push(contact.rel3_email_3);
+			relatives.push({
+				emails,
+				first_name: contact.rel3_first_name,
+				last_name: contact.rel3_last_name,
+			});
+		}
+		if (contact.rel4_email_1) {
+			// check if there are additional emails for rel1
+			// if so add them to the array
+			let emails = [contact.rel4_email_1];
+			if (contact.rel4_email_2) emails.push(contact.rel4_email_2);
+			if (contact.rel4_email_3) emails.push(contact.rel4_email_3);
+			relatives.push({
+				emails,
+				first_name: contact.rel4_first_name,
+				last_name: contact.rel4_last_name,
+			});
+		}
+		if (contact.rel5_email_1) {
+			// check if there are additional emails for rel1
+			// if so add them to the array
+			let emails = [contact.rel5_email_1];
+			if (contact.rel5_email_2) emails.push(contact.rel5_email_2);
+			if (contact.rel5_email_3) emails.push(contact.rel5_email_3);
+			relatives.push({
+				emails,
+				first_name: contact.rel5_first_name,
+				last_name: contact.rel5_last_name,
+			});
+		}
+		// remove duplicates
+		relatives = relatives.filter((rel, index, self) => {
+			return (
+				index ===
+				self.findIndex(
+					(t) =>
+						t.first_name === rel.first_name && t.last_name === rel.last_name
+				)
+			);
+		});
+		return relatives;
+	};
+
+	formattedContacts.forEach((contact) => {
+		// get the relatives for each contact
+		let relatives = getRelativeEmails(contact);
+		// now we have all the relatives and we will create an email object for each relative
+		// create a function that capitalizes the first letter of the string\
+		const capitalizeFirstLetter = (string: string) => {
+			return string.charAt(0).toUpperCase() + string.slice(1);
+		};
+		relatives.forEach((rel) => {
+			// create an email object for each relative
+			rel.emails.forEach((email) => {
+				// convert the first letter of the first name to uppercase
+				let first_name = capitalizeFirstLetter(rel.first_name);
+				let last_name = capitalizeFirstLetter(rel.last_name);
+				let relName = `${first_name} ${last_name}`;
+				let emailObject: RelEmailObject = {
+					relEmail: email,
+					subject: `Important for ${relName}`,
+					relName,
+					address1: capitalizeFirstLetter(contact.input_address_1),
+					city: capitalizeFirstLetter(contact.input_city),
+					state: capitalizeFirstLetter(contact.input_state),
+					zip: contact.input_zip_code,
+				};
+				emailObjects.push(emailObject);
+			});
+		});
+	});
+	return emailObjects;
+};
+
+const formatClearSkipRegular = (contacts: ClearSkipRegular[]) => {
+	// clear skip regular
+	// get the contacts
+	// create an array of email objects
+	let emailObjects: StandardEmailObject[] = [];
+	// create a function that capitalizes the first letter of the string
+	const capitalizeFirstLetter = (string: string) => {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	};
+	// loop through the contacts
+	contacts.forEach((contact) => {
+		// each contact will have multiple available email fields so you will need to check each of the fields for an email
+		for (let key in contact) {
+			if (key.includes('email_email')) {
+				// check if the value is not null
+				if (contact[key as keyof typeof contact]) {
+					// create an email object
+					let emailObject: StandardEmailObject = {
+						email: contact[key as keyof typeof contact],
+						subject: `Important for ${capitalizeFirstLetter(
+							contact.input_first_name
+						)} ${capitalizeFirstLetter(contact.input_last_name)}`,
+						name: `${capitalizeFirstLetter(
+							contact.input_first_name
+						)} ${capitalizeFirstLetter(contact.input_last_name)}`,
+						address1: capitalizeFirstLetter(contact.input_address_1),
+						city: capitalizeFirstLetter(contact.input_city),
+						state: capitalizeFirstLetter(contact.input_state),
+						zip: contact.input_zip_code,
+					};
+					emailObjects.push(emailObject);
+				}
+			}
+		}
+	});
+	return emailObjects;
+};
+
 const handleEmail = async () => {
 	let usedEmails = [] as string[];
 	if (type.value === 'attorneys') {
@@ -192,123 +346,10 @@ const handleEmail = async () => {
 		}
 	} else if (type.value === 'probates') {
 		if (skipTrace.value === 'clearSkip_probate') {
-			let formattedContacts =
-				clearSkipProbateContacts.value as ClearSkipProbate[];
-
-			let emailObjects = [] as RelEmailObject[];
-			// will want to get all the rel emails and send them an email
-			// check if there is an email for all of the rel keys
-			const getRelativeEmails = (contact: ClearSkipProbate) => {
-				let relatives = [] as {
-					emails: string[];
-					first_name: string;
-					last_name: string;
-				}[];
-				if (contact.rel1_email_1) {
-					// check if there are additional emails for rel1
-					// if so add them to the array
-					let emails = [contact.rel1_email_1];
-					if (contact.rel1_email_2) emails.push(contact.rel1_email_2);
-					if (contact.rel1_email_3) emails.push(contact.rel1_email_3);
-					relatives.push({
-						emails,
-						first_name: contact.rel1_first_name,
-						last_name: contact.rel1_last_name,
-					});
-				}
-				if (contact.rel2_email_1) {
-					// check if there are additional emails for rel1
-					// if so add them to the array
-					let emails = [contact.rel2_email_1];
-					if (contact.rel2_email_2) emails.push(contact.rel2_email_2);
-					if (contact.rel2_email_3) emails.push(contact.rel2_email_3);
-					relatives.push({
-						emails,
-						first_name: contact.rel2_first_name,
-						last_name: contact.rel2_last_name,
-					});
-				}
-				if (contact.rel3_email_1) {
-					// check if there are additional emails for rel1
-					// if so add them to the array
-					let emails = [contact.rel3_email_1];
-					if (contact.rel3_email_2) emails.push(contact.rel3_email_2);
-					if (contact.rel3_email_3) emails.push(contact.rel3_email_3);
-					relatives.push({
-						emails,
-						first_name: contact.rel3_first_name,
-						last_name: contact.rel3_last_name,
-					});
-				}
-				if (contact.rel4_email_1) {
-					// check if there are additional emails for rel1
-					// if so add them to the array
-					let emails = [contact.rel4_email_1];
-					if (contact.rel4_email_2) emails.push(contact.rel4_email_2);
-					if (contact.rel4_email_3) emails.push(contact.rel4_email_3);
-					relatives.push({
-						emails,
-						first_name: contact.rel4_first_name,
-						last_name: contact.rel4_last_name,
-					});
-				}
-				if (contact.rel5_email_1) {
-					// check if there are additional emails for rel1
-					// if so add them to the array
-					let emails = [contact.rel5_email_1];
-					if (contact.rel5_email_2) emails.push(contact.rel5_email_2);
-					if (contact.rel5_email_3) emails.push(contact.rel5_email_3);
-					relatives.push({
-						emails,
-						first_name: contact.rel5_first_name,
-						last_name: contact.rel5_last_name,
-					});
-				}
-				// remove duplicates
-				relatives = relatives.filter((rel, index, self) => {
-					return (
-						index ===
-						self.findIndex(
-							(t) =>
-								t.first_name === rel.first_name && t.last_name === rel.last_name
-						)
-					);
-				});
-				return relatives;
-			};
-
-			formattedContacts.forEach((contact) => {
-				// get the relatives for each contact
-				let relatives = getRelativeEmails(contact);
-				// now we have all the relatives and we will create an email object for each relative
-				// create a function that capitalizes the first letter of the string
-
-				const capitalizeFirstLetter = (string: string) => {
-					return string.charAt(0).toUpperCase() + string.slice(1);
-				};
-
-				relatives.forEach((rel) => {
-					// create an email object for each relative
-					rel.emails.forEach((email) => {
-						// convert the first letter of the first name to uppercase
-						let first_name = capitalizeFirstLetter(rel.first_name);
-						let last_name = capitalizeFirstLetter(rel.last_name);
-						let relName = `${first_name} ${last_name}`;
-						let emailObject: RelEmailObject = {
-							relEmail: email,
-							subject: `Important for ${relName}`,
-							relName,
-							address1: capitalizeFirstLetter(contact.input_address_1),
-							city: capitalizeFirstLetter(contact.input_city),
-							state: capitalizeFirstLetter(contact.input_state),
-							zip: contact.input_zip_code,
-						};
-						emailObjects.push(emailObject);
-					});
-				});
-			});
 			// we need to send an email to each relative
-			console.log(emailObjects);
+			const emailObjects = formatClearSkipProbate(
+				clearSkipProbateContacts.value
+			);
 			try {
 				uiStore.toggleFunctionLoading(true);
 				// send the emails
@@ -322,59 +363,26 @@ const handleEmail = async () => {
 				if (error) throw error;
 				console.log(data);
 			} catch (error) {
-				console.log(error);
+				console.log('error', error);
 			} finally {
 				uiStore.toggleFunctionLoading(false);
 			}
 		} else if (skipTrace.value === 'clearSkip_regular') {
-			// clear skip regular
-			// get the contacts
-			let contacts = clearSkipRegularContacts.value;
-			// create an array of email objects
-			let emailObjects: StandardEmailObject[] = [];
-			// create a function that capitalizes the first letter of the string
-			const capitalizeFirstLetter = (string: string) => {
-				return string.charAt(0).toUpperCase() + string.slice(1);
-			};
-			// loop through the contacts
-			contacts.forEach((contact) => {
-				// each contact will have multiple available email fields so you will need to check each of the fields for an email
-				for (let key in contact) {
-					if (key.includes('email_email')) {
-						// check if the value is not null
-						if (contact[key as keyof typeof contact]) {
-							// create an email object
-							let emailObject: StandardEmailObject = {
-								email: contact[key as keyof typeof contact],
-								subject: `Important for ${capitalizeFirstLetter(
-									contact.input_first_name
-								)} ${capitalizeFirstLetter(contact.input_last_name)}`,
-								name: `${capitalizeFirstLetter(
-									contact.input_first_name
-								)} ${capitalizeFirstLetter(contact.input_last_name)}`,
-								address1: capitalizeFirstLetter(contact.input_address_1),
-								city: capitalizeFirstLetter(contact.input_city),
-								state: capitalizeFirstLetter(contact.input_state),
-								zip: contact.input_zip_code,
-							};
-							emailObjects.push(emailObject);
-						}
-					}
-				}
-			});
-			// we need to send an email to each contact
-			console.log(emailObjects);
+			const emailObjects = formatClearSkipRegular(
+				clearSkipRegularContacts.value
+			);
+			// create a function to send the emails
 			const sendEmail = async (emailObject: StandardEmailObject) => {
 				try {
 					uiStore.toggleFunctionLoading(true);
 					// send the emails
-					const { data, error } = await $fetch(
-						'/api/email/single-probate-standard',
-						{
-							method: 'POST',
-							body: { ...emailObject },
-						}
-					);
+					const { data, error } = await $fetch('/api/email/single-regular', {
+						method: 'POST',
+						body: {
+							emailObject,
+							type: 'probate',
+						},
+					});
 					if (error) throw error;
 					console.log(data);
 					console.log(emailObject);
@@ -384,11 +392,87 @@ const handleEmail = async () => {
 					uiStore.toggleFunctionLoading(false);
 				}
 			};
-			for (let i = 0; i < emailObjects.length; i++) {
-				await sendEmail(emailObjects[i]);
+			// check email_campaigns table to see if there are any emails that have been sent to the same email address
+			// if there are, then we will filter out the emailObjects that have the same email address
+			let sentEmails = [] as string[];
+			for (let i = 0; i < emailObjects.length; i += 50) {
+				const { data, error } = await client
+					.from('email_campaigns')
+					.select('email')
+					.in(
+						'email',
+						emailObjects.splice(i, 50).map((emailObject) => emailObject.email)
+					);
+				if (error) throw error;
+				if (data) {
+					sentEmails = [...sentEmails, ...data.map((email) => email.email)];
+				}
+			}
+			const filteredEmailObjects =
+				sentEmails.length > 0
+					? emailObjects.filter(
+							(emailObject) => !sentEmails.includes(emailObject.email)
+					  )
+					: emailObjects;
+
+			for (let i = 0; i < filteredEmailObjects.length; i++) {
+				await sendEmail(filteredEmailObjects[i]);
 			}
 		}
 	} else if (type.value === 'cashOffer') {
+		if (skipTrace.value === 'clearSkip_regular') {
+			const emailObjects = formatClearSkipRegular(
+				clearSkipRegularContacts.value
+			);
+			// create a function to send the emails
+			const sendEmail = async (emailObject: StandardEmailObject) => {
+				try {
+					uiStore.toggleFunctionLoading(true);
+					// send the emails
+					const { data, error } = await $fetch('/api/email/single-regular', {
+						method: 'POST',
+						body: {
+							emailObject,
+							type: 'cashOffer',
+						},
+					});
+					if (error) throw error;
+					console.log(data);
+				} catch (error) {
+					console.log(error);
+				} finally {
+					uiStore.toggleFunctionLoading(false);
+				}
+			};
+			// check email_campaigns table to see if there are any emails that have been sent to the same email address
+			// if there are, then we will filter out the emailObjects that have the same email address
+			let sentEmails = [] as string[];
+
+			for (let i = 0; i < emailObjects.length; i += 50) {
+				const { data, error } = await client
+					.from('email_campaigns')
+					.select('email')
+					.in(
+						'email',
+						emailObjects.splice(i, 50).map((emailObject) => emailObject.email)
+					);
+				if (error) throw error;
+				if (data) {
+					sentEmails = [...sentEmails, ...data.map((email) => email.email)];
+				}
+			}
+
+			const filteredEmailObjects =
+				sentEmails.length > 0
+					? emailObjects.filter(
+							(emailObject) => !sentEmails.includes(emailObject.email)
+					  )
+					: emailObjects;
+
+			for (let i = 0; i < filteredEmailObjects.length; i++) {
+				await sendEmail(filteredEmailObjects[i]);
+			}
+		}
 	}
 };
 

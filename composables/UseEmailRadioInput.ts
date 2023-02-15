@@ -8,6 +8,8 @@ export const useEmailRadioInput = () => {
 		{ value: 'cashOffer', label: 'Cash Offer' },
 		{ value: 'probates', label: 'Probates' },
 		{ value: 'attorneys', label: 'Attorneys' },
+		{ value: 'evictions', label: 'Evictions' },
+		{ value: 'codeViolation', label: 'Code Violation' },
 	];
 
 	const skipTraceOptions = [

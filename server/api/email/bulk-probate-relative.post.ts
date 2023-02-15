@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
 			const log = await sendEmail(emailObject);
 			logs.push(log);
 			if (!log.error) {
-				// insert into the attorney_emails table
+				// insert into the email_campaigns table
 				try {
 					const { error: insertError } = await client
 						.from('email_campaigns')
@@ -89,7 +89,6 @@ export default defineEventHandler(async (event) => {
 							rel_name: emailObject.relName,
 							type: 'probateRelative',
 						});
-
 					if (insertError) throw insertError;
 				} catch (error) {
 					console.log(error);
@@ -101,19 +100,25 @@ export default defineEventHandler(async (event) => {
 
 	// will want to double check the emails table to make sure we do not double email anyone
 	try {
-		const { data, error } = await client
-			.from('email_campaigns')
-			.select('*')
-			.in(
-				'email',
-				emailObjects.map((obj) => obj.relEmail)
-			);
-		if (error) throw error;
+		let emails = emailObjects.map((obj) => obj.relEmail);
+		let sentEmails: string[] = [];
+		// loop through the emails and check if they are in the emails table for every 50 emails
+		for (let i = 0; i < emails.length; i += 50) {
+			const { data, error } = await client
+				.from('email_campaigns')
+				.select('*')
+				.in('email', emails.splice(i, 50));
+			if (error) throw error;
+			if (data) {
+				sentEmails = [...sentEmails, ...data.map((obj) => obj.email)];
+			}
+		}
+
 		// filter out all the emails from the emailObjects that are already in the emails table
 		const filteredEmailObjects =
-			data.length > 0
+			sentEmails.length > 0
 				? emailObjects.filter(
-						(obj) => !data.some((d) => d.email === obj.relEmail)
+						(obj) => !sentEmails.some((email) => email === obj.relEmail)
 				  )
 				: emailObjects;
 

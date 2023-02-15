@@ -1,10 +1,13 @@
-import { useCreateTransporter } from '~~/server/utils/useCreateTransporter';
-import { StandardEmailObject } from '~/types/types';
+import { StandardEmailObject } from '~~/types/types';
 
 export default defineEventHandler(async (event) => {
-	const transporter = useCreateTransporter();
-	const emailObject = (await readBody(event)) as StandardEmailObject;
 	const config = useRuntimeConfig().private;
+
+	const transporter = useCreateTransporter();
+	const { emailObject, type } = (await readBody(event)) as {
+		emailObject: StandardEmailObject;
+		type: 'cashOffer' | 'probate' | 'evictions' | 'codeViolation';
+	};
 
 	const sendEmail = async (emailObject: StandardEmailObject) => {
 		try {
@@ -12,7 +15,7 @@ export default defineEventHandler(async (event) => {
 				from: config.EMAIL_USER,
 				to: 'lukelongo0421@gmail.com',
 				subject: emailObject.subject,
-				template: 'email.probate-standard',
+				template: `email.${type}.standard`,
 				context: {
 					name: emailObject.name,
 					address1: emailObject.address1,
@@ -55,6 +58,7 @@ export default defineEventHandler(async (event) => {
 	};
 
 	const result = await sendEmail(emailObject);
+
 	console.log(result);
 
 	return {
