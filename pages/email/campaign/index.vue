@@ -443,8 +443,8 @@ const handleEmail = async () => {
 
 		for (let i = 0; i < filteredEmailObjects.length; i++) {
 			const emailObject = filteredEmailObjects[i];
+			if (emailObject.email === '') continue;
 			let log = await sendEmail(emailObject);
-
 			logs.push(log);
 		}
 
