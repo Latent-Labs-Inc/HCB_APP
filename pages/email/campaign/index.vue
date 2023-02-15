@@ -322,7 +322,9 @@ const handleEmail = async () => {
 			state: string;
 			zip: string;
 		}[];
+
 		let formattedContacts = attorneys.value as FormattedProbates[];
+
 		formattedContacts.forEach((contact) => {
 			if (!contact.attorney_email) return console.log('no email', contact);
 			if (!contact.attorney_last)
@@ -343,20 +345,61 @@ const handleEmail = async () => {
 			emailObjects.push(emailObject);
 			usedEmails.push(contact.attorney_email);
 		});
-		try {
-			uiStore.toggleFunctionLoading(true);
-			const { data, error } = await $fetch('/api/email/send-bulk-attorneys', {
-				method: 'POST',
-				body: emailObjects,
-			});
 
-			if (error) throw error;
+		let sentEmails = [] as string[];
+		// now we will loop through the email objects and check if the email has already been sent to an attorney already
+		for (let i = 0; i < emailObjects.length; i += 50) {
+			try {
+				uiStore.toggleFunctionLoading(true);
+				const { data: emails, error } = await client
+					.from('attorney_emails')
+					.select('email')
+					.in(
+						'email',
+						emailObjects.slice(i, i + 50).map((e) => e.attorneyEmail)
+					);
+				if (error) throw error;
+				if (emails.length > 0) {
+					emails.forEach((email) => {
+						sentEmails.push(email.email);
+					});
+				}
+			} catch (error) {
+				console.log(error);
+			} finally {
+				uiStore.toggleFunctionLoading(false);
+			}
+		}
+		// filter out the emails that have already been sent
+		const filteredEmailObjects =
+			sentEmails.length > 0
+				? emailObjects.filter((e) => !sentEmails.includes(e.attorneyEmail))
+				: emailObjects;
+		// run the server endpoint
 
-			console.log(data);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			uiStore.toggleFunctionLoading(false);
+		for (let i = 0; i < filteredEmailObjects.length; i++) {
+			const emailObject = filteredEmailObjects[i];
+			if (!emailObject.attorneyEmail) continue;
+			try {
+				uiStore.toggleFunctionLoading(true);
+				const { data, error } = await $fetch('/api/email/single-attorney', {
+					method: 'POST',
+					body: { emailObject, type: type.value },
+				});
+				if (error) throw error;
+
+				const { data: supaData, error: supaError } = await client
+					.from('attorney_emails')
+					.insert({
+						email: filteredEmailObjects[i].attorneyEmail,
+						user_id: useAuthStore().user_id!,
+					});
+				if (supaError) throw supaError;
+			} catch (error) {
+				console.log(error);
+			} finally {
+				uiStore.toggleFunctionLoading(false);
+			}
 		}
 	} else if (type.value === 'probate') {
 		if (skipTrace.value === 'clearSkip_probate') {
@@ -414,13 +457,14 @@ const handleEmail = async () => {
 		// check email_campaigns table to see if there are any emails that have been sent to the same email address
 		// if there are, then we will filter out the emailObjects that have the same email address
 		let sentEmails = [] as string[];
+
 		for (let i = 0; i < emailObjects.length; i += 50) {
 			const { data, error } = await client
 				.from('email_campaigns')
 				.select('email')
 				.in(
 					'email',
-					emailObjects.splice(i, 50).map((emailObject) => emailObject.email)
+					emailObjects.slice(i, i + 50).map((emailObject) => emailObject.email)
 				);
 			if (error) throw error;
 			if (data) {
