@@ -448,22 +448,29 @@ const handleEmail = async () => {
 			logs.push(log);
 		}
 
-		// const { data, error } = await client.from('email_campaigns').insert(
-		// 	filteredEmailObjects.map((obj) => {
-		// 		return {
-		// 			user_id: useAuthStore().user_id!,
-		// 			id: useUuid(),
-		// 			address_1: obj.address1,
-		// 			city: obj.city,
-		// 			state: obj.state,
-		// 			zip: obj.zip,
-		// 			email: obj.email,
-		// 			name: obj.name,
-		// 			sent_at: new Date().toISOString(),
-		// 			type: type.value,
-		// 		};
-		// 	})
-		// );
+		try {
+			const { data, error } = await client.from('email_campaigns').insert(
+				filteredEmailObjects.map((obj) => {
+					return {
+						user_id: useAuthStore().user_id!,
+						id: useUuid(),
+						address_1: obj.address1,
+						city: obj.city,
+						state: obj.state,
+						zip: obj.zip,
+						email: obj.email,
+						name: obj.name,
+						sent_at: new Date().toISOString(),
+						type: type.value,
+					};
+				})
+			);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			uiStore.toggleFunctionLoading(false);
+			clearContacts();
+		}
 	}
 };
 
