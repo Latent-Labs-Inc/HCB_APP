@@ -74,60 +74,33 @@ import Papa from 'papaparse';
 import {
 	FD_Probate,
 	FormattedProbates,
-	PropSkipTrace,
 	ClearSkipProbate,
 	ClearSkipRegular,
 	RelEmailObject,
+	StandardEmailObject,
 } from '~/types/types';
 import { Database } from '~/types/supabase';
-import { cp } from 'fs';
 
 const uiStore = useUiStore();
 const client = useSupabaseClient<Database>();
 
-const type = ref<'probates' | 'attorneys' | 'cashOffer'>('attorneys');
-const skipTrace = ref<'propstream' | 'clearSkip_probate' | 'clearSkip_regular'>(
-	'propstream'
-);
+const {
+	type,
+	skipTrace,
+	options,
+	skipTraceOptions,
+	handleOption,
+	handleSkipOptions,
+} = useEmailRadioInput();
 
-const options = [
-	{ value: 'cashOffer', label: 'Cash Offer' },
-	{ value: 'probates', label: 'Probates' },
-	{ value: 'attorneys', label: 'Attorneys' },
-];
-
-const skipTraceOptions = [
-	{ value: 'propstream', label: 'Propstream' },
-	{ value: 'clearSkip_probate', label: 'Clear Skip Probate' },
-	{ value: 'clearSkip_regular', label: 'Clear Skip Regular' },
-];
-
-const handleOption = (value: string | boolean) => {
-	type.value = value as 'probates' | 'attorneys' | 'cashOffer';
-};
-
-const handleSkipOptions = (value: string | boolean) => {
-	skipTrace.value = value as
-		| 'propstream'
-		| 'clearSkip_probate'
-		| 'clearSkip_regular';
-};
-
-// will need to change this to support more than just the attorneys
-const areContacts = computed(() => {
-	// check if there are contacts in any of the arrays
-	return (
-		attorneys.value.length > 0 ||
-		propstreamContacts.value.length > 0 ||
-		clearSkipProbateContacts.value.length > 0 ||
-		clearSkipRegularContacts.value.length > 0
-	);
-});
-
-const clearSkipProbateContacts = ref<ClearSkipProbate[]>([]);
-const propstreamContacts = ref<PropSkipTrace[]>([]);
-const clearSkipRegularContacts = ref<ClearSkipRegular[]>([]);
-const attorneys = ref<FormattedProbates[]>([]);
+const {
+	attorneys,
+	propstreamContacts,
+	clearSkipProbateContacts,
+	clearSkipRegularContacts,
+	areContacts,
+	formatData,
+} = useEmailCampaignData();
 
 const handleFile = (file: File) => {
 	if (type.value === 'attorneys') {
@@ -163,98 +136,8 @@ const handleFile = (file: File) => {
 				meta: any;
 			} = Papa.parse(csv as string, { header: true });
 			// map the data to the same key but convert the keys to lowercase and replace all the spaces with underscores
-			formatData(results.data);
+			formatData(results.data, skipTrace.value);
 		};
-	}
-};
-
-const formatData = (data: any[]) => {
-	// I can choose to set up a basic interface for this and then use that to map the data to the correct keys and then push it to the contacts array and then use that to display the data
-	if (skipTrace.value === 'propstream') {
-		let formattedData = data.map((contact) => {
-			let formattedContact = {} as PropSkipTrace;
-			for (let key in contact) {
-				// check if there is a colon and remove that
-				let formattedKey = key
-					.toLowerCase()
-					.replace(/ /g, '_')
-					.replace(':', '');
-				// check if the key is blank and if so remove it, remove all that do not have an email
-				if (formattedKey === '') {
-					continue;
-				}
-				formattedContact[formattedKey as keyof PropSkipTrace] = contact[key]
-					? contact[key]
-					: null;
-			}
-			return formattedContact;
-		});
-		// remove all that do not have an email or first name or last name
-		formattedData = formattedData.filter(
-			(contact) =>
-				contact.email_1 !== null &&
-				contact.first_name !== null &&
-				contact.last_name !== null
-		);
-		// now push the data to the propstream contacts array
-		propstreamContacts.value.push(...formattedData);
-	} else if (skipTrace.value === 'clearSkip_regular') {
-		let formattedData = data.map((contact) => {
-			let formattedContact = {} as ClearSkipRegular;
-			for (let key in contact) {
-				// check if there is a colon and remove that
-				let formattedKey = key
-					.toLowerCase()
-					.replace(/ /g, '_')
-					.replace(':', '');
-				// check if the key is blank and if so remove it
-				if (formattedKey === '') {
-					continue;
-				}
-				formattedContact[formattedKey as keyof ClearSkipRegular] = contact[key]
-					? contact[key].toLowerCase()
-					: null;
-			}
-			return formattedContact;
-		});
-		// remove all that do not have an email or first name or last name
-		formattedData = formattedData.filter(
-			(contact) =>
-				contact.email_email1 !== null &&
-				contact.pr_first_name !== null &&
-				contact.pr_last_name !== null
-		);
-		// now push the data to the clearskip regular contacts array
-		clearSkipRegularContacts.value.push(...formattedData);
-	} else if (skipTrace.value === 'clearSkip_probate') {
-		let formattedData = data.map((contact) => {
-			let formattedContact = {} as ClearSkipProbate;
-			for (let key in contact) {
-				// check if there is a colon and remove that
-				let formattedKey = key
-					.toLowerCase()
-					.replace(/ /g, '_')
-					.replace(':', '');
-				// check if the key is blank and if so remove it
-				if (formattedKey === '') {
-					continue;
-				}
-				formattedContact[formattedKey as keyof ClearSkipProbate] = contact[key]
-					? contact[key].toLowerCase()
-					: null;
-			}
-			return formattedContact;
-		});
-		// remove all that do not have an email or first name or last name
-		formattedData = formattedData.filter(
-			(contact) =>
-				contact.rel1_email_1 !== null &&
-				contact.rel1_first_name !== null &&
-				contact.rel1_last_name !== null
-		);
-
-		// now push the data to the clearSkip probate contacts array
-		clearSkipProbateContacts.value.push(...formattedData);
 	}
 };
 
@@ -298,6 +181,10 @@ const handleEmail = async () => {
 				method: 'POST',
 				body: emailObjects,
 			});
+
+			if (error) throw error;
+
+			console.log(data);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -438,6 +325,67 @@ const handleEmail = async () => {
 				console.log(error);
 			} finally {
 				uiStore.toggleFunctionLoading(false);
+			}
+		} else if (skipTrace.value === 'clearSkip_regular') {
+			// clear skip regular
+			// get the contacts
+			let contacts = clearSkipRegularContacts.value;
+			// create an array of email objects
+			let emailObjects: StandardEmailObject[] = [];
+			// create a function that capitalizes the first letter of the string
+			const capitalizeFirstLetter = (string: string) => {
+				return string.charAt(0).toUpperCase() + string.slice(1);
+			};
+			// loop through the contacts
+			contacts.forEach((contact) => {
+				// each contact will have multiple available email fields so you will need to check each of the fields for an email
+				for (let key in contact) {
+					if (key.includes('email_email')) {
+						// check if the value is not null
+						if (contact[key as keyof typeof contact]) {
+							// create an email object
+							let emailObject: StandardEmailObject = {
+								email: contact[key as keyof typeof contact],
+								subject: `Important for ${capitalizeFirstLetter(
+									contact.input_first_name
+								)} ${capitalizeFirstLetter(contact.input_last_name)}`,
+								name: `${capitalizeFirstLetter(
+									contact.input_first_name
+								)} ${capitalizeFirstLetter(contact.input_last_name)}`,
+								address1: capitalizeFirstLetter(contact.input_address_1),
+								city: capitalizeFirstLetter(contact.input_city),
+								state: capitalizeFirstLetter(contact.input_state),
+								zip: contact.input_zip_code,
+							};
+							emailObjects.push(emailObject);
+						}
+					}
+				}
+			});
+			// we need to send an email to each contact
+			console.log(emailObjects);
+			const sendEmail = async (emailObject: StandardEmailObject) => {
+				try {
+					uiStore.toggleFunctionLoading(true);
+					// send the emails
+					const { data, error } = await $fetch(
+						'/api/email/single-probate-standard',
+						{
+							method: 'POST',
+							body: { ...emailObject },
+						}
+					);
+					if (error) throw error;
+					console.log(data);
+					console.log(emailObject);
+				} catch (error) {
+					console.log(error);
+				} finally {
+					uiStore.toggleFunctionLoading(false);
+				}
+			};
+			for (let i = 0; i < emailObjects.length; i++) {
+				await sendEmail(emailObjects[i]);
 			}
 		}
 	} else if (type.value === 'cashOffer') {

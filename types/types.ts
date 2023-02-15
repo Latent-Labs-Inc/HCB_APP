@@ -462,3 +462,13 @@ export interface RelEmailObject {
 	state: string;
 	zip: string;
 }
+
+export interface StandardEmailObject {
+	name: string;
+	email: string;
+	subject: string;
+	address1: string;
+	city: string;
+	state: string;
+	zip: string;
+}

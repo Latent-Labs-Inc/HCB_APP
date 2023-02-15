@@ -1,7 +1,4 @@
 import { serverSupabaseClient } from '#supabase/server';
-import nodemailer from 'nodemailer';
-import hbs from 'nodemailer-express-handlebars';
-import path from 'path';
 import { Database } from '~~/types/supabase';
 import { EmailObject } from '~~/types/types';
 
@@ -14,31 +11,7 @@ export default defineEventHandler(async (event) => {
 
 	const client = serverSupabaseClient<Database>(event);
 
-	let transporter = nodemailer.createTransport({
-		host: config.EMAIL_HOST,
-		port: 587,
-		secure: false,
-		auth: {
-			user: config.EMAIL_USER,
-			pass: config.EMAIL_PASSWORD,
-		},
-		tls: {
-			rejectUnauthorized: false,
-		},
-	});
-
-	transporter.use(
-		'compile',
-		hbs({
-			viewEngine: {
-				extname: '.hbs',
-				partialsDir: path.resolve('./views'),
-				defaultLayout: false,
-			},
-			viewPath: path.resolve('./views'),
-			extName: '.hbs',
-		})
-	);
+	const transporter = useCreateTransporter();
 
 	const sendEmail = async (emailObject: EmailObject) => {
 		const {
@@ -102,11 +75,6 @@ export default defineEventHandler(async (event) => {
 			logs.push(log);
 			if (!log.error) {
 				// insert into the attorney_emails table
-				console.log('no log error');
-				console.log(
-					'inserting into attorney_emails table',
-					emailObject.attorneyEmail
-				);
 				try {
 					const { data, error } = await client
 						.from('attorney_emails')
@@ -121,28 +89,31 @@ export default defineEventHandler(async (event) => {
 	};
 
 	let logs;
+
 	try {
 		const emails = emailObjects.map((emailObject) => emailObject.attorneyEmail);
-		const { data, error } = await client
+		const { data: attorneyEmails, error } = await client
 			.from('attorney_emails')
 			.select('*')
 			.in('email', emails);
-		let attorneyEmails = data as { email: string; user_id: string }[];
+
 		if (error) throw error;
-		if (!attorneyEmails) {
-			// send emails
-			logs = await sendEmails(emailObjects);
-		} else {
-			// filter out the emails that are already in the table
-			const filteredEmails = emailObjects.filter((emailObject) => {
-				const found = attorneyEmails.find((attorneyEmail) => {
-					return attorneyEmail.email === emailObject.attorneyEmail;
-				});
-				if (!found) return emailObject;
-			});
-			// now you will send the emails
-			logs = await sendEmails(filteredEmails);
-		}
+
+		// filter out the emails that are already in the table, use conditional to check and if false use standard object
+		const filteredEmails =
+			attorneyEmails.length > 0
+				? emailObjects.filter((emailObject) => {
+						const found = attorneyEmails.find((attorneyEmail) => {
+							return attorneyEmail.email === emailObject.attorneyEmail;
+						});
+
+						if (!found) return emailObject;
+				  })
+				: emailObjects;
+
+		// now you will send the emails
+		logs = await sendEmails(filteredEmails);
+
 		return {
 			data: logs,
 			error: null,

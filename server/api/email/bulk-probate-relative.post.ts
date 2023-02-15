@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 		try {
 			const mailOptions = {
 				from: config.EMAIL_USER,
-				to: 'lukelongo0421@gmail.com',
+				to: emailObject.relEmail,
 				subject: emailObject.subject,
 				template: 'email.probate-relative',
 				context: {
@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
 
 		// now we will send the emails, we can do the promise method or we can not depending on the user experience
 
-		const results = sendEmails(filteredEmailObjects);
+		const results = await sendEmails(filteredEmailObjects);
 
 		// now we will insert the emails into the emails table
 		return {
