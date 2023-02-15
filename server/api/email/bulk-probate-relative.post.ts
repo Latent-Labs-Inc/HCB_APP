@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
 							city: emailObject.city,
 							state: emailObject.state,
 							zip: emailObject.zip,
-							rel_name: emailObject.relName,
+							name: emailObject.relName,
 							type: 'probateRelative',
 						});
 					if (insertError) throw insertError;

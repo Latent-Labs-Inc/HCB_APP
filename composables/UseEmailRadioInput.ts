@@ -1,14 +1,16 @@
 export const useEmailRadioInput = () => {
-	const type = ref<'probates' | 'attorneys' | 'cashOffer'>('attorneys');
+	const type = ref<
+		'probate' | 'attorney' | 'cashOffer' | 'eviction' | 'codeViolation'
+	>('attorney');
 	const skipTrace = ref<
 		'propstream' | 'clearSkip_probate' | 'clearSkip_regular'
 	>('propstream');
 
 	const options = [
 		{ value: 'cashOffer', label: 'Cash Offer' },
-		{ value: 'probates', label: 'Probates' },
-		{ value: 'attorneys', label: 'Attorneys' },
-		{ value: 'evictions', label: 'Evictions' },
+		{ value: 'probate', label: 'Probates' },
+		{ value: 'attorney', label: 'Attorneys' },
+		{ value: 'eviction', label: 'Evictions' },
 		{ value: 'codeViolation', label: 'Code Violation' },
 	];
 
@@ -19,7 +21,12 @@ export const useEmailRadioInput = () => {
 	];
 
 	const handleOption = (value: string | boolean) => {
-		type.value = value as 'probates' | 'attorneys' | 'cashOffer';
+		type.value = value as
+			| 'probate'
+			| 'attorney'
+			| 'cashOffer'
+			| 'eviction'
+			| 'codeViolation';
 	};
 
 	const handleSkipOptions = (value: string | boolean) => {

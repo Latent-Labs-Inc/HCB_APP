@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 	const transporter = useCreateTransporter();
 	const { emailObject, type } = (await readBody(event)) as {
 		emailObject: StandardEmailObject;
-		type: 'cashOffer' | 'probate' | 'evictions' | 'codeViolation';
+		type: 'cashOffer' | 'probate' | 'eviction' | 'codeViolation';
 	};
 
 	const sendEmail = async (emailObject: StandardEmailObject) => {
@@ -58,8 +58,6 @@ export default defineEventHandler(async (event) => {
 	};
 
 	const result = await sendEmail(emailObject);
-
-	console.log(result);
 
 	return {
 		data: result,

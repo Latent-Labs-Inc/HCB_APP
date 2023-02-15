@@ -5,7 +5,7 @@
 			:grid-cols="gridCols"
 			:colKeyPairs="colKeyPairs"
 			:flip="true"
-			itemName="Clear Skip Probate"
+			itemName="Clear Skip Regular"
 		/>
 	</div>
 </template>
@@ -17,12 +17,14 @@ const props = defineProps<{
 	data: ClearSkipRegular[];
 }>();
 
+console.log(props.data);
+
 const gridCols = 'grid-cols-4';
 const colKeyPairs = reactive({
-	'First Name': 'pr_first_name',
-	'Last Name': 'pr_last_name',
-	Address: 'address',
-	Zip: 'zip',
+	'First Name': 'input_first_name',
+	'Last Name': 'input_last_name',
+	Address: 'property_address',
+	Zip: 'property_zip',
 });
 </script>
 
