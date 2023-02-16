@@ -221,55 +221,45 @@ const searchLeads = async (action: 'search' | 'toggle') => {
 	}
 };
 
-const sendTexts = async () => {
+const validate = () => {
 	if (leads.value.length === 0) {
 		alert('Please select leads to send messages to');
-		return;
+		return false;
 	}
 	if (!templateSelected.value) {
 		alert('Please select a template with a message');
-		return;
+		return false;
 	}
-	uiStore.toggleFunctionLoading(true);
-	try {
-		// get the amount of messages sent by the amount of wireless numbers in the leads array
-		const { data, error } = await $fetch('/api/bulk-send-messages', {
-			method: 'POST',
-			body: {
-				leads: leads.value,
-				message: templateSelected.value
-					? templateSelected.value.message
-					: message.value,
-				user_id: leads.value[0].user_id,
-			},
-		});
-		if (error) throw error;
+	return true;
+};
 
-		setTimeout(() =>
-			leads.value.forEach((lead) => {
-				lead.wireless!.forEach((wireless) => {
-					sentMessages.value++;
-				});
-			}, 3000)
-		);
-
-		// const { data, error } = await client
-		// 	.from('leads')
-		// 	.update({
-		// 		texted: true,
-		// 	})
-		// 	.in(
-		// 		'lead_id',
-		// 		leads.value.map((lead) => lead.lead_id)
-		// 	);
-		// if (error) throw error;
-		// console.log(data);
-		// sentMessages.value = leads.value.length;
-	} catch (error) {
-		console.log(error);
-	} finally {
-		uiStore.toggleFunctionLoading(false);
+const sendTexts = async () => {
+	if (!validate()) return;
+	// to the endpoint we will send the lead containing the array of wireless numbers, and the message we want to send. We can create dynamic messages by using the lead data, have the user put in {{name}} etc.
+	// so we want to keep track of the leads and hit the endpoint for each lead, we will have a counter that tracks the progress and fills up the progress bar
+	let counter = 0;
+	while (counter < leads.value.length) {
+		const lead = leads.value[counter];
+		try {
+			// can choose to look for the dynamic message here or within the endpoint, do not need to pass user id as the server will get it from the token
+			const { data, error } = await $fetch('/api/text/single-lead', {
+				method: 'POST',
+				body: {
+					lead,
+					message: templateSelected.value!.message,
+				},
+			});
+			// the lead will be updated on the end of the server
+			if (error) throw error;
+			console.log(data);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			counter++;
+			sentMessages.value = counter;
+		}
 	}
+	uiStore.toggleFunctionLoading(false);
 };
 
 const handleConfirm = () => {

@@ -7,6 +7,15 @@
 						<UiBaseSpinner></UiBaseSpinner>
 					</div>
 				</transition>
+				<transition name="fade" mode="out-in">
+					<div v-if="uiStore.progressBar.show">
+						<UiProgressBar
+							:max="uiStore.progressBar.max"
+							:value="uiStore.progressBar.value"
+							:label="uiStore.progressBar.label"
+						/>
+					</div>
+				</transition>
 			</teleport>
 			<UiNav class="dark:bg-darkBg dark:text-darkSecondary" />
 			<div class="flex dark:bg-black h-full w-full">
