@@ -55,25 +55,25 @@ export default defineEventHandler(async (event) => {
 				const res = await twilioClient.messages.create({
 					body: message,
 					from: twilioNumber,
-					to: wireless,
+					to: '+18134084221',
 				});
 				if (res.errorMessage) throw new Error(res.errorMessage);
 				log.data = res.sid;
 			} catch (error: any) {
 				log.error = error.message;
 			} finally {
-				try {
-					const { data, error } = await supabaseClient
-						.from('leads')
-						// @ts-ignore
-						.update({ texted: true })
-						.eq('lead_id', lead.lead_id);
-					if (error) throw error;
-				} catch (error: any) {
-					log.supabaseError = error;
-				} finally {
-					logs.push(log);
-				}
+				// try {
+				// 	const { data, error } = await supabaseClient
+				// 		.from('leads')
+				// 		// @ts-ignore
+				// 		.update({ texted: true })
+				// 		.eq('lead_id', lead.lead_id);
+				// 	if (error) throw error;
+				// } catch (error: any) {
+				// 	log.supabaseError = error;
+				// } finally {
+				// 	logs.push(log);
+				// }
 			}
 		}
 		return logs;
