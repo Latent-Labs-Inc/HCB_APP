@@ -64,6 +64,13 @@ export const useUiStore = defineStore('ui', () => {
 		progressBar.label = updatedBar.label;
 	};
 
+	const clearProgressBar = () => {
+		progressBar.max = 0;
+		progressBar.value = 0;
+		progressBar.show = false;
+		progressBar.label = '';
+	};
+
 	return {
 		sidebar,
 		theme,
@@ -80,5 +87,6 @@ export const useUiStore = defineStore('ui', () => {
 		toggleAppLoading,
 		toggleFunctionLoading,
 		setProgressBar,
+		clearProgressBar,
 	};
 });

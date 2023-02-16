@@ -8,12 +8,18 @@
 					</div>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<div v-if="uiStore.progressBar.show">
-						<UiProgressBar
-							:max="uiStore.progressBar.max"
-							:value="uiStore.progressBar.value"
-							:label="uiStore.progressBar.label"
-						/>
+					<div class="modal-backdrop z-50" v-if="uiStore.progressBar.show">
+						<div
+							class="fixed card dark:bg-darkBg w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 flex flex-col justify-center gap-4"
+						>
+							<h3 class="text-xl text-white text-center">
+								{{ uiStore.progressBar.label }}
+							</h3>
+							<UiProgressBar
+								:max="uiStore.progressBar.max"
+								:value="uiStore.progressBar.value"
+							/>
+						</div>
 					</div>
 				</transition>
 			</teleport>

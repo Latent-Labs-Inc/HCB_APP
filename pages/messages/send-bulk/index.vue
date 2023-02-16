@@ -240,6 +240,12 @@ const sendTexts = async () => {
 	let counter = 0;
 	while (counter < leads.value.length) {
 		const lead = leads.value[counter];
+		uiStore.setProgressBar({
+			value: counter + 1,
+			max: leads.value.length,
+			label: `Texting Leads Please Wait...`,
+			show: true,
+		});
 		try {
 			// can choose to look for the dynamic message here or within the endpoint, do not need to pass user id as the server will get it from the token
 			const { data, error } = await $fetch('/api/text/single-lead', {
@@ -257,6 +263,7 @@ const sendTexts = async () => {
 		} finally {
 			counter++;
 			sentMessages.value = counter;
+			uiStore.clearProgressBar();
 		}
 	}
 	uiStore.toggleFunctionLoading(false);
