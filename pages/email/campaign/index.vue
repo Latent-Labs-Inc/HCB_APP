@@ -146,35 +146,11 @@ const handleFile = (file: File) => {
 };
 
 const handleEmail = async () => {
-	let usedEmails = [] as string[];
 	if (type.value === 'attorney') {
-		let emailObjects = [] as AttorneyEmailObject[];
-
-		let formattedContacts = attorneys.value as FormattedProbates[];
-
-		formattedContacts.forEach((contact) => {
-			if (!contact.attorney_email) return console.log('no email', contact);
-			if (!contact.attorney_last)
-				return console.log('no attorney last', contact);
-			if (!contact.pr_last || !contact.pr_first)
-				return console.log('no pr name', contact);
-			if (usedEmails.includes(contact.attorney_email)) return;
-			const emailObject: AttorneyEmailObject = {
-				email: contact.attorney_email,
-				name: contact.attorney_last,
-				subject: `Important for ${contact.pr_first + ' ' + contact.pr_last}`,
-				prName: contact.pr_first + ' ' + contact.pr_last,
-				address1: contact.address1,
-				city: contact.city,
-				state: contact.state,
-				zip: contact.zip,
-			};
-			emailObjects.push(emailObject);
-			usedEmails.push(contact.attorney_email);
-		});
+		const emailObjects = await formatContacts('attorney', type.value);
 
 		let filteredEmailObjects = await filterEmailsFromTable(
-			emailObjects,
+			emailObjects!,
 			'attorney_emails'
 		);
 
@@ -207,23 +183,23 @@ const handleEmail = async () => {
 
 		// will bulk insert the emails into the email_campaigns table in supabase
 		try {
-			const { data, error } = await client.from('email_campaigns').insert(
-				filteredEmailObjects.map((obj) => {
-					return {
-						user_id: useAuthStore().user_id!,
-						id: useUuid(),
-						address_1: obj.address1,
-						city: obj.city,
-						state: obj.state,
-						zip: obj.zip,
-						email: obj.email,
-						name: obj.name,
-						sent_at: new Date().toISOString(),
-						type: type.value,
-					};
-				})
-			);
-			if (error) throw error;
+			// const { data, error } = await client.from('email_campaigns').insert(
+			// 	filteredEmailObjects.map((obj) => {
+			// 		return {
+			// 			user_id: useAuthStore().user_id!,
+			// 			id: useUuid(),
+			// 			address_1: obj.address1,
+			// 			city: obj.city,
+			// 			state: obj.state,
+			// 			zip: obj.zip,
+			// 			email: obj.email,
+			// 			name: obj.name,
+			// 			sent_at: new Date().toISOString(),
+			// 			type: type.value,
+			// 		};
+			// 	})
+			// );
+			// if (error) throw error;
 		} catch (error) {
 			console.log(error);
 		} finally {

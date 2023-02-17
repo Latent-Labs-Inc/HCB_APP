@@ -371,16 +371,46 @@ export const useEmailCampaignData = () => {
 			| 'clearSkip_regular'
 			| 'propstream'
 			| 'attorney',
-		emailType: 'codeViolation' | 'eviction' | 'probate' | 'cashOffer'
+		emailType:
+			| 'codeViolation'
+			| 'eviction'
+			| 'probate'
+			| 'cashOffer'
+			| 'attorney'
 	) => {
 		if (skipType === 'clearSkip_probate') {
 			return formatClearSkipProbate(clearSkipProbateContacts.value);
-		} else if (skipType === 'clearSkip_regular') {
+		} else if (skipType === 'clearSkip_regular' && emailType !== 'attorney') {
 			return formatClearSkipRegular(clearSkipRegularContacts.value, emailType);
 		} else if (skipType === 'propstream') {
 			// return formatPropstream(propstreamContacts.value );
 		} else if (skipType === 'attorney') {
-			// return formatAttorney(attorneyContacts.value );
+			let emailObjects = [] as AttorneyEmailObject[];
+			let duplicateEmails = [] as string[];
+			let formattedContacts = attorneys.value;
+
+			formattedContacts.forEach((contact) => {
+				if (!contact.attorney_email) return console.log('no email', contact);
+				if (!contact.attorney_last)
+					return console.log('no attorney last', contact);
+				if (!contact.pr_last || !contact.pr_first)
+					return console.log('no pr name', contact);
+				if (duplicateEmails.includes(contact.attorney_email)) return;
+				const emailObject: AttorneyEmailObject = {
+					email: contact.attorney_email,
+					name: contact.attorney_last,
+					subject: `Important for ${contact.pr_first + ' ' + contact.pr_last}`,
+					prName: contact.pr_first + ' ' + contact.pr_last,
+					address1: contact.address1,
+					city: contact.city,
+					state: contact.state,
+					zip: contact.zip,
+				};
+				emailObjects.push(emailObject);
+				duplicateEmails.push(contact.attorney_email);
+			});
+
+			return emailObjects;
 		} else {
 			// return formatRegular(regularContacts.value );
 		}
