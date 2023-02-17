@@ -170,8 +170,9 @@ const handleEmail = async () => {
 			console.log(error);
 		}
 	} else {
+		// format the contacts
 		const emailObjects = formatContacts(skipTrace.value, type.value);
-
+		// filter the emails
 		const filteredEmailObjects = await filterEmailsFromTable(
 			emailObjects!,
 			'email_campaigns'
@@ -179,7 +180,7 @@ const handleEmail = async () => {
 
 		// run the server endpoint to send the emails
 
-		await sendEmails(emailObjects!, 'regular', type.value);
+		await sendEmails(filteredEmailObjects, 'regular', type.value);
 
 		// will bulk insert the emails into the email_campaigns table in supabase
 		try {
