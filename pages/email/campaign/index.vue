@@ -179,7 +179,7 @@ const handleEmail = async () => {
 
 		// run the server endpoint to send the emails
 
-		await sendEmails(filteredEmailObjects, 'regular', type.value);
+		await sendEmails(emailObjects!, 'regular', type.value);
 
 		// will bulk insert the emails into the email_campaigns table in supabase
 		try {
