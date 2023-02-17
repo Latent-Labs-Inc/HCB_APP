@@ -353,7 +353,7 @@ export const useEmailCampaignData = () => {
 			try {
 				const { data, error } = await $fetch(`/api/email/single-${apiType}`, {
 					method: 'POST',
-					body: { emailObject, emailType },
+					body: { emailObject, type: emailType },
 				});
 				if (error) throw error;
 			} catch (error) {

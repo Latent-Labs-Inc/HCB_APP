@@ -1,5 +1,3 @@
-import { serverSupabaseClient } from '#supabase/server';
-import { Database } from '~~/types/supabase';
 import { AttorneyEmailObject } from '~~/types/types';
 
 export default defineEventHandler(async (event) => {
@@ -7,9 +5,7 @@ export default defineEventHandler(async (event) => {
 		emailObject: AttorneyEmailObject;
 		type: string;
 	};
-
 	const config = useRuntimeConfig().private;
-
 	const transporter = useCreateTransporter();
 
 	const sendEmail = async (emailObject: AttorneyEmailObject) => {
