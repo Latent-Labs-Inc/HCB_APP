@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 				from: config.EMAIL_USER,
 				to: emailObject.email,
 				subject: emailObject.subject,
-				template: `email.${type}.standard`,
+				template: `email.${type}`,
 				context: {
 					name: emailObject.name,
 					address1: emailObject.address1,

@@ -3,9 +3,15 @@ import {
 	ClearSkipRegular,
 	PropSkipTrace,
 	FormattedProbates,
+	EmailObject,
+	AttorneyEmailObject,
 } from '~~/types/types';
+import { useUiStore } from '~~/stores/ui';
+import { Database } from '~~/types/supabase';
 
 export const useEmailCampaignData = () => {
+	const uiStore = useUiStore();
+	const client = useSupabaseClient<Database>();
 	const areContacts = computed(() => {
 		// check if there are contacts in any of the arrays
 		return (
@@ -118,6 +124,268 @@ export const useEmailCampaignData = () => {
 		}
 	};
 
+	const formatClearSkipProbate = (contacts: ClearSkipProbate[]) => {
+		let emailObjects = [] as EmailObject[];
+		// will want to get all the rel emails and send them an email
+		// check if there is an email for all of the rel keys
+		const getRelativeEmails = (contact: ClearSkipProbate) => {
+			let relatives = [] as {
+				emails: string[];
+				first_name: string;
+				last_name: string;
+			}[];
+			if (contact.rel1_email_1) {
+				// check if there are additional emails for rel1
+				// if so add them to the array
+				let emails = [contact.rel1_email_1];
+				if (contact.rel1_email_2) emails.push(contact.rel1_email_2);
+				if (contact.rel1_email_3) emails.push(contact.rel1_email_3);
+				relatives.push({
+					emails,
+					first_name: contact.rel1_first_name,
+					last_name: contact.rel1_last_name,
+				});
+			}
+			if (contact.rel2_email_1) {
+				// check if there are additional emails for rel1
+				// if so add them to the array
+				let emails = [contact.rel2_email_1];
+				if (contact.rel2_email_2) emails.push(contact.rel2_email_2);
+				if (contact.rel2_email_3) emails.push(contact.rel2_email_3);
+				relatives.push({
+					emails,
+					first_name: contact.rel2_first_name,
+					last_name: contact.rel2_last_name,
+				});
+			}
+			if (contact.rel3_email_1) {
+				// check if there are additional emails for rel1
+				// if so add them to the array
+				let emails = [contact.rel3_email_1];
+				if (contact.rel3_email_2) emails.push(contact.rel3_email_2);
+				if (contact.rel3_email_3) emails.push(contact.rel3_email_3);
+				relatives.push({
+					emails,
+					first_name: contact.rel3_first_name,
+					last_name: contact.rel3_last_name,
+				});
+			}
+			if (contact.rel4_email_1) {
+				// check if there are additional emails for rel1
+				// if so add them to the array
+				let emails = [contact.rel4_email_1];
+				if (contact.rel4_email_2) emails.push(contact.rel4_email_2);
+				if (contact.rel4_email_3) emails.push(contact.rel4_email_3);
+				relatives.push({
+					emails,
+					first_name: contact.rel4_first_name,
+					last_name: contact.rel4_last_name,
+				});
+			}
+			if (contact.rel5_email_1) {
+				// check if there are additional emails for rel1
+				// if so add them to the array
+				let emails = [contact.rel5_email_1];
+				if (contact.rel5_email_2) emails.push(contact.rel5_email_2);
+				if (contact.rel5_email_3) emails.push(contact.rel5_email_3);
+				relatives.push({
+					emails,
+					first_name: contact.rel5_first_name,
+					last_name: contact.rel5_last_name,
+				});
+			}
+			// remove duplicates
+			relatives = relatives.filter((rel, index, self) => {
+				return (
+					index ===
+					self.findIndex(
+						(t) =>
+							t.first_name === rel.first_name && t.last_name === rel.last_name
+					)
+				);
+			});
+			return relatives;
+		};
+
+		contacts.forEach((contact) => {
+			// get the relatives for each contact
+			let relatives = getRelativeEmails(contact);
+			// now we have all the relatives and we will create an email object for each relative
+			// create a function that capitalizes the first letter of the string\
+			const capitalizeFirstLetter = (string: string) => {
+				return string.charAt(0).toUpperCase() + string.slice(1);
+			};
+			relatives.forEach((rel) => {
+				// create an email object for each relative
+				rel.emails.forEach((email) => {
+					// convert the first letter of the first name to uppercase
+					let first_name = capitalizeFirstLetter(rel.first_name);
+					let last_name = capitalizeFirstLetter(rel.last_name);
+					let name = `${first_name} ${last_name}`;
+					let emailObject: EmailObject = {
+						email,
+						subject: `Important for ${name}`,
+						name,
+						address1: capitalizeFirstLetter(contact.input_address_1),
+						city: capitalizeFirstLetter(contact.input_city),
+						state: capitalizeFirstLetter(contact.input_state),
+						zip: contact.input_zip_code,
+					};
+					emailObjects.push(emailObject);
+				});
+			});
+		});
+		return emailObjects;
+	};
+
+	const formatClearSkipRegular = (
+		contacts: ClearSkipRegular[],
+		type: 'probate' | 'codeViolation' | 'eviction' | 'cashOffer'
+	) => {
+		// clear skip regular
+		// get the contacts
+		// create an array of email objects
+		let emailObjects: EmailObject[] = [];
+		// create a function that capitalizes the first letter of the string
+		const capitalizeFirstLetter = (string: string) => {
+			return string.charAt(0).toUpperCase() + string.slice(1);
+		};
+		// loop through the contacts
+		contacts.forEach((contact) => {
+			// each contact will have multiple available email fields so you will need to check each of the fields for an email
+			for (let key in contact) {
+				if (key.includes('email_email')) {
+					// check if the value is not null
+					if (contact[key as keyof typeof contact]) {
+						const subject = computed(() => {
+							if (type === 'probate') {
+								return `Important for ${capitalizeFirstLetter(
+									contact.input_first_name
+								)} ${capitalizeFirstLetter(contact.input_last_name)}`;
+							} else if (type === 'codeViolation') {
+								return 'Help with your code violations';
+							} else if (type === 'eviction') {
+								return 'Help with your eviction situation';
+							} else {
+								return `Important for ${capitalizeFirstLetter(
+									contact.input_first_name
+								)} ${capitalizeFirstLetter(contact.input_last_name)}`;
+							}
+						});
+						// create an email object
+						let emailObject: EmailObject = {
+							email: contact[key as keyof typeof contact],
+							subject: subject.value,
+							name: `${capitalizeFirstLetter(
+								contact.input_first_name
+							)} ${capitalizeFirstLetter(contact.input_last_name)}`,
+							address1: capitalizeFirstLetter(contact.input_address_1),
+							city: capitalizeFirstLetter(contact.input_city),
+							state: capitalizeFirstLetter(contact.input_state),
+							zip: contact.input_zip_code,
+						};
+						emailObjects.push(emailObject);
+					}
+				}
+			}
+		});
+		return emailObjects;
+	};
+
+	const filterEmailsFromTable = async (
+		emailObjects: AttorneyEmailObject[] | EmailObject[],
+		table: 'attorney_emails' | 'email_campaigns'
+	) => {
+		let sentEmails = [] as string[];
+		// now we will loop through the email objects and check if the email has already been sent to an attorney already
+		for (let i = 0; i < emailObjects.length; i += 50) {
+			try {
+				uiStore.toggleFunctionLoading(true);
+				const { data: emails, error } = await client
+					.from(table)
+					.select('email')
+					.in(
+						'email',
+						emailObjects.slice(i, i + 50).map((e) => e.email)
+					);
+				if (error) throw error;
+				if (emails.length > 0) {
+					emails.forEach((email) => {
+						sentEmails.push(email.email);
+					});
+				}
+			} catch (error) {
+				console.log(error);
+			} finally {
+				uiStore.toggleFunctionLoading(false);
+			}
+		}
+
+		// filter out the emails that have already been sent
+		const filteredEmailObjects =
+			sentEmails.length > 0
+				? emailObjects.filter((e) => !sentEmails.includes(e.email))
+				: emailObjects;
+
+		return filteredEmailObjects;
+	};
+
+	const sendEmails = async (
+		filteredEmailObjects: AttorneyEmailObject[] | EmailObject[],
+		apiType: 'attorney' | 'regular' | 'probate',
+		emailType:
+			| 'codeViolation'
+			| 'eviction'
+			| 'probate'
+			| 'attorney'
+			| 'cashOffer'
+	) => {
+		let counter = 0;
+		while (counter < filteredEmailObjects.length) {
+			uiStore.setProgressBar({
+				value: counter + 1,
+				max: filteredEmailObjects.length,
+				show: true,
+				label: 'Sending Emails Please Wait...',
+			});
+			const emailObject = filteredEmailObjects[counter];
+			if (!emailObject.email) continue;
+			try {
+				const { data, error } = await $fetch(`/api/email/single-${apiType}`, {
+					method: 'POST',
+					body: { emailObject, emailType },
+				});
+				if (error) throw error;
+			} catch (error) {
+				console.log(error);
+			} finally {
+				counter++;
+			}
+		}
+		uiStore.clearProgressBar();
+	};
+
+	const formatContacts = (
+		skipType:
+			| 'clearSkip_probate'
+			| 'clearSkip_regular'
+			| 'propstream'
+			| 'attorney',
+		emailType: 'codeViolation' | 'eviction' | 'probate' | 'cashOffer'
+	) => {
+		if (skipType === 'clearSkip_probate') {
+			return formatClearSkipProbate(clearSkipProbateContacts.value);
+		} else if (skipType === 'clearSkip_regular') {
+			return formatClearSkipRegular(clearSkipRegularContacts.value, emailType);
+		} else if (skipType === 'propstream') {
+			// return formatPropstream(propstreamContacts.value );
+		} else if (skipType === 'attorney') {
+			// return formatAttorney(attorneyContacts.value );
+		} else {
+			// return formatRegular(regularContacts.value );
+		}
+	};
+
 	return {
 		areContacts,
 		clearSkipProbateContacts,
@@ -125,5 +393,8 @@ export const useEmailCampaignData = () => {
 		clearSkipRegularContacts,
 		attorneys,
 		formatData,
+		filterEmailsFromTable,
+		sendEmails,
+		formatContacts,
 	};
 };

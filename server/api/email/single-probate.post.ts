@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 				from: config.EMAIL_USER,
 				to: emailObject.email,
 				subject: emailObject.subject,
-				template: 'email.probate-relative',
+				template: 'email.probate',
 				context: {
 					name: emailObject.name,
 					address1: emailObject.address1,
