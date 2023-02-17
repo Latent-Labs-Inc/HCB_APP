@@ -180,33 +180,33 @@ const handleEmail = async () => {
 
 		// run the server endpoint to send the emails
 
-		await sendEmails(filteredEmailObjects, 'regular', type.value);
+		await sendEmails(emailObjects!, 'regular', type.value);
 
 		// will bulk insert the emails into the email_campaigns table in supabase
-		try {
-			const { data, error } = await client.from('email_campaigns').insert(
-				filteredEmailObjects.map((obj) => {
-					return {
-						user_id: useAuthStore().user_id!,
-						id: useUuid(),
-						address_1: obj.address1,
-						city: obj.city,
-						state: obj.state,
-						zip: obj.zip,
-						email: obj.email,
-						name: obj.name,
-						sent_at: new Date().toISOString(),
-						type: type.value,
-					};
-				})
-			);
-			if (error) throw error;
-		} catch (error) {
-			console.log(error);
-		} finally {
-			uiStore.toggleFunctionLoading(false);
-			clearContacts();
-		}
+		// try {
+		// 	const { data, error } = await client.from('email_campaigns').insert(
+		// 		filteredEmailObjects.map((obj) => {
+		// 			return {
+		// 				user_id: useAuthStore().user_id!,
+		// 				id: useUuid(),
+		// 				address_1: obj.address1,
+		// 				city: obj.city,
+		// 				state: obj.state,
+		// 				zip: obj.zip,
+		// 				email: obj.email,
+		// 				name: obj.name,
+		// 				sent_at: new Date().toISOString(),
+		// 				type: type.value,
+		// 			};
+		// 		})
+		// 	);
+		// 	if (error) throw error;
+		// } catch (error) {
+		// 	console.log(error);
+		// } finally {
+		// 	uiStore.toggleFunctionLoading(false);
+		// 	clearContacts();
+		// }
 	}
 };
 
