@@ -443,30 +443,20 @@ export interface ClearSkipRegular {
 	zip: string;
 }
 
-export interface EmailObject {
-	attorneyEmail: string;
+export interface AttorneyEmailObject {
+	email: string;
 	subject: string;
-	attorneyName: string;
+	name: string;
 	prName: string;
 	address1: string;
 	city: string;
 	state: string;
 	zip: string;
 }
-export interface RelEmailObject {
-	relEmail: string;
-	subject: string;
-	relName: string;
-	address1: string;
-	city: string;
-	state: string;
-	zip: string;
-}
-
-export interface StandardEmailObject {
-	name: string;
+export interface EmailObject {
 	email: string;
 	subject: string;
+	name: string;
 	address1: string;
 	city: string;
 	state: string;

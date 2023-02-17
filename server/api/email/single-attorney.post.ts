@@ -1,10 +1,10 @@
 import { serverSupabaseClient } from '#supabase/server';
 import { Database } from '~~/types/supabase';
-import { EmailObject } from '~~/types/types';
+import { AttorneyEmailObject } from '~~/types/types';
 
 export default defineEventHandler(async (event) => {
 	const { emailObject, type } = (await readBody(event)) as {
-		emailObject: EmailObject;
+		emailObject: AttorneyEmailObject;
 		type: string;
 	};
 
@@ -12,24 +12,16 @@ export default defineEventHandler(async (event) => {
 
 	const transporter = useCreateTransporter();
 
-	const sendEmail = async (emailObject: EmailObject) => {
-		const {
-			attorneyEmail,
-			subject,
-			attorneyName,
-			prName,
-			address1,
-			city,
-			state,
-			zip,
-		} = emailObject;
+	const sendEmail = async (emailObject: AttorneyEmailObject) => {
+		const { email, subject, name, prName, address1, city, state, zip } =
+			emailObject;
 		const mailOptions = {
 			from: config.EMAIL_USER,
-			to: attorneyEmail,
+			to: email,
 			subject: subject,
 			template: 'email.attorney',
 			context: {
-				attorneyName,
+				name,
 				prName,
 				address1,
 				city,
@@ -47,14 +39,14 @@ export default defineEventHandler(async (event) => {
 					console.log(error);
 					reject({
 						error,
-						email: emailObject.attorneyEmail,
+						email: emailObject.email,
 						data: null,
 					});
 				} else {
 					console.log('Email sent: ' + info.response);
 					resolve({
 						error: null,
-						email: emailObject.attorneyEmail,
+						email: emailObject.email,
 						data: info.response,
 					});
 				}

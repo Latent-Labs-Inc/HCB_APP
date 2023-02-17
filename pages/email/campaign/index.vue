@@ -76,8 +76,8 @@ import {
 	FormattedProbates,
 	ClearSkipProbate,
 	ClearSkipRegular,
-	RelEmailObject,
-	StandardEmailObject,
+	EmailObject,
+	AttorneyEmailObject,
 } from '~/types/types';
 import { Database } from '~/types/supabase';
 import { useAuthStore } from '~~/stores/auth';
@@ -141,11 +141,9 @@ const handleFile = (file: File) => {
 		};
 	}
 };
-
+// fix the email, and name to just be email and name
 const formatClearSkipProbate = (contacts: ClearSkipProbate[]) => {
-	let formattedContacts = clearSkipProbateContacts.value as ClearSkipProbate[];
-
-	let emailObjects = [] as RelEmailObject[];
+	let emailObjects = [] as EmailObject[];
 	// will want to get all the rel emails and send them an email
 	// check if there is an email for all of the rel keys
 	const getRelativeEmails = (contact: ClearSkipProbate) => {
@@ -227,7 +225,7 @@ const formatClearSkipProbate = (contacts: ClearSkipProbate[]) => {
 		return relatives;
 	};
 
-	formattedContacts.forEach((contact) => {
+	contacts.forEach((contact) => {
 		// get the relatives for each contact
 		let relatives = getRelativeEmails(contact);
 		// now we have all the relatives and we will create an email object for each relative
@@ -241,11 +239,11 @@ const formatClearSkipProbate = (contacts: ClearSkipProbate[]) => {
 				// convert the first letter of the first name to uppercase
 				let first_name = capitalizeFirstLetter(rel.first_name);
 				let last_name = capitalizeFirstLetter(rel.last_name);
-				let relName = `${first_name} ${last_name}`;
-				let emailObject: RelEmailObject = {
-					relEmail: email,
-					subject: `Important for ${relName}`,
-					relName,
+				let name = `${first_name} ${last_name}`;
+				let emailObject: EmailObject = {
+					email,
+					subject: `Important for ${name}`,
+					name,
 					address1: capitalizeFirstLetter(contact.input_address_1),
 					city: capitalizeFirstLetter(contact.input_city),
 					state: capitalizeFirstLetter(contact.input_state),
@@ -262,7 +260,7 @@ const formatClearSkipRegular = (contacts: ClearSkipRegular[]) => {
 	// clear skip regular
 	// get the contacts
 	// create an array of email objects
-	let emailObjects: StandardEmailObject[] = [];
+	let emailObjects: EmailObject[] = [];
 	// create a function that capitalizes the first letter of the string
 	const capitalizeFirstLetter = (string: string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -290,7 +288,7 @@ const formatClearSkipRegular = (contacts: ClearSkipRegular[]) => {
 						}
 					});
 					// create an email object
-					let emailObject: StandardEmailObject = {
+					let emailObject: EmailObject = {
 						email: contact[key as keyof typeof contact],
 						subject: subject.value,
 						name: `${capitalizeFirstLetter(
@@ -312,16 +310,7 @@ const formatClearSkipRegular = (contacts: ClearSkipRegular[]) => {
 const handleEmail = async () => {
 	let usedEmails = [] as string[];
 	if (type.value === 'attorney') {
-		let emailObjects = [] as {
-			attorneyEmail: string;
-			subject: string;
-			attorneyName: string;
-			prName: string;
-			address1: string;
-			city: string;
-			state: string;
-			zip: string;
-		}[];
+		let emailObjects = [] as AttorneyEmailObject[];
 
 		let formattedContacts = attorneys.value as FormattedProbates[];
 
@@ -332,9 +321,9 @@ const handleEmail = async () => {
 			if (!contact.pr_last || !contact.pr_first)
 				return console.log('no pr name', contact);
 			if (usedEmails.includes(contact.attorney_email)) return;
-			const emailObject = {
-				attorneyEmail: contact.attorney_email,
-				attorneyName: contact.attorney_last,
+			const emailObject: AttorneyEmailObject = {
+				email: contact.attorney_email,
+				name: contact.attorney_last,
 				subject: `Important for ${contact.pr_first + ' ' + contact.pr_last}`,
 				prName: contact.pr_first + ' ' + contact.pr_last,
 				address1: contact.address1,
@@ -356,7 +345,7 @@ const handleEmail = async () => {
 					.select('email')
 					.in(
 						'email',
-						emailObjects.slice(i, i + 50).map((e) => e.attorneyEmail)
+						emailObjects.slice(i, i + 50).map((e) => e.email)
 					);
 				if (error) throw error;
 				if (emails.length > 0) {
@@ -373,13 +362,13 @@ const handleEmail = async () => {
 		// filter out the emails that have already been sent
 		const filteredEmailObjects =
 			sentEmails.length > 0
-				? emailObjects.filter((e) => !sentEmails.includes(e.attorneyEmail))
+				? emailObjects.filter((e) => !sentEmails.includes(e.email))
 				: emailObjects;
 		// run the server endpoint
 
 		for (let i = 0; i < filteredEmailObjects.length; i++) {
 			const emailObject = filteredEmailObjects[i];
-			if (!emailObject.attorneyEmail) continue;
+			if (!emailObject.email) continue;
 			try {
 				uiStore.toggleFunctionLoading(true);
 				const { data, error } = await $fetch('/api/email/single-attorney', {
@@ -391,7 +380,7 @@ const handleEmail = async () => {
 				const { data: supaData, error: supaError } = await client
 					.from('attorney_emails')
 					.insert({
-						email: filteredEmailObjects[i].attorneyEmail,
+						email: filteredEmailObjects[i].email,
 						user_id: useAuthStore().user_id!,
 					});
 				if (supaError) throw supaError;
@@ -407,20 +396,88 @@ const handleEmail = async () => {
 			const emailObjects = formatClearSkipProbate(
 				clearSkipProbateContacts.value
 			);
+			// will want to check if the email has already been sent to the relative
+			let sentEmails = [] as string[];
+
+			uiStore.toggleFunctionLoading(true);
+			for (let i = 0; i < emailObjects.length; i += 50) {
+				try {
+					const { data: emails, error } = await client
+						.from('email_campaigns')
+						.select('email')
+						.in(
+							'email',
+							emailObjects.slice(i, i + 50).map((e) => e.email)
+						);
+					if (error) throw error;
+					if (emails.length > 0) {
+						emails.forEach((email) => {
+							sentEmails.push(email.email);
+						});
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			}
+			uiStore.toggleFunctionLoading(false);
+
+			// filter out the emails that have already been sent
+			const filteredEmailObjects =
+				sentEmails.length > 0
+					? emailObjects.filter((e) => !sentEmails.includes(e.email))
+					: emailObjects;
+
+			// run the server endpoint
+			let counter = 0;
+
+			while (counter < filteredEmailObjects.length) {
+				// display progress bar
+				uiStore.setProgressBar({
+					value: counter + 1,
+					max: filteredEmailObjects.length,
+					show: true,
+					label: 'Sending Emails Please Wait...',
+				});
+
+				const emailObject = filteredEmailObjects[counter];
+
+				try {
+					// send the emails via single endpoint
+					const { data, error } = await $fetch('/api/email/single-probate', {
+						method: 'POST',
+						body: { emailObject, type: type.value },
+					});
+					if (error) throw error;
+					console.log(data);
+				} catch (error) {
+					console.log('error', error);
+				} finally {
+					counter++;
+				}
+			}
+			uiStore.clearProgressBar();
+
+			// will bulk insert the emails into the email_campaigns table
 			try {
 				uiStore.toggleFunctionLoading(true);
-				// send the emails
-				const { data, error } = await $fetch(
-					'/api/email/bulk-probate-relative',
-					{
-						method: 'POST',
-						body: { emailObjects },
-					}
+				const { data, error } = await client.from('email_campaigns').insert(
+					filteredEmailObjects.map((e) => ({
+						id: useUuid(),
+						email: e.email,
+						user_id: useAuthStore().user_id!,
+						name: e.name,
+						address_1: e.address1,
+						city: e.city,
+						state: e.state,
+						zip: e.zip,
+						sent_at: new Date().toISOString(),
+						type: 'probateRelative',
+					}))
 				);
 				if (error) throw error;
 				console.log(data);
 			} catch (error) {
-				console.log('error', error);
+				console.log(error);
 			} finally {
 				uiStore.toggleFunctionLoading(false);
 			}
@@ -430,7 +487,7 @@ const handleEmail = async () => {
 	if (skipTrace.value === 'clearSkip_regular') {
 		const emailObjects = formatClearSkipRegular(clearSkipRegularContacts.value);
 		// create a function to send the emails
-		const sendEmail = async (emailObject: StandardEmailObject) => {
+		const sendEmail = async (emailObject: EmailObject) => {
 			try {
 				uiStore.toggleFunctionLoading(true);
 				// send the emails
@@ -457,7 +514,7 @@ const handleEmail = async () => {
 		// check email_campaigns table to see if there are any emails that have been sent to the same email address
 		// if there are, then we will filter out the emailObjects that have the same email address
 		let sentEmails = [] as string[];
-
+		// get all the sent emails from supabase
 		for (let i = 0; i < emailObjects.length; i += 50) {
 			const { data, error } = await client
 				.from('email_campaigns')
@@ -471,44 +528,60 @@ const handleEmail = async () => {
 				sentEmails = [...sentEmails, ...data.map((email) => email.email)];
 			}
 		}
-
+		// filter out the emails that have already been sent
 		const filteredEmailObjects =
 			sentEmails.length > 0
 				? emailObjects.filter(
 						(emailObject) => !sentEmails.includes(emailObject.email)
 				  )
 				: emailObjects;
-
+		// create logs to keep track of the emails that were sent
 		let logs: {
 			error: Error | null;
 			email: string;
 			data: string | null;
 		}[] = [];
-
-		for (let i = 0; i < filteredEmailObjects.length; i++) {
-			const emailObject = filteredEmailObjects[i];
+		// send the emails
+		let counter = 0;
+		while (counter < filteredEmailObjects.length) {
+			uiStore.setProgressBar({
+				value: counter + 1,
+				max: filteredEmailObjects.length,
+				show: true,
+				label: 'Sending Emails Please Wait...',
+			});
+			const emailObject = filteredEmailObjects[counter];
 			if (emailObject.email === '') continue;
-			let log = await sendEmail(emailObject);
-			logs.push(log);
+			const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+			await wait(500);
+			// let log = await sendEmail(emailObject);
+			// logs.push(log);
+
+			counter++;
 		}
 
+		// clear the progress bar once completed
+		uiStore.clearProgressBar();
+
+		// will bulk insert the emails into the email_campaigns table in supabase
 		try {
-			const { data, error } = await client.from('email_campaigns').insert(
-				filteredEmailObjects.map((obj) => {
-					return {
-						user_id: useAuthStore().user_id!,
-						id: useUuid(),
-						address_1: obj.address1,
-						city: obj.city,
-						state: obj.state,
-						zip: obj.zip,
-						email: obj.email,
-						name: obj.name,
-						sent_at: new Date().toISOString(),
-						type: type.value,
-					};
-				})
-			);
+			// const { data, error } = await client.from('email_campaigns').insert(
+			// 	filteredEmailObjects.map((obj) => {
+			// 		return {
+			// 			user_id: useAuthStore().user_id!,
+			// 			id: useUuid(),
+			// 			address_1: obj.address1,
+			// 			city: obj.city,
+			// 			state: obj.state,
+			// 			zip: obj.zip,
+			// 			email: obj.email,
+			// 			name: obj.name,
+			// 			sent_at: new Date().toISOString(),
+			// 			type: type.value,
+			// 		};
+			// 	})
+			// );
+			// if (error) throw error;
 		} catch (error) {
 			console.log(error);
 		} finally {

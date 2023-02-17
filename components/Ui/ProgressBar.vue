@@ -1,10 +1,10 @@
 <template>
-	<div class="mx-8 bg-gray-200 rounded-full dark:bg-black">
+	<div class="mx-8 bg-gray-200 rounded-full dark:bg-black shadow-xl">
 		<div
-			class="bg-primary dark:bg-darkPrimary text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full h-6 flex items-center justify-center"
+			class="bg-primary dark:bg-darkPrimary text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full h-6 flex items-center justify-center animate-pulse"
 			:style="{ width: barStyle.width, transition: 'width 0.5s ease-in-out' }"
 		>
-			<div class="my-auto">
+			<div class="my-auto text-white">
 				{{ barStyle.width }}
 			</div>
 		</div>

@@ -1,12 +1,21 @@
+import { serverSupabaseClient } from '#supabase/server';
 import { EmailObject } from '~~/types/types';
+import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
+	const transporter = useCreateTransporter();
+
+	const client = serverSupabaseClient<Database>(event);
+
 	const config = useRuntimeConfig().private;
 
-	const transporter = useCreateTransporter();
+	let err: string = '';
+
+	const user_id = event.context.auth.user.id;
+
 	const { emailObject, type } = (await readBody(event)) as {
 		emailObject: EmailObject;
-		type: 'cashOffer' | 'probate' | 'eviction' | 'codeViolation';
+		type: 'probateRelative' | 'probateAttorney';
 	};
 
 	const sendEmail = async (emailObject: EmailObject) => {
@@ -15,7 +24,7 @@ export default defineEventHandler(async (event) => {
 				from: config.EMAIL_USER,
 				to: emailObject.email,
 				subject: emailObject.subject,
-				template: `email.${type}.standard`,
+				template: 'email.probate-relative',
 				context: {
 					name: emailObject.name,
 					address1: emailObject.address1,
@@ -32,6 +41,7 @@ export default defineEventHandler(async (event) => {
 				transporter.sendMail(mailOptions, (error, info) => {
 					if (error) {
 						console.log(error);
+						err = error.message as string;
 						reject({
 							error,
 							email: emailObject.email,
@@ -57,10 +67,28 @@ export default defineEventHandler(async (event) => {
 		}
 	};
 
-	const result = await sendEmail(emailObject);
+	const log = await sendEmail(emailObject);
+
+	try {
+		const { error } = await client.from('email_campaigns').insert({
+			user_id,
+			id: useUuid(),
+			email: emailObject.email,
+			name: emailObject.name,
+			type,
+			address_1: emailObject.address1,
+			city: emailObject.city,
+			state: emailObject.state,
+			zip: emailObject.zip,
+			sent_at: new Date().toISOString(),
+		});
+		if (error) throw error;
+	} catch (error) {
+		console.log(error);
+	}
 
 	return {
-		data: result,
-		error: result.error,
+		data: log,
+		error: err,
 	};
 });
