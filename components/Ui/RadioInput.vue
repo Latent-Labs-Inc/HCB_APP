@@ -4,8 +4,8 @@
 			<p v-if="question">{{ question }}</p>
 		</div>
 		<div
-			class="flex justify-center gap-2"
-			:class="row ? 'flex-row' : 'flex-col'"
+			class="flex justify-center gap-2 flex-col sm:flex-row"
+			:class="[row ? 'flex-row' : 'flex-col']"
 		>
 			<div class="flex justify-center" v-for="option of options">
 				<div

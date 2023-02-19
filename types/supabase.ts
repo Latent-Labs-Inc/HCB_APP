@@ -142,9 +142,6 @@ export interface Database {
           modified_at: string | null
           ownerFirstName: string | null
           ownerLastName: string | null
-          prAddress: Json | null
-          prFirstName: string | null
-          prLastName: string | null
           propertyAddress: Json | null
           texted: boolean
           user_id: string
@@ -166,9 +163,6 @@ export interface Database {
           modified_at?: string | null
           ownerFirstName?: string | null
           ownerLastName?: string | null
-          prAddress?: Json | null
-          prFirstName?: string | null
-          prLastName?: string | null
           propertyAddress?: Json | null
           texted?: boolean
           user_id: string
@@ -190,9 +184,6 @@ export interface Database {
           modified_at?: string | null
           ownerFirstName?: string | null
           ownerLastName?: string | null
-          prAddress?: Json | null
-          prFirstName?: string | null
-          prLastName?: string | null
           propertyAddress?: Json | null
           texted?: boolean
           user_id?: string

@@ -90,6 +90,7 @@ export const useEmailCampaignData = () => {
 			);
 			// now push the data to the clearskip regular contacts array
 			clearSkipRegularContacts.value.push(...formattedData);
+			return formattedData;
 		} else if (skipTrace === 'clearSkip_probate') {
 			let formattedData = data.map((contact) => {
 				let formattedContact = {} as ClearSkipProbate;
@@ -121,6 +122,7 @@ export const useEmailCampaignData = () => {
 
 			// now push the data to the clearSkip probate contacts array
 			clearSkipProbateContacts.value.push(...formattedData);
+			return formattedData;
 		}
 	};
 

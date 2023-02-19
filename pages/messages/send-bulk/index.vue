@@ -2,7 +2,7 @@
 	<div class="grid gap-8 dark:text-white text-primary">
 		<h3 class="header">Send Messages</h3>
 		<transition name="fade" mode="out-in">
-			<div class="grid gap-8" v-if="sentMessages === 0">
+			<div class="grid gap-8 mx-2" v-if="sentMessages === 0">
 				<transition name="fade" mode="out-in">
 					<div class="grid gap-4 mx-auto">
 						<UiRadioInput

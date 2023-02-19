@@ -1,9 +1,11 @@
 <template>
-	<div class="flex justify-center gap-4">
+	<div
+		class="flex flex-col sm:flex-row justify-center gap-4 w-1/2 sm:w-full mx-auto text-center"
+	>
 		<label
 			v-for="radioType in radioTypes"
 			:key="radioType.id"
-			class="text-base cursor-pointer dark:hover:bg-darkBg hover:bg-darkSecondary rounded-lg p-2 trans"
+			class="text-base cursor-pointer dark:hover:bg-darkBg hover:bg-darkSecondary rounded-lg p-2 trans my-auto"
 			:class="{
 				selected: radioType.id === modelValue,
 				flip: reverse && radioType.id === modelValue,

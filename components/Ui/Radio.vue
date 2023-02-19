@@ -1,5 +1,7 @@
 <template>
-	<div class="flex justify-center gap-6">
+	<div
+		class="flex flex-col sm:flex-row justify-center gap-4 w-1/2 sm:w-full mx-auto text-center"
+	>
 		<label
 			v-for="radioType in radioTypes"
 			:key="radioType.id"
@@ -16,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { mode } from "process";
-
 interface RadioType {
 	id: string;
 	label: string;
@@ -28,18 +28,13 @@ interface Props {
 	reverse?: boolean;
 }
 const emit = defineEmits<{
-	(e: "update:modelValue", value: string): void;
+	(e: 'update:modelValue', value: string): void;
 }>();
 const props = defineProps<Props>();
 
 const handleUpdate = (type: string) => {
-	emit("update:modelValue", type);
+	emit('update:modelValue', type);
 };
-
-const isActive = ref(true);
-const error = ref(null);
-
-const classObject = computed(() => ({}));
 </script>
 
 <style scoped>

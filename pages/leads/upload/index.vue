@@ -1,9 +1,9 @@
 <template>
-	<div>
+	<div class="mx-4">
 		<h3 class="header">Upload Leads</h3>
 		<div class="flex flex-col gap-8">
 			<div class="my-6">
-				<UiRadio v-model="leadProvider" :radio-types="providerTypes" />
+				<UiRadioSmall v-model="leadProvider" :radio-types="providerTypes" />
 			</div>
 			<transition name="fade" mode="out-in">
 				<div class="flex justify-center gap-4" v-if="leadProvider === 'other'">
@@ -12,7 +12,7 @@
 				</div>
 			</transition>
 			<div class="my-6">
-				<UiRadio v-model="leadType" :radio-types="leadTypes" />
+				<UiRadioSmall v-model="leadType" :radio-types="leadTypes" />
 			</div>
 			<transition name="fade" mode="out-in">
 				<div class="flex justify-center gap-4" v-if="leadType === 'other'">
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { useLeadStore } from '~/stores/lead';
 import Papa from 'papaparse';
-import { Lead } from '~~/types/types';
+import { ClearSkipProbate, ClearSkipRegular, Lead } from '~~/types/types';
 import { useAuthStore } from '~~/stores/auth';
 import { Database } from '~~/types/supabase';
 import { useUiStore } from '~~/stores/ui';
@@ -47,7 +47,14 @@ const client = useSupabaseClient<Database>();
 const authStore = useAuthStore();
 const uiStore = useUiStore();
 
-const leadProvider = ref('propStream');
+const leadProvider = ref<
+	| 'propstream'
+	| 'clearSkip_probate'
+	| 'foreclosureDaily'
+	| 'fiverr'
+	| 'clearSkip_regular'
+	| 'other'
+>('propstream');
 
 const otherProviderInput = ref('');
 
@@ -65,12 +72,22 @@ const providerTypes = [
 		id: 'fiverr',
 	},
 	{
+		label: 'ClearSkip Probate',
+		id: 'clearSkip_probate',
+	},
+	{
+		label: 'ClearSkip Regular',
+		id: 'clearSkip_regular',
+	},
+	{
 		label: 'Other',
 		id: 'other',
 	},
 ];
 
-const leadType = ref('foreclosure');
+const leadType = ref<
+	'foreclosure' | 'eviction' | 'probate' | 'other' | 'codeViolation'
+>('foreclosure');
 
 const otherLeadTypeInput = ref('');
 
@@ -84,12 +101,12 @@ const leadTypes = [
 		id: 'probate',
 	},
 	{
-		label: 'Divorce',
-		id: 'divorce',
+		label: 'Code Violation',
+		id: 'codeViolation',
 	},
 	{
-		label: 'High Equity',
-		id: 'highEquity',
+		label: 'Eviction',
+		id: 'eviction',
 	},
 	{
 		label: 'Other',
@@ -154,6 +171,18 @@ interface FD_Contact {
 	Zip: string;
 }
 
+const { formatData } = useEmailCampaignData();
+
+const uploadLeads = async (leads: Lead[]) => {
+	try {
+		const { error } = await client.from('leads').insert(leads);
+		if (error) throw error;
+	} catch (error) {
+		console.log(error);
+	} finally {
+		uiStore.toggleFunctionLoading(false);
+	}
+};
 const handleFile = (file: File) => {
 	uiStore.toggleFunctionLoading(true);
 	const reader = new FileReader();
@@ -163,76 +192,189 @@ const handleFile = (file: File) => {
 			header: true,
 			skipEmptyLines: true,
 		});
-		const data = parsed.data as FD_Contact[];
+		const data = parsed.data as any[];
 		// remove all leads with a company name
-		const contactLeads = data.filter((contact) => {
-			return contact['Company Name'] === '';
-		});
+		let leads: Lead[] = [];
+		if (leadProvider.value === 'clearSkip_regular') {
+			// use formatData function to format clearSkip
+			const formattedClearSkipRegular = formatData(
+				data,
+				'clearSkip_regular'
+			) as ClearSkipRegular[];
 
-		// convert contact leads to lead type
-		const leads: Lead[] = contactLeads.map((contact) => {
-			const lead: Lead = {
-				leadProvider: leadProvider.value,
-				leadType: leadType.value,
-				user_id: useAuthStore().user_id!,
-				lead_id: useUuid(),
-				propertyAddress: {
-					address1: contact['Street Address'],
-					address2: '',
-					city: contact.City,
-					state: contact.State,
-					zip: contact.Zip,
-				},
-				ownerFirstName: contact['First Name'],
-				ownerLastName: contact['Last Name'],
-				wireless: [
-					contact.Cell,
-					contact['Cell 2'],
-					contact['Cell 3'],
-					contact['Cell 4'],
-				],
-				landline: [
-					contact.Landline,
-					contact['Landline 2'],
-					contact['Landline 3'],
-					contact['Landline 4'],
-				],
-				email: [
-					contact['Email 1'],
-					contact['Email 2'],
-					contact['Email 3'],
-					contact['Email 4'],
-				],
-				created_at: new Date().toDateString(),
-				modified_at: new Date().toDateString(),
-				texted: false,
-				emailed: false,
-				mailed: false,
-				mailingAddress: {
-					street: contact['Mail Street Address'],
-					city: contact['Mail City'],
-					state: contact['Mail State'],
-					zip: contact['Mail Zip'],
-				},
-				favorite: false,
-				favoritePhone: '',
-				fileDate: new Date().toDateString(),
-				prAddress: {},
-				prFirstName: '',
-				prLastName: '',
-			};
-			return lead;
-		});
-		try {
-			const { data: insertedLeads, error } = await client
-				.from('leads')
-				.insert(leads);
-			if (error) throw error;
-		} catch (error) {
-			console.log(error);
-		} finally {
-			uiStore.toggleFunctionLoading(false);
+			// now we need a function or something to convert the clearSkip data to lead type
+			leads = formattedClearSkipRegular.map((regular) => {
+				let emails: string[] = [];
+				let wireless: string[] = [];
+				for (let key in regular) {
+					if (
+						key.includes('email_email') &&
+						!key.includes('first') &&
+						!key.includes('last') &&
+						regular[key as keyof typeof regular] !== ''
+					) {
+						emails.push(regular[key as keyof typeof regular]);
+					}
+					if (
+						key.includes('ph_phone') &&
+						!key.includes('type') &&
+						!key.includes('last') &&
+						regular[key as keyof typeof regular] !== ''
+					) {
+						wireless.push(regular[key as keyof typeof regular]);
+					}
+				}
+				return {
+					leadProvider: leadProvider.value,
+					leadType: leadType.value,
+					user_id: useAuthStore().user_id!,
+					lead_id: useUuid(),
+					created_at: new Date().toISOString(),
+					modified_at: new Date().toISOString(),
+					propertyAddress: {
+						address1: regular.input_address_1,
+						address2: '',
+						city: regular.input_city,
+						state: regular.input_state,
+						zip: regular.input_zip_code,
+					},
+					email: emails,
+					emailed: false,
+					wireless: wireless,
+					texted: false,
+					favorite: false,
+					favoritePhone: '',
+					ownerFirstName: regular.input_first_name,
+					ownerLastName: regular.input_last_name,
+					mailed: false,
+					mailingAddress: {
+						address1: regular.input_address_1,
+						address2: '',
+						city: regular.input_city,
+						state: regular.input_state,
+						zip: regular.input_zip_code,
+					},
+					fileDate: new Date().toISOString(),
+					landline: [],
+				};
+			});
+		} else if (leadProvider.value === 'clearSkip_probate') {
+			const formattedClearSkipProbate = formatData(
+				data,
+				'clearSkip_probate'
+			) as ClearSkipProbate[];
+
+			// now we need a function or something to convert the clearSkip data to lead type
+			leads = formattedClearSkipProbate.map((probate) => {
+				let wireless: string[] = [];
+				let emails: string[] = [];
+				for (let key in probate) {
+					if (
+						key.includes('rel') &&
+						key.includes('email') &&
+						probate[key as keyof typeof probate] !== ''
+					) {
+						emails.push(probate[key as keyof typeof probate]);
+					}
+					if (
+						key.includes('rel') &&
+						key.includes('phone') &&
+						probate[key as keyof typeof probate] !== ''
+					) {
+						wireless.push(probate[key as keyof typeof probate]);
+					}
+				}
+				return {
+					lead_id: useUuid(),
+					leadProvider: leadProvider.value,
+					leadType: leadType.value,
+					user_id: useAuthStore().user_id!,
+					created_at: new Date().toISOString(),
+					modified_at: new Date().toISOString(),
+					propertyAddress: {
+						address1: probate.input_address_1,
+						address2: '',
+						city: probate.input_city,
+						state: probate.input_state,
+						zip: probate.input_zip_code,
+					},
+					email: emails,
+					emailed: false,
+					wireless: wireless,
+					texted: false,
+					favorite: false,
+					favoritePhone: '',
+					ownerFirstName: probate.input_first_name,
+					ownerLastName: probate.input_last_name,
+					mailed: false,
+					mailingAddress: {
+						address1: probate.input_address_1,
+						address2: '',
+						city: probate.input_city,
+						state: probate.input_state,
+						zip: probate.input_zip_code,
+					},
+					fileDate: new Date().toISOString(),
+					landline: [],
+				};
+			});
+		} else {
+			const contactLeads = data.filter((contact) => {
+				return contact['Company Name'] === '';
+			}) as FD_Contact[];
+			// convert contact leads to lead type
+			leads = contactLeads.map((contact) => {
+				const lead: Lead = {
+					leadProvider: leadProvider.value,
+					leadType: leadType.value,
+					user_id: useAuthStore().user_id!,
+					lead_id: useUuid(),
+					propertyAddress: {
+						address1: contact['Street Address'],
+						address2: '',
+						city: contact.City,
+						state: contact.State,
+						zip: contact.Zip,
+					},
+					ownerFirstName: contact['First Name'],
+					ownerLastName: contact['Last Name'],
+					wireless: [
+						contact.Cell,
+						contact['Cell 2'],
+						contact['Cell 3'],
+						contact['Cell 4'],
+					],
+					landline: [
+						contact.Landline,
+						contact['Landline 2'],
+						contact['Landline 3'],
+						contact['Landline 4'],
+					],
+					email: [
+						contact['Email 1'],
+						contact['Email 2'],
+						contact['Email 3'],
+						contact['Email 4'],
+					],
+					created_at: new Date().toDateString(),
+					modified_at: new Date().toDateString(),
+					texted: false,
+					emailed: false,
+					mailed: false,
+					mailingAddress: {
+						street: contact['Mail Street Address'],
+						city: contact['Mail City'],
+						state: contact['Mail State'],
+						zip: contact['Mail Zip'],
+					},
+					favorite: false,
+					favoritePhone: '',
+					fileDate: new Date().toDateString(),
+				};
+				return lead;
+			});
 		}
+		await uploadLeads(leads);
 	};
 
 	reader.readAsText(file);
