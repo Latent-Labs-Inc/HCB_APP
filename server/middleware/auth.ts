@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
 	const allowedRoutes = [
 		'/api/public/twilio-incoming',
 		'/api/public/twilio-status-update',
+		'/api/public/flip-list-cron',
 		'/api/incoming-message',
 		'/api/status-update',
 	];
