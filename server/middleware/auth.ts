@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
 		'/api/public/twilio-incoming',
 		'/api/public/twilio-status-update',
 		'/api/public/flip-list-cron',
+		'/api/puppeteer/flip-list',
 		'/api/incoming-message',
 		'/api/status-update',
 	];

@@ -4,6 +4,7 @@ import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
+	console.log('event', event);
 	const { twilioClient, twilioNumber } = useTwilio();
 	const browser = await puppeteer.launch({
 		headless: false,
@@ -14,7 +15,9 @@ export default defineEventHandler(async (event) => {
 	});
 	const page = await browser.newPage();
 
-	const user_id = event.context.auth.user.id as string;
+	const user_id =
+		(event.context.auth.user.id as string) ||
+		'7cbf3f6e-1602-43ad-88c0-29f7bede6baa';
 
 	const client = serverSupabaseClient<Database>(event);
 
@@ -145,14 +148,17 @@ export default defineEventHandler(async (event) => {
 			.upsert(formattedProperties);
 		if (error) throw error;
 		console.log(formattedProperties.length);
+		return {
+			data: formattedProperties.length,
+			error: null,
+		};
 	} catch (e) {
 		console.error(e);
+		return {
+			data: null,
+			error: e,
+		};
 	} finally {
 		// browser.close();
 	}
-
-	return {
-		data: null,
-		error: null,
-	};
 });
