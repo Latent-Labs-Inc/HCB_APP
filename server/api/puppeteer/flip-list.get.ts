@@ -1,25 +1,28 @@
-import { serverSupabaseClient } from '#supabase/server';
+import { serverSupabaseServiceRole } from '#supabase/server';
 import puppeteer from 'puppeteer';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
-	console.log('event', event);
 	const { twilioClient, twilioNumber } = useTwilio();
-	const browser = await puppeteer.launch({
+	const options = {
 		headless: false,
 		defaultViewport: {
 			width: 1080,
 			height: 720,
 		},
-	});
+	};
+	const browser = await puppeteer
+		.launch
+		// options
+		();
 	const page = await browser.newPage();
 
 	const user_id =
-		(event.context.auth.user.id as string) ||
+		(event.context.auth.user?.id as string) ||
 		'7cbf3f6e-1602-43ad-88c0-29f7bede6baa';
 
-	const client = serverSupabaseClient<Database>(event);
+	const client = serverSupabaseServiceRole<Database>(event);
 
 	await page.goto('https://www.fliplist.com/');
 
@@ -125,21 +128,35 @@ export default defineEventHandler(async (event) => {
 		});
 
 		// if there is an available property, send a text message
-		if (availableProperties.length > 0) {
-			availableProperties.forEach(async (property) => {
-				try {
-					let { messagingServiceSid, errorMessage } =
-						await twilioClient.messages.create({
-							from: twilioNumber,
-							to: '+18134084221',
-							body: `There is a new property available at ${property.address}\nLink:${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed} Bed\n${property.bath} Bath\n${property.sqft} sqft\n`,
-						});
-					if (errorMessage) throw errorMessage;
-				} catch (e) {
-					console.log(error);
-				}
-			});
-		}
+		// if (availableProperties.length > 0) {
+		// availableProperties.forEach(async (property) => {
+		// 	try {
+		// 		let { messagingServiceSid, errorMessage } =
+		// 			await twilioClient.messages.create({
+		// 				from: twilioNumber,
+		// 				to: '+18134084221',
+		// 				body: `There is a new property available at ${property.address}\nLink:${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed} Bed\n${property.bath} Bath\n${property.sqft} sqft\n`,
+		// 			});
+		// 		if (errorMessage) throw errorMessage;
+		// 	} catch (e) {
+		// 		console.log(error);
+		// 	}
+		// });
+		// }
+
+		formattedProperties.forEach(async (property) => {
+			try {
+				let { messagingServiceSid, errorMessage } =
+					await twilioClient.messages.create({
+						from: twilioNumber,
+						to: '+18134084221',
+						body: `There is a new property available at ${property.address}\nLink: ${property.link}\nDetails: \nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed} Bed\n${property.bath} Bath\n${property.sqft} sqft\n`,
+					});
+				if (errorMessage) throw errorMessage;
+			} catch (e) {
+				console.log(error);
+			}
+		});
 
 		// might not need to even push to supabase if we are just going to use the data to send a text message, we would only check the if the property is pending or available
 		// now we will push these to supabase to store them in the database
