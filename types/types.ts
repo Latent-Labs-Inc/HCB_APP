@@ -462,3 +462,13 @@ export interface EmailObject {
 	state: string;
 	zip: string;
 }
+
+export interface Property {
+	address: string;
+	price: string;
+	link: string;
+	bedrooms: string;
+	bathrooms: string;
+	sqft: string;
+	status: string;
+}

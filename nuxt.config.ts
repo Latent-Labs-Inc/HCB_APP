@@ -47,6 +47,7 @@ export default defineNuxtConfig({
 			EMAIL_HOST: process.env.EMAIL_HOST,
 			EMAIL_PORT: process.env.EMAIL_PORT,
 			EMAIL_FROM: process.env.EMAIL_FROM,
+			CRON_API_KEY: process.env.CRON_API_KEY,
 		},
 	},
 });
