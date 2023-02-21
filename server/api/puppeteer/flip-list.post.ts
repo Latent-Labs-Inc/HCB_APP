@@ -10,16 +10,8 @@ export default defineEventHandler(async (event) => {
 
 	const { twilioClient, twilioNumber } = useTwilio();
 
-	const options = {
-		headless: false,
-		defaultViewport: {
-			width: 1080,
-			height: 720,
-		},
-	};
-
 	let error: any = null;
-	const browser = await puppeteer.launch(options);
+	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
 	const client = serverSupabaseServiceRole<Database>(event);
 
