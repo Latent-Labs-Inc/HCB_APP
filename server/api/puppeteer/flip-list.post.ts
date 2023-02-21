@@ -1,10 +1,12 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import chromium from 'chrome-aws-lambda';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
+	let result = null;
+	let newBrowser = null;
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
 	const { CRON_API_KEY } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
