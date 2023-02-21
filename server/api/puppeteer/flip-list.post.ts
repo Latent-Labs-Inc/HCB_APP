@@ -5,8 +5,6 @@ import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
-	let result = null;
-	let newBrowser = null;
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
 	const { CRON_API_KEY } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
@@ -14,79 +12,87 @@ export default defineEventHandler(async (event) => {
 	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
-	const browser = await puppeteer.launch();
-	const page = await browser.newPage();
-	const client = serverSupabaseServiceRole<Database>(event);
-
-	await page.goto('https://www.fliplist.com/');
-
-	// create function to evaluate properties on the page
-	const evaluateProperties = async () => {
-		return await page.evaluate(() => {
-			const properties = document.querySelectorAll('.property');
-
-			let props = Array.from(properties).map((property) => {
-				return {
-					address:
-						property.querySelector('.property-title.card-title')?.textContent ||
-						'',
-					price: property.querySelector('.lead')?.textContent || '',
-					link: property.querySelector('a')?.href || '',
-					bed:
-						property.querySelector('a > div > ul > li:nth-child(2)')
-							?.textContent || '',
-					bath:
-						property.querySelector('a > div > ul > li:nth-child(3)')
-							?.textContent || '',
-					sqft:
-						property.querySelector('a > div > ul > li:nth-child(4)')
-							?.textContent || '',
-					status:
-						property.querySelector('a > div > span.badge')?.textContent ||
-						'available',
-					texted: false,
-					created_at: new Date().toISOString(),
-					modified_at: new Date().toISOString(),
-				};
-			});
-			props = props.filter((property) => {
-				return (
-					property.address !== '' &&
-					property.price !== '' &&
-					property.link !== '' &&
-					property.bed !== '' &&
-					property.bath !== '' &&
-					property.sqft !== '' &&
-					property.status !== ''
-				);
-			});
-
-			return props.map((property) => {
-				let regExp = /\(([^)]+)\)/;
-				let arv = property.address.match(regExp)
-					? property.address.match(regExp)![1]
-					: '';
-				let address = property.address.replace(`(${arv})`, '').trim();
-				property.address = address;
-				property.status = property.status.toLowerCase();
-				let formattedProperty = { ...property, arv: arv };
-				return formattedProperty;
-			});
-		});
-	};
-
-	const setFilters = async () => {
-		await page.waitForSelector('text/properties');
-		// await page.select('select[name="loc"]', '1592');
-		await page.select('select[name="loc"]', '6537');
-		await page.waitForSelector('text/Status');
-		await page.select('select[name="status"]', 'available');
-		await page.waitForSelector(
-			'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
-		);
-	};
+	let result = null;
+	let browser = null;
 
 	try {
+		browser = await chromium.puppeteer.launch({
+			args: chromium.args,
+			executablePath: await chromium.executablePath,
+			headless: true,
+			ignoreHTTPSErrors: true,
+		});
+		const page = await browser.newPage();
+		const client = serverSupabaseServiceRole<Database>(event);
+
+		await page.goto('https://www.fliplist.com/');
+
+		// create function to evaluate properties on the page
+		const evaluateProperties = async () => {
+			return await page.evaluate(() => {
+				const properties = document.querySelectorAll('.property');
+
+				let props = Array.from(properties).map((property) => {
+					return {
+						address:
+							property.querySelector('.property-title.card-title')
+								?.textContent || '',
+						price: property.querySelector('.lead')?.textContent || '',
+						link: property.querySelector('a')?.href || '',
+						bed:
+							property.querySelector('a > div > ul > li:nth-child(2)')
+								?.textContent || '',
+						bath:
+							property.querySelector('a > div > ul > li:nth-child(3)')
+								?.textContent || '',
+						sqft:
+							property.querySelector('a > div > ul > li:nth-child(4)')
+								?.textContent || '',
+						status:
+							property.querySelector('a > div > span.badge')?.textContent ||
+							'available',
+						texted: false,
+						created_at: new Date().toISOString(),
+						modified_at: new Date().toISOString(),
+					};
+				});
+				props = props.filter((property) => {
+					return (
+						property.address !== '' &&
+						property.price !== '' &&
+						property.link !== '' &&
+						property.bed !== '' &&
+						property.bath !== '' &&
+						property.sqft !== '' &&
+						property.status !== ''
+					);
+				});
+
+				return props.map((property) => {
+					let regExp = /\(([^)]+)\)/;
+					let arv = property.address.match(regExp)
+						? property.address.match(regExp)![1]
+						: '';
+					let address = property.address.replace(`(${arv})`, '').trim();
+					property.address = address;
+					property.status = property.status.toLowerCase();
+					let formattedProperty = { ...property, arv: arv };
+					return formattedProperty;
+				});
+			});
+		};
+
+		const setFilters = async () => {
+			await page.waitForSelector('text/properties');
+			// await page.select('select[name="loc"]', '1592');
+			await page.select('select[name="loc"]', '6537');
+			await page.waitForSelector('text/Status');
+			await page.select('select[name="status"]', 'available');
+			await page.waitForSelector(
+				'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
+			);
+		};
+
 		// Wait for the results to show up
 		await page.click('text/View Properties');
 		await page.waitForSelector('text/Tampa, FL');
@@ -209,6 +215,6 @@ export default defineEventHandler(async (event) => {
 			error: { e, error },
 		};
 	} finally {
-		browser.close();
+		browser!.close();
 	}
 });
