@@ -6,22 +6,22 @@ import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
-	const { CRON_API_KEY } = useRuntimeConfig().private;
+	const { CRON_API_KEY, CHROME_EXECUTABLE_PATH } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
 
 	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
-	let result = null;
 	let browser = null;
 
 	try {
-		browser = await chromium.puppeteer.launch({
+		browser = await puppeteer.launch({
 			args: chromium.args,
-			executablePath: await chromium.executablePath,
+			executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
 			headless: true,
 			ignoreHTTPSErrors: true,
 		});
+
 		const page = await browser.newPage();
 		const client = serverSupabaseServiceRole<Database>(event);
 
@@ -204,6 +204,8 @@ export default defineEventHandler(async (event) => {
 			};
 		}
 
+		await browser.close();
+
 		return {
 			data: 'None Texted',
 			error,
@@ -214,7 +216,5 @@ export default defineEventHandler(async (event) => {
 			data: null,
 			error: { e, error },
 		};
-	} finally {
-		browser!.close();
 	}
 });
