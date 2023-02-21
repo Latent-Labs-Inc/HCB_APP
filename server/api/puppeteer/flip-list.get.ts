@@ -7,7 +7,9 @@ export default defineEventHandler(async (event) => {
 	const { apiKey } = getQuery(event) as { apiKey: string };
 	const { CRON_API_KEY } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
+
 	const { twilioClient, twilioNumber } = useTwilio();
+
 	const options = {
 		headless: false,
 		defaultViewport: {
@@ -15,6 +17,8 @@ export default defineEventHandler(async (event) => {
 			height: 720,
 		},
 	};
+
+	let error: any = null;
 	const browser = await puppeteer
 		.launch
 		// options
@@ -28,17 +32,18 @@ export default defineEventHandler(async (event) => {
 	const evaluateProperties = async () => {
 		return await page.evaluate(() => {
 			const properties = document.querySelectorAll('.property');
-			return Array.from(properties).map((property) => {
+
+			let props = Array.from(properties).map((property) => {
 				return {
 					address:
 						property.querySelector('.property-title.card-title')?.textContent ||
 						'',
 					price: property.querySelector('.lead')?.textContent || '',
 					link: property.querySelector('a')?.href || '',
-					bedrooms:
+					bed:
 						property.querySelector('a > div > ul > li:nth-child(2)')
 							?.textContent || '',
-					bathrooms:
+					bath:
 						property.querySelector('a > div > ul > li:nth-child(3)')
 							?.textContent || '',
 					sqft:
@@ -46,11 +51,46 @@ export default defineEventHandler(async (event) => {
 							?.textContent || '',
 					status:
 						property.querySelector('a > div > span.badge')?.textContent ||
-						'available' ||
-						'',
+						'available',
+					texted: false,
+					created_at: new Date().toISOString(),
+					modified_at: new Date().toISOString(),
 				};
 			});
+			props = props.filter((property) => {
+				return (
+					property.address !== '' &&
+					property.price !== '' &&
+					property.link !== '' &&
+					property.bed !== '' &&
+					property.bath !== '' &&
+					property.sqft !== '' &&
+					property.status !== ''
+				);
+			});
+
+			return props.map((property) => {
+				let regExp = /\(([^)]+)\)/;
+				let arv = property.address.match(regExp)
+					? property.address.match(regExp)![1]
+					: '';
+				let address = property.address.replace(`(${arv})`, '').trim();
+				property.address = address;
+				property.status = property.status.toLowerCase();
+				let formattedProperty = { ...property, arv: arv };
+				return formattedProperty;
+			});
 		});
+	};
+
+	const setFilters = async () => {
+		await page.waitForSelector('text/properties');
+		await page.select('select[name="loc"]', '1592');
+		await page.waitForSelector('text/Status');
+		await page.select('select[name="status"]', 'available');
+		await page.waitForSelector(
+			'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
+		);
 	};
 
 	try {
@@ -61,15 +101,6 @@ export default defineEventHandler(async (event) => {
 		await page.waitForSelector('text/Change To Sort View Mode');
 		await page.click('text/Change To Sort View Mode');
 
-		const setFilters = async () => {
-			await page.waitForSelector('text/properties');
-			await page.select('select[name="loc"]', '1592');
-			await page.waitForSelector('text/Status');
-			await page.select('select[name="status"]', 'available');
-			await page.waitForSelector(
-				'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
-			);
-		};
 		let properties: Property[] = [];
 
 		// evaluate the properties on each page and push the results to the properties array
@@ -84,81 +115,103 @@ export default defineEventHandler(async (event) => {
 				'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
 			);
 		}
-		// check to make sure there are no blanks in the array
-		const checkedProperties = properties.filter((property) => {
-			return (
-				property.address !== '' &&
-				property.price !== '' &&
-				property.link !== '' &&
-				property.bedrooms !== '' &&
-				property.bathrooms !== '' &&
-				property.sqft !== '' &&
-				property.status !== ''
-			);
-		});
 
-		// we will format the properties to match the supabase schema
-		const formattedProperties = checkedProperties.map((property) => {
-			var regExp = /\(([^)]+)\)/;
-			let arv = property.address.match(regExp)
-				? property.address.match(regExp)![1]
-				: '';
-			let address = property.address.replace(`(${arv})`, '').trim();
-			return {
-				address,
-				id: useUuid(),
-				arv,
-				price: property.price,
-				link: property.link,
-				bed: property.bedrooms,
-				bath: property.bathrooms,
-				sqft: property.sqft,
-				status: property.status,
-				created_at: new Date().toISOString(),
-				modified_at: new Date().toISOString(),
-			};
-		});
+		// will want to check to see if the properties are already in the database
+		// if they are not in the database then we will want to insert them into the database
+		try {
+			const { data: dbProperties, error: dbError } = await client
+				.from('flip_list')
+				.select('*')
+				.in(
+					'address',
+					properties.map((property) => property.address)
+				);
+			if (error) throw error;
+			// update the properties in the properties array to have the texted property from the one in the database
+			if (dbProperties) {
+				properties = properties.map((property) => {
+					const dbProperty = dbProperties.find(
+						(dbProperty) => dbProperty.address === property.address
+					);
+					if (dbProperty) {
+						// we will leave the status from the website listing but change the texted property to the one from the database
+						return {
+							...property,
+							texted: dbProperty.texted,
+						};
+					}
+					// if the property is not in the database then we will just return the property
+					return property;
+				});
+			}
+		} catch (e) {
+			console.error(e);
+			error = e;
+		}
 
-		// filter the properties into an array to find the available ones
-		const availableProperties = formattedProperties.filter((property) => {
-			return property.status === 'available';
-		});
+		// insert the properties into the database
+		try {
+			const { data, error } = await client.from('flip_list').insert(properties);
+			if (error) throw error;
+		} catch (e) {
+			console.log(e);
+			error = e;
+		}
 
-		// if there is an available property, send a text message
+		// filter out all properties that are pending status and texted is false
+		let availableProperties = properties.filter(
+			(property) => property.status === 'available' && !property.texted
+		);
+
+		let textedProperties: string[] = [];
+		// if there are any properties that are available and have not been texted then we will want to text them
 		if (availableProperties.length > 0) {
 			availableProperties.forEach(async (property) => {
 				try {
-					let { messagingServiceSid, errorMessage } =
-						await twilioClient.messages.create({
-							from: twilioNumber,
-							to: '+18134084221',
-							body: `There is a new property available at ${property.address}\nLink:${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed} Bed\n${property.bath} Bath\n${property.sqft} sqft\n`,
-						});
-					if (errorMessage) throw errorMessage;
+					let body = `There is a new property available at ${property.address}\nLink: ${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed}\n${property.bath}\n${property.sqft}`;
+					const res = await twilioClient.messages.create({
+						body,
+						from: twilioNumber,
+						to: '+18134750728',
+					});
+					if (res.errorMessage) throw res.errorMessage;
+					const res2 = await twilioClient.messages.create({
+						body,
+						from: twilioNumber,
+						to: '+18134084221',
+					});
+					if (res2.errorMessage) throw res2.errorMessage;
 				} catch (e) {
-					console.log(error);
+					console.log(e);
+					error = e;
+				} finally {
+					try {
+						textedProperties.push(property.address);
+						// update the database to have the texted property set to true
+						const { error } = await client
+							.from('flip_list')
+							.update({ texted: true })
+							.eq('address', property.address);
+						if (error) throw error;
+					} catch (e) {
+						console.log(e);
+						error = e;
+					}
 				}
 			});
 		}
 
-		// might not need to even push to supabase if we are just going to use the data to send a text message, we would only check the if the property is pending or available
-		// now we will push these to supabase to store them in the database
-		const { data, error } = await client
-			.from('flip_list')
-			.upsert(formattedProperties);
-		if (error) throw error;
-		console.log(formattedProperties.length);
 		return {
-			data: formattedProperties.length,
-			error: null,
+			data: textedProperties ? textedProperties : 'None Texted',
+			error,
 		};
 	} catch (e) {
-		console.error(e);
+		console.log(e);
 		return {
 			data: null,
-			error: e,
+			error: { e, error },
 		};
 	} finally {
-		// browser.close();
+		browser.close();
 	}
 });

@@ -463,12 +463,4 @@ export interface EmailObject {
 	zip: string;
 }
 
-export interface Property {
-	address: string;
-	price: string;
-	link: string;
-	bedrooms: string;
-	bathrooms: string;
-	sqft: string;
-	status: string;
-}
+export type Property = Database['public']['Tables']['flip_list']['Row'];

@@ -75,6 +75,47 @@ export interface Database {
           zip?: string
         }
       }
+      flip_list: {
+        Row: {
+          address: string
+          arv: string
+          bath: string
+          bed: string
+          created_at: string | null
+          link: string
+          modified_at: string | null
+          price: string
+          sqft: string
+          status: string
+          texted: boolean
+        }
+        Insert: {
+          address: string
+          arv: string
+          bath: string
+          bed: string
+          created_at?: string | null
+          link: string
+          modified_at?: string | null
+          price: string
+          sqft: string
+          status: string
+          texted?: boolean
+        }
+        Update: {
+          address?: string
+          arv?: string
+          bath?: string
+          bed?: string
+          created_at?: string | null
+          link?: string
+          modified_at?: string | null
+          price?: string
+          sqft?: string
+          status?: string
+          texted?: boolean
+        }
+      }
       incoming_messages: {
         Row: {
           created_at: string | null
