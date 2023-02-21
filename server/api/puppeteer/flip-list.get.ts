@@ -4,6 +4,9 @@ import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
+	const { apiKey } = getQuery(event) as { apiKey: string };
+	const { CRON_API_KEY } = useRuntimeConfig().private;
+	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
 	const { twilioClient, twilioNumber } = useTwilio();
 	const options = {
 		headless: false,
@@ -137,19 +140,6 @@ export default defineEventHandler(async (event) => {
 				}
 			});
 		}
-		// formattedProperties.forEach(async (property) => {
-		// 	try {
-		// 		let { messagingServiceSid, errorMessage } =
-		// 			await twilioClient.messages.create({
-		// 				from: twilioNumber,
-		// 				to: '+18134750728',
-		// 				body: `There is a new property available at ${property.address}\nLink: ${property.link}\nDetails: \nPrice - ${property.price} ${property.arv}\nStatus - ${property.status}\n${property.bed}\n${property.bath}\n${property.sqft}\n`,
-		// 			});
-		// 		if (errorMessage) throw errorMessage;
-		// 	} catch (e) {
-		// 		console.log(error);
-		// 	}
-		// });
 
 		// might not need to even push to supabase if we are just going to use the data to send a text message, we would only check the if the property is pending or available
 		// now we will push these to supabase to store them in the database

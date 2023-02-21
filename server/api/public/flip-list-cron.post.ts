@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
-	console.log(apiKey);
 	const { CRON_API_KEY } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) {
 		return {
@@ -11,6 +10,9 @@ export default defineEventHandler(async (event) => {
 	try {
 		const { data, error } = await $fetch('/api/puppeteer/flip-list', {
 			method: 'GET',
+			query: {
+				apiKey: apiKey,
+			},
 		});
 		console.log(data, error);
 	} catch (e) {
