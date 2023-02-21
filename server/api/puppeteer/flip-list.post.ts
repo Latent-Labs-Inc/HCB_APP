@@ -1,5 +1,6 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
 import puppeteer from 'puppeteer';
+import chromium from 'chrome-aws-lambda';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
