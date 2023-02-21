@@ -46,7 +46,7 @@ const {
 
 const testPuppeteer = async () => {
 	const { data, error } = await $fetch('/api/puppeteer/flip-list', {
-		method: 'GET',
+		method: 'POST',
 	});
 	console.log(data, error);
 };

@@ -4,7 +4,7 @@ import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
-	const { apiKey } = getQuery(event) as { apiKey: string };
+	const { apiKey } = (await readBody(event)) as { apiKey: string };
 	const { CRON_API_KEY } = useRuntimeConfig().private;
 	if (apiKey !== CRON_API_KEY) return { error: 'Unauthorized', data: null };
 
@@ -19,10 +19,7 @@ export default defineEventHandler(async (event) => {
 	};
 
 	let error: any = null;
-	const browser = await puppeteer
-		.launch
-		// options
-		();
+	const browser = await puppeteer.launch(options);
 	const page = await browser.newPage();
 	const client = serverSupabaseServiceRole<Database>(event);
 
@@ -199,10 +196,14 @@ export default defineEventHandler(async (event) => {
 					}
 				}
 			});
+			return {
+				data: textedProperties.length ? textedProperties : 'None Texted',
+				error,
+			};
 		}
 
 		return {
-			data: textedProperties ? textedProperties : 'None Texted',
+			data: 'None Texted',
 			error,
 		};
 	} catch (e) {
