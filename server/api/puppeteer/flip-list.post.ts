@@ -82,7 +82,8 @@ export default defineEventHandler(async (event) => {
 
 	const setFilters = async () => {
 		await page.waitForSelector('text/properties');
-		await page.select('select[name="loc"]', '1592');
+		// await page.select('select[name="loc"]', '1592');
+		await page.select('select[name="loc"]', '6537');
 		await page.waitForSelector('text/Status');
 		await page.select('select[name="status"]', 'available');
 		await page.waitForSelector(
