@@ -10,7 +10,7 @@ const handler: Handler = async (event, context) => {
 	console.log('apiKey', apiKey);
 	let appUrl = 'https://app.highestcashbuyer.com/api/public/flip-list-cron';
 	try {
-		const response = axios.post(
+		const response = await axios.post(
 			appUrl,
 			{
 				apiKey,
