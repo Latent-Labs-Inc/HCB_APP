@@ -3,7 +3,8 @@
   prebuild = "npx playwright install"
   functions = "functions"
 
-[[functions]]
+[functions]
+  [[functions.cron-job]]
   name = "cron-job"
-  schedule = "*/5 * * * *"
-  path = "/functions/cronJob.ts"
+  schedule = "*/15 * * * *"
+  path = "cronJob.ts"
