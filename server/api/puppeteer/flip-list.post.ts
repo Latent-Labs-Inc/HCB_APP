@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 	try {
 		console.log('starting puppeteer');
 		const browser = await playwright.launchChromium({
-			headless: false,
+			headless: true,
 		});
 
 		const page = await browser.newPage();
