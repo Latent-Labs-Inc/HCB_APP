@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
-
+	return await chromium.executablePath;
 	try {
 		const browser = await puppeteer.launch({
 			executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
