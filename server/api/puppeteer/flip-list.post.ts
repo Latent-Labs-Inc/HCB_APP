@@ -15,12 +15,6 @@ export default defineEventHandler(async (event) => {
 
 	let error: any = null;
 	try {
-		// const browser = await puppeteer.launch({
-		// 	executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
-		// 	args: chromium.args,
-		// 	defaultViewport: chromium.defaultViewport,
-		// 	headless: chromium.headless,
-		// });
 		const browser = await chromium.launch({
 			executablePath: (await Chromium.executablePath) || CHROME_EXECUTABLE_PATH,
 			args: Chromium.args,
