@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 		};
 	}
 	try {
-		const { data, error } = await $fetch('/api/puppeteer/flip-list', {
+		const data = await $fetch('/api/puppeteer/flip-list', {
 			method: 'POST',
 			body: {
 				apiKey: apiKey,
