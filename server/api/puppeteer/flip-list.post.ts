@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
 	const { CRON_API_KEY, CHROME_EXECUTABLE_PATH } = useRuntimeConfig().private;
 	const user_id = event.context.auth.user?.id || null;
-	if (apiKey !== CRON_API_KEY || !user_id)
+	if (apiKey !== CRON_API_KEY && !user_id)
 		return { error: 'Unauthorized', data: null };
 
 	const { twilioClient, twilioNumber } = useTwilio();
