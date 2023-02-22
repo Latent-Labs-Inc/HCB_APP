@@ -15,12 +15,15 @@ export default defineEventHandler(async (event) => {
 			},
 		});
 		console.log(data, error);
+		return {
+			error: error,
+			data: data,
+		};
 	} catch (e) {
 		console.log(e);
+		return {
+			error: e,
+			data: null,
+		};
 	}
-
-	return {
-		error: null,
-		data: 'Success',
-	};
 });
