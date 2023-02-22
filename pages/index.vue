@@ -46,18 +46,22 @@ const {
 } = await useChartDataLeads();
 
 const testPuppeteer = async () => {
-	const browser = await puppeteer.launch({
-		executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-		headless: true,
-	});
+	try {
+		const browser = await puppeteer.launch({
+			executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+			headless: true,
+		});
 
-	const page = await browser.newPage();
-	await page.goto('https://www.google.com');
+		const page = await browser.newPage();
+		await page.goto('https://www.google.com');
 
-	// Take a screenshot to verify that the page was loaded correctly
-	await page.screenshot({ path: 'screenshot.png' });
+		// Take a screenshot to verify that the page was loaded correctly
+		await page.screenshot({ path: 'screenshot.png' });
 
-	await browser.close();
+		await browser.close();
+	} catch (error) {
+		console.log(error);
+	}
 };
 </script>
 
