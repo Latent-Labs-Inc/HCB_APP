@@ -1,5 +1,4 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import Chromium from 'chrome-aws-lambda';
 import { chromium } from 'playwright-core';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
