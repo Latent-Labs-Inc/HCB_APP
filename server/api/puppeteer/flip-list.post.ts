@@ -1,5 +1,6 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
 import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
@@ -13,9 +14,7 @@ export default defineEventHandler(async (event) => {
 	let error: any = null;
 
 	try {
-		console.log('starting puppeteer');
-		console.log(chromium);
-		const browser = await chromium.puppeteer.launch({
+		const browser = await puppeteer.launch({
 			executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
 			args: chromium.args,
 			defaultViewport: chromium.defaultViewport,
