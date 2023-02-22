@@ -46,9 +46,11 @@ const {
 } = await useChartDataLeads();
 
 const testPuppeteer = async () => {
-	await $fetch('api/test-puppeteer', {
+	const res = await $fetch('api/test-puppeteer', {
 		method: 'POST',
 	});
+
+	console.log(res);
 };
 </script>
 
