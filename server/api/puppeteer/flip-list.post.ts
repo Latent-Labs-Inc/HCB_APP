@@ -1,5 +1,4 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import puppeteer from 'puppeteer-core';
 import chromium from 'chrome-aws-lambda';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
@@ -12,14 +11,15 @@ export default defineEventHandler(async (event) => {
 	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
-	let browser = null;
 
 	try {
-		browser = await chromium.puppeteer.launch({
+		console.log('starting puppeteer');
+		console.log(chromium);
+		const browser = await chromium.puppeteer.launch({
+			executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
 			args: chromium.args,
-			// executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
-			headless: false,
-			ignoreHTTPSErrors: true,
+			defaultViewport: chromium.defaultViewport,
+			headless: chromium.headless,
 		});
 
 		const page = await browser.newPage();

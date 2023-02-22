@@ -5553,7 +5553,7 @@ puppeteer-core@19.7.1:
     unbzip2-stream "1.4.3"
     ws "8.11.0"
 
-puppeteer-core@^19.7.2:
+puppeteer-core@19.7.2, puppeteer-core@^19.7.2:
   version "19.7.2"
   resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-19.7.2.tgz#deee9ef915829b6a1d1a3a008625c29eeb251161"
   integrity sha512-PvI+fXqgP0uGJxkyZcX51bnzjFA73MODZOAv0fSD35yR7tvbqwtMV3/Y+hxQ0AMMwzxkEebP6c7po/muqxJvmQ==
@@ -5570,7 +5570,7 @@ puppeteer-core@^19.7.2:
     unbzip2-stream "1.4.3"
     ws "8.11.0"
 
-puppeteer@*, puppeteer@^19.6.0:
+puppeteer@*:
   version "19.7.1"
   resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-19.7.1.tgz#53c0234cac96f28934da139b0239237ccef3251a"
   integrity sha512-Hampj7jHlicySL1sSLHCwoFoRCi6RcEbnZmRE5brtbk0mp6Td33+9kWQD2eFs09772JIt00ybPKr50Gt7Y18Xg==
@@ -5580,6 +5580,17 @@ puppeteer@*, puppeteer@^19.6.0:
     progress "2.0.3"
     proxy-from-env "1.1.0"
     puppeteer-core "19.7.1"
+
+puppeteer@^19.6.0:
+  version "19.7.2"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-19.7.2.tgz#1b3ce99a093cc2f8f84dfb06f066d0757ea79d4b"
+  integrity sha512-4Lm7Qpe/LU95Svirei/jDLDvR5oMrl9BPGd7HMY5+Q28n+BhvKuW97gKkR+1LlI86bO8J3g8rG/Ll5kv9J1nlQ==
+  dependencies:
+    cosmiconfig "8.0.0"
+    https-proxy-agent "5.0.1"
+    progress "2.0.3"
+    proxy-from-env "1.1.0"
+    puppeteer-core "19.7.2"
 
 q@2.0.x:
   version "2.0.3"
