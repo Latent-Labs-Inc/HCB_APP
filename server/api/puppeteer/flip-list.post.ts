@@ -7,18 +7,22 @@ import { Database } from '~~/types/supabase';
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
 	const { CRON_API_KEY, CHROME_EXECUTABLE_PATH } = useRuntimeConfig().private;
+
 	const user_id = event.context.auth.user?.id || null;
+
 	if (apiKey !== CRON_API_KEY && !user_id)
 		return { error: 'Unauthorized', data: null };
 
 	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
+
 	try {
+		console.log('starting puppeteer');
 		const browser = await chromium.launch({
-			executablePath: (await Chromium.executablePath) || CHROME_EXECUTABLE_PATH,
-			args: Chromium.args,
-			headless: Chromium.headless,
+			// executablePath: (await Chromium.executablePath) || CHROME_EXECUTABLE_PATH,
+			// args: Chromium.args,
+			// headless: Chromium.headless,
 		});
 
 		const page = await browser.newPage();

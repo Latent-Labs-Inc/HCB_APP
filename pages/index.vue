@@ -1,9 +1,6 @@
 <template>
 	<div>
 		<h3 class="header">Home</h3>
-		<div class="flex my-4">
-			<button class="mx-auto" @click="testPuppeteer">Test Puppeteer</button>
-		</div>
 		<div class="grid gap-6">
 			<div class="grid gap-4 justify-center lg:grid-cols-2">
 				<LeadBarChart
@@ -44,14 +41,6 @@ const {
 	chartOptions: leadOptions,
 	datasetIdKey: leadId,
 } = await useChartDataLeads();
-
-const testPuppeteer = async () => {
-	const res = await $fetch('api/test-puppeteer', {
-		method: 'POST',
-	});
-
-	console.log(res);
-};
 </script>
 
 <style scoped>
