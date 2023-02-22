@@ -1,12 +1,12 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import chromium from 'chrome-aws-lambda';
-import puppeteer from 'puppeteer-core';
+import Chromium from 'chrome-aws-lambda';
+import { chromium } from 'playwright-core';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
-	const { CRON_API_KEY, CHROME_EXECUTABLE_PATH } = useRuntimeConfig().private;
+	const { CRON_API_KEY } = useRuntimeConfig().private;
 	const user_id = event.context.auth.user?.id || null;
 	if (apiKey !== CRON_API_KEY && !user_id)
 		return { error: 'Unauthorized', data: null };
@@ -15,11 +15,16 @@ export default defineEventHandler(async (event) => {
 
 	let error: any = null;
 	try {
-		const browser = await puppeteer.launch({
-			executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
-			args: chromium.args,
-			defaultViewport: chromium.defaultViewport,
-			headless: chromium.headless,
+		// const browser = await puppeteer.launch({
+		// 	executablePath: (await chromium.executablePath) || CHROME_EXECUTABLE_PATH,
+		// 	args: chromium.args,
+		// 	defaultViewport: chromium.defaultViewport,
+		// 	headless: chromium.headless,
+		// });
+		const browser = await chromium.launch({
+			// executablePath: (await Chromium.executablePath) || CHROME_EXECUTABLE_PATH,
+			args: Chromium.args,
+			headless: false,
 		});
 
 		const page = await browser.newPage();
@@ -83,22 +88,23 @@ export default defineEventHandler(async (event) => {
 		};
 
 		const setFilters = async () => {
-			await page.waitForSelector('text/properties');
-			// await page.select('select[name="loc"]', '1592');
-			await page.select('select[name="loc"]', '6537');
-			await page.waitForSelector('text/Status');
-			await page.select('select[name="status"]', 'available');
+			// Wait for the results to show up
+			await page.click('text=View Properties');
+			await page.waitForSelector('text=Tampa, FL');
+			await page.click('text=Tampa, FL');
+			await page.waitForSelector('text=Change To Sort View Mode');
+			await page.click('text=Change To Sort View Mode');
+			await page.waitForSelector(
+				'body > div > div.content-wrap > div > main > div.page-header > h1'
+			);
+			// await page.selectOption('select[name="loc"]', '1592');
+			await page.selectOption('select[name="loc"]', '6537');
+			await page.waitForSelector('text=Status');
+			await page.selectOption('select[name="status"]', 'available');
 			await page.waitForSelector(
 				'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
 			);
 		};
-
-		// Wait for the results to show up
-		await page.click('text/View Properties');
-		await page.waitForSelector('text/Tampa, FL');
-		await page.click('text/Tampa, FL');
-		await page.waitForSelector('text/Change To Sort View Mode');
-		await page.click('text/Change To Sort View Mode');
 
 		let properties: Property[] = [];
 
@@ -109,7 +115,7 @@ export default defineEventHandler(async (event) => {
 			let pageProperties = await evaluateProperties();
 			properties = [...properties, ...pageProperties];
 			if (pageProperties.length < 15) break;
-			await page.click('text/Next');
+			await page.click('text=Next');
 			await page.waitForSelector(
 				'body > div > div.content-wrap > div > main > div.property-list.row.three-column'
 			);
