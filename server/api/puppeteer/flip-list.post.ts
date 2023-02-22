@@ -164,17 +164,18 @@ export default defineEventHandler(async (event) => {
 		let textedProperties: string[] = [];
 		// if there are any properties that are available and have not been texted then we will want to text them
 		if (availableProperties.length > 0) {
-			availableProperties.forEach(async (property) => {
+			// instead of doing the forEach loop above can we do the same thing in a for loop and use await to wait for the text to be sent before moving on to the next property
+			for (let i = 0; i < availableProperties.length; i++) {
 				try {
-					let body = `There is a new property available at ${property.address}\nLink: ${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed}\n${property.bath}\n${property.sqft}`;
+					let msg = `There is a new property available at ${availableProperties[i].address}\nLink: ${availableProperties[i].link}\nDetails:\nPrice - ${availableProperties[i].price} ${availableProperties[i].arv}\nStatus: ${availableProperties[i].status}\n${availableProperties[i].bed}\n${availableProperties[i].bath}\n${availableProperties[i].sqft}`;
 					const res = await twilioClient.messages.create({
-						body,
+						body: msg,
 						from: twilioNumber,
 						to: '+18134750728',
 					});
 					if (res.errorMessage) throw res.errorMessage;
 					const res2 = await twilioClient.messages.create({
-						body,
+						body: msg,
 						from: twilioNumber,
 						to: '+18134084221',
 					});
@@ -184,19 +185,20 @@ export default defineEventHandler(async (event) => {
 					error = e;
 				} finally {
 					try {
-						textedProperties.push(property.address);
+						textedProperties.push(availableProperties[i].address);
 						// update the database to have the texted property set to true
 						const { error } = await client
+
 							.from('flip_list')
 							.update({ texted: true })
-							.eq('address', property.address);
+							.eq('address', availableProperties[i].address);
 						if (error) throw error;
 					} catch (e) {
 						console.log(e);
 						error = e;
 					}
 				}
-			});
+			}
 			return {
 				data: textedProperties.length ? textedProperties : 'None Texted',
 				error,
