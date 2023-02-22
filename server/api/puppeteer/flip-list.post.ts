@@ -1,5 +1,5 @@
 import { serverSupabaseServiceRole } from '#supabase/server';
-import { chromium } from 'playwright-core';
+import playwright from 'playwright-aws-lambda';
 import { Property } from '~~/types/types';
 import { Database } from '~~/types/supabase';
 
@@ -18,10 +18,8 @@ export default defineEventHandler(async (event) => {
 
 	try {
 		console.log('starting puppeteer');
-		const browser = await chromium.launch({
-			// executablePath: (await Chromium.executablePath) || CHROME_EXECUTABLE_PATH,
-			// args: Chromium.args,
-			// headless: Chromium.headless,
+		const browser = await playwright.launchChromium({
+			headless: false,
 		});
 
 		const page = await browser.newPage();
