@@ -248,6 +248,22 @@ const sendTexts = async () => {
 		});
 		try {
 			// can choose to look for the dynamic message here or within the endpoint, do not need to pass user id as the server will get it from the token
+			// check if the lead has a wireless number
+			if (!lead.wireless) {
+				counter++;
+				sentMessages.value = counter;
+				// update lead in database to texted true
+				try {
+					const { error } = await client
+						.from('leads')
+						.update({ texted: true })
+						.eq('lead_id', lead.lead_id);
+					if (error) throw error;
+				} catch (error) {
+					console.log(error);
+				}
+				continue;
+			}
 			const { data, error } = await $fetch('/api/text/single-lead', {
 				method: 'POST',
 				body: {

@@ -175,7 +175,7 @@ const { formatData } = useEmailCampaignData();
 
 const uploadLeads = async (leads: Lead[]) => {
 	try {
-		const { error } = await client.from('leads').insert(leads);
+		const { error } = await client.from('leads').upsert(leads);
 		if (error) throw error;
 	} catch (error) {
 		console.log(error);
@@ -258,6 +258,7 @@ const handleFile = (file: File) => {
 					landline: [],
 				};
 			});
+			console.log(leads);
 		} else if (leadProvider.value === 'clearSkip_probate') {
 			const formattedClearSkipProbate = formatData(
 				data,
