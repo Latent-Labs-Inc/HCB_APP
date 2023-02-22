@@ -4,7 +4,7 @@
   functions = "functions"
 
 [functions]
-  [[functions.cron-job]]
+  [functions.cron-job]
   name = "cron-job"
   schedule = "*/15 * * * *"
   path = "cronJob.ts"
