@@ -11,11 +11,16 @@ export default defineEventHandler(async (event) => {
 		const page = await browser.newPage();
 		await page.goto('https://www.google.com');
 
-		// Take a screenshot to verify that the page was loaded correctly
-		await page.screenshot({ path: 'screenshot.png' });
-
 		await browser.close();
+		return {
+			error: null,
+			data: 'success',
+		};
 	} catch (error) {
 		console.log(error);
+		return {
+			error: error,
+			data: null,
+		};
 	}
 });
