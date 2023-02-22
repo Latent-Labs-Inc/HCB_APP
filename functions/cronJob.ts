@@ -17,6 +17,7 @@ const handler: Handler = async (event, context) => {
 			},
 			{
 				method: 'POST',
+				timeout: 30000,
 			}
 		);
 		return {
