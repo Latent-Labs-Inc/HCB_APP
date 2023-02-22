@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<h3 class="header">Home</h3>
-		<!-- <div class="flex my-4">
+		<div class="flex my-4">
 			<button class="mx-auto" @click="testPuppeteer">Test Puppeteer</button>
-		</div> -->
+		</div>
 		<div class="grid gap-6">
 			<div class="grid gap-4 justify-center lg:grid-cols-2">
 				<LeadBarChart
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { useUiStore } from '~/stores/ui';
+import puppeteer from 'puppeteer-core';
 
 const uiStore = useUiStore();
 
@@ -45,10 +46,18 @@ const {
 } = await useChartDataLeads();
 
 const testPuppeteer = async () => {
-	const { data, error } = await $fetch('/api/puppeteer/flip-list', {
-		method: 'POST',
+	const browser = await puppeteer.launch({
+		executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+		headless: true,
 	});
-	console.log(data, error);
+
+	const page = await browser.newPage();
+	await page.goto('https://www.google.com');
+
+	// Take a screenshot to verify that the page was loaded correctly
+	await page.screenshot({ path: 'screenshot.png' });
+
+	await browser.close();
 };
 </script>
 
