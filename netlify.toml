@@ -6,6 +6,6 @@
 
 [functions]
   [functions.cronJob]
-  name = "cron-job"
+  name = "cron_job"
   schedule = "*/15 * * * *"
   path = "cronJob.ts"
