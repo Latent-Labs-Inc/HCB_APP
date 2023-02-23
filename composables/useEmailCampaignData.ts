@@ -242,7 +242,7 @@ export const useEmailCampaignData = () => {
 
 	const formatClearSkipRegular = (
 		contacts: ClearSkipRegular[],
-		type: 'probate' | 'codeViolation' | 'eviction' | 'cashOffer'
+		type: 'probate' | 'codeViolation' | 'eviction' | 'cashOffer' | 'foreclosure'
 	) => {
 		// clear skip regular
 		// get the contacts
@@ -341,6 +341,7 @@ export const useEmailCampaignData = () => {
 			| 'probate'
 			| 'attorney'
 			| 'cashOffer'
+			| 'foreclosure'
 	) => {
 		let counter = 0;
 		while (counter < filteredEmailObjects.length) {
@@ -367,7 +368,7 @@ export const useEmailCampaignData = () => {
 		uiStore.clearProgressBar();
 	};
 
-	const formatContacts = (
+	const formatEmailObjects = (
 		skipType:
 			| 'clearSkip_probate'
 			| 'clearSkip_regular'
@@ -379,6 +380,7 @@ export const useEmailCampaignData = () => {
 			| 'probate'
 			| 'cashOffer'
 			| 'attorney'
+			| 'foreclosure'
 	) => {
 		if (skipType === 'clearSkip_probate') {
 			return formatClearSkipProbate(clearSkipProbateContacts.value);
@@ -427,6 +429,6 @@ export const useEmailCampaignData = () => {
 		formatData,
 		filterEmailsFromTable,
 		sendEmails,
-		formatContacts,
+		formatEmailObjects,
 	};
 };

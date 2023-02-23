@@ -1,6 +1,11 @@
 export const useEmailRadioInput = () => {
 	const type = ref<
-		'probate' | 'attorney' | 'cashOffer' | 'eviction' | 'codeViolation'
+		| 'probate'
+		| 'attorney'
+		| 'cashOffer'
+		| 'eviction'
+		| 'codeViolation'
+		| 'foreclosure'
 	>('attorney');
 	const skipTrace = ref<
 		'propstream' | 'clearSkip_probate' | 'clearSkip_regular'
@@ -12,6 +17,7 @@ export const useEmailRadioInput = () => {
 		{ value: 'attorney', label: 'Attorneys' },
 		{ value: 'eviction', label: 'Evictions' },
 		{ value: 'codeViolation', label: 'Code Violation' },
+		{ value: 'foreclosure', label: 'Foreclosure' },
 	];
 
 	const skipTraceOptions = [
@@ -26,7 +32,8 @@ export const useEmailRadioInput = () => {
 			| 'attorney'
 			| 'cashOffer'
 			| 'eviction'
-			| 'codeViolation';
+			| 'codeViolation'
+			| 'foreclosure';
 	};
 
 	const handleSkipOptions = (value: string | boolean) => {

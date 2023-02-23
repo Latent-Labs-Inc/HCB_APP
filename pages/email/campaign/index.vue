@@ -94,7 +94,7 @@ const {
 	clearSkipRegularContacts,
 	areContacts,
 	formatData,
-	formatContacts,
+	formatEmailObjects,
 	filterEmailsFromTable,
 	sendEmails,
 } = useEmailCampaignData();
@@ -140,7 +140,7 @@ const handleFile = (file: File) => {
 
 const handleEmail = async () => {
 	if (type.value === 'attorney') {
-		const emailObjects = await formatContacts('attorney', type.value);
+		const emailObjects = await formatEmailObjects('attorney', type.value);
 
 		let filteredEmailObjects = await filterEmailsFromTable(
 			emailObjects!,
@@ -164,7 +164,7 @@ const handleEmail = async () => {
 		}
 	} else {
 		// format the contacts
-		const emailObjects = formatContacts(skipTrace.value, type.value);
+		const emailObjects = formatEmailObjects(skipTrace.value, type.value);
 		// filter the emails
 		const filteredEmailObjects = await filterEmailsFromTable(
 			emailObjects!,
