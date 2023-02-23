@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
 		};
 	}
 	try {
+		console.log('running flip list endpoint');
 		const { data, error } = await $fetch('/api/puppeteer/flip-list', {
 			method: 'POST',
 			body: {
