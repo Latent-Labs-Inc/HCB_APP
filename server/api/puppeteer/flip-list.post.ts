@@ -116,6 +116,8 @@ export default defineEventHandler(async (event) => {
 			);
 		}
 
+		// declare newProperties to track which are new
+		let newProperties: Property[];
 		// will want to check to see if the properties are already in the database
 		// if they are not in the database then we will want to insert them into the database
 		try {
@@ -129,6 +131,13 @@ export default defineEventHandler(async (event) => {
 			if (error) throw error;
 			// update the properties in the properties array to have the texted property from the one in the database
 			if (dbProperties) {
+				// set newProperties to the properties that are not in the database
+				newProperties = properties.filter(
+					(property) =>
+						!dbProperties.find(
+							(dbProperty) => dbProperty.address === property.address
+						)
+				);
 				properties = properties.map((property) => {
 					const dbProperty = dbProperties.find(
 						(dbProperty) => dbProperty.address === property.address
@@ -140,21 +149,35 @@ export default defineEventHandler(async (event) => {
 							texted: dbProperty.texted,
 						};
 					}
+
 					// if the property is not in the database then we will just return the property
 					return property;
 				});
+				// after the above we will have updated all the properties in the properties array to have the texted property from the database
+				// insert the properties that are not in the database
+				try {
+					const { data, error } = await client
+						.from('flip_list')
+						.insert(newProperties);
+					if (error) throw error;
+				} catch (e) {
+					console.log(e);
+					error = e;
+				}
+			} else {
+				// insert the properties that are not in the database
+				try {
+					const { data, error } = await client
+						.from('flip_list')
+						.insert(properties);
+					if (error) throw error;
+				} catch (e) {
+					console.log(e);
+					error = e;
+				}
 			}
 		} catch (e) {
 			console.error(e);
-			error = e;
-		}
-
-		// insert the properties into the database
-		try {
-			const { data, error } = await client.from('flip_list').insert(properties);
-			if (error) throw error;
-		} catch (e) {
-			console.log(e);
 			error = e;
 		}
 
@@ -166,8 +189,10 @@ export default defineEventHandler(async (event) => {
 		let textedProperties: string[] = [];
 		// if there are any properties that are available and have not been texted then we will want to text them
 		if (availableProperties.length > 0) {
+			console.log('There are new properties available', availableProperties);
 			// instead of doing the forEach loop above can we do the same thing in a for loop and use await to wait for the text to be sent before moving on to the next property
 			for (let i = 0; i < availableProperties.length; i++) {
+				console.log('sending text');
 				try {
 					let msg = `There is a new property available at ${availableProperties[i].address}\nLink: ${availableProperties[i].link}\nDetails:\nPrice - ${availableProperties[i].price} ${availableProperties[i].arv}\nStatus: ${availableProperties[i].status}\n${availableProperties[i].bed}\n${availableProperties[i].bath}\n${availableProperties[i].sqft}`;
 					const res = await twilioClient.messages.create({
@@ -190,7 +215,6 @@ export default defineEventHandler(async (event) => {
 						textedProperties.push(availableProperties[i].address);
 						// update the database to have the texted property set to true
 						const { error } = await client
-
 							.from('flip_list')
 							.update({ texted: true })
 							.eq('address', availableProperties[i].address);

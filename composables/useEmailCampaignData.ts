@@ -351,7 +351,7 @@ export const useEmailCampaignData = () => {
 				label: 'Sending Emails Please Wait...',
 			});
 			const emailObject = filteredEmailObjects[counter];
-			if (!emailObject.email) continue;
+			if (!emailObject.email || emailObject.email === '') continue;
 			try {
 				const { data, error } = await $fetch(`/api/email/single-${apiType}`, {
 					method: 'POST',

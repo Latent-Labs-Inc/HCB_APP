@@ -8,7 +8,7 @@ const handler: Handler = async (event, context) => {
 		// 2. Call API
 		dotenv.config();
 		const { CRON_API_KEY: apiKey } = process.env;
-		console.log('apiKey', apiKey);
+
 		let appUrl = 'https://app.highestcashbuyer.com/api/public/flip-list-cron';
 
 		const response = axios.post(
