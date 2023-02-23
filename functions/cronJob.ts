@@ -11,7 +11,7 @@ const handler: Handler = async (event, context) => {
 
 		let appUrl = 'https://app.highestcashbuyer.com/api/public/flip-list-cron';
 
-		const response = axios.post(
+		const response = await axios.post(
 			appUrl,
 			{
 				apiKey,
@@ -21,6 +21,9 @@ const handler: Handler = async (event, context) => {
 				timeout: 30000,
 			}
 		);
+
+		console.log(response.data);
+		console.log('ran axios request');
 		return {
 			statusCode: 200,
 			body: JSON.stringify('Cron job ran successfully'),
@@ -32,6 +35,7 @@ const handler: Handler = async (event, context) => {
 			body: JSON.stringify(error),
 		};
 	} finally {
+		console.log('cron job attempted to run');
 		return {
 			statusCode: 200,
 			body: JSON.stringify('Cron job ran successfully'),
