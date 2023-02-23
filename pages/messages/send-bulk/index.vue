@@ -253,15 +253,6 @@ const sendTexts = async () => {
 				counter++;
 				sentMessages.value = counter;
 				// update lead in database to texted true
-				try {
-					const { error } = await client
-						.from('leads')
-						.update({ texted: true })
-						.eq('lead_id', lead.lead_id);
-					if (error) throw error;
-				} catch (error) {
-					console.log(error);
-				}
 				continue;
 			}
 			const { data, error } = await $fetch('/api/text/single-lead', {
@@ -280,6 +271,15 @@ const sendTexts = async () => {
 			counter++;
 			sentMessages.value = counter;
 			uiStore.clearProgressBar();
+			try {
+				const { error } = await client
+					.from('leads')
+					.update({ texted: true })
+					.eq('lead_id', lead.lead_id);
+				if (error) throw error;
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	}
 	uiStore.toggleFunctionLoading(false);
