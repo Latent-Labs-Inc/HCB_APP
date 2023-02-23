@@ -34,9 +34,9 @@ export default defineEventHandler(async (event) => {
 			});
 		}
 	});
-
 	try {
 		// getting user id from phone number
+		console.log('getting user id from phone number');
 		const { data, error: err } = await supabase
 			.from('profiles')
 			.select('*')
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 		if (err) throw err;
 
 		const user_id = data!.user_id;
-
+		console.log('user_id', user_id);
 		const { data: lead, error } = await supabase
 			.from('leads')
 			.select('*')
@@ -80,6 +80,7 @@ export default defineEventHandler(async (event) => {
 		};
 
 		try {
+			console.log('inserting message');
 			const { data: message, error } = await supabase
 				.from('incoming_messages')
 				.insert(incoming_message);
