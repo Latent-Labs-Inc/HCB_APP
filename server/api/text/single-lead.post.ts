@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server';
 import { PostgrestError } from '@supabase/supabase-js';
-import { Lead } from '~~/types/types';
+import { Database } from '~~/types/supabase';
+import { Lead, SentMessage } from '~~/types/types';
 
 export default defineEventHandler(async (event) => {
 	const { twilioClient, twilioNumber } = useTwilio();
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
 	};
 	const user_id = event.context.auth.user.id;
 
-	const supabaseClient = serverSupabaseClient(event);
+	const supabaseClient = serverSupabaseClient<Database>(event);
 
 	const checkBadNumber = async (wireless: string) => {
 		let badNumber = false;
@@ -59,6 +60,27 @@ export default defineEventHandler(async (event) => {
 				});
 				if (res.errorMessage) throw new Error(res.errorMessage);
 				log.data = res.sid;
+				// update the sent messages table to include the message
+				let sentMessage: SentMessage = {
+					user_id: user_id,
+					lead_id: lead.lead_id,
+					message: message,
+					sid: res.sid,
+					direction: res.direction,
+					status: res.status,
+					errorCode: res.errorCode.toString(),
+					errorMessage: res.errorMessage,
+					from: res.from,
+					to: res.to,
+					created_at: res.dateCreated.toDateString(),
+					sent_at: res.dateSent.toDateString(),
+					updated_at: res.dateUpdated.toDateString(),
+					propertyAddress: lead.propertyAddress,
+				};
+				const { data, error } = await supabaseClient
+					.from('sent_messages')
+					.insert(sentMessage);
+				if (error) throw error;
 			} catch (error: any) {
 				log.error = error.message;
 			} finally {

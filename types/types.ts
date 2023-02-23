@@ -86,6 +86,8 @@ export interface Filter {
 	value: string | number | boolean;
 }
 
+export type SentMessage = Database['public']['Tables']['sent_messages']['Row'];
+
 export interface Message {
 	user_id: string;
 	message: string;
