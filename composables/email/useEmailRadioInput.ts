@@ -18,6 +18,7 @@ export const useEmailRadioInput = () => {
 		{ value: 'eviction', label: 'Evictions' },
 		{ value: 'codeViolation', label: 'Code Violation' },
 		{ value: 'foreclosure', label: 'Foreclosure' },
+		{ value: 'attorneyBreakfast', label: 'Attorney Breakfast' },
 	];
 
 	const skipTraceOptions = [
