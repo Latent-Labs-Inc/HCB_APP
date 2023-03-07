@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
 			await page.waitForSelector(
 				'body > div > div.content-wrap > div > main > div.page-header > h1'
 			);
-			await page.selectOption('select[name="loc"]', '1592');
+			// await page.selectOption('select[name="loc"]', '1592');
 			// await page.selectOption('select[name="loc"]', '6537');
 			await page.waitForSelector('text=Status');
 			await page.selectOption('select[name="status"]', 'available');
