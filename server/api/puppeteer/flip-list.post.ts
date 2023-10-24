@@ -124,7 +124,7 @@ export default defineEventHandler(async (event) => {
 					'address',
 					properties.map((property) => property.address)
 				);
-			if (error) throw error;
+			if (dbError) throw dbError;
 			if (dbProperties) {
 				newProperties = properties.filter(
 					(property) =>
@@ -146,7 +146,7 @@ export default defineEventHandler(async (event) => {
 					return property;
 				});
 				try {
-					const { data, error } = await client
+					const { error } = await client
 						.from('flip_list')
 						.insert(newProperties);
 					if (error) throw error;
