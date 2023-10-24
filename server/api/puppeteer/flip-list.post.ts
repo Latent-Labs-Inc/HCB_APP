@@ -183,7 +183,7 @@ export default defineEventHandler(async (event) => {
 				const message = createMessage(property);
 				return {
 					id: property.address as string,
-					email_to: ['lukelong0421@gmail.com', 'chad@highestcashbuyer.com'],
+					email_to: ['lukelongo0421@gmail.com', 'chad@highestcashbuyer.com'],
 					subject,
 					message,
 				};
