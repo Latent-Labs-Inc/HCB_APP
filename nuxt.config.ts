@@ -38,6 +38,7 @@ export default defineNuxtConfig({
 			SUPABASE_URL: process.env.SUPABASE_URL,
 			SUPABASE_KEY: process.env.SUPABASE_KEY,
 			SUPABASE_PROJECT_ID: process.env.SUPABASE_PROJECT_ID,
+			BASE_URL: process.env.BASE_URL,
 		},
 		private: {
 			TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
@@ -52,6 +53,8 @@ export default defineNuxtConfig({
 			EMAIL_FROM: process.env.EMAIL_FROM,
 			CRON_API_KEY: process.env.CRON_API_KEY,
 			CHROME_EXECUTABLE_PATH: process.env.CHROME_EXECUTABLE_PATH,
+			SERVER_FUNCTIONS_API_KEY: process.env.SERVER_FUNCTIONS_API_KEY,
+			SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
 		},
 	},
 });

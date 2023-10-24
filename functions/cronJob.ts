@@ -7,9 +7,9 @@ const handler: Handler = async (event, context) => {
 		console.log('Cron job ran at ' + new Date().toLocaleString());
 		// 2. Call API
 		dotenv.config();
-		const { CRON_API_KEY: apiKey } = process.env;
+		const { CRON_API_KEY: apiKey, BASE_URL } = process.env;
 
-		let appUrl = 'https://app.highestcashbuyer.com/api/public/flip-list-cron';
+		let appUrl = `${BASE_URL}/api/public/flip-list-cron`;
 
 		const response = await axios.post(
 			appUrl,
@@ -22,7 +22,6 @@ const handler: Handler = async (event, context) => {
 			}
 		);
 
-		console.log(response.data);
 		console.log('ran axios request');
 		return {
 			statusCode: 200,

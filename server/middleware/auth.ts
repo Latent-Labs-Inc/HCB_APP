@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
 		'/api/puppeteer/flip-list',
 		'/api/incoming-message',
 		'/api/status-update',
+		'/api/email/notification/send',
 	];
 
 	if (clientSideRoutes || event.path?.includes('_supabase')) {

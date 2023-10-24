@@ -1,4 +1,4 @@
-const useUuid = () => {
+export const useUuid = () => {
 	let uuid = () => {
 		let s4 = () => {
 			return Math.floor((1 + Math.random()) * 0x10000)
@@ -7,11 +7,20 @@ const useUuid = () => {
 		};
 		//return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
 		return (
-			s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4()
+			s4() +
+			s4() +
+			'-' +
+			s4() +
+			'-' +
+			s4() +
+			'-' +
+			s4() +
+			'-' +
+			s4() +
+			s4() +
+			s4()
 		);
 	};
 
 	return uuid();
 };
-
-export default useUuid;

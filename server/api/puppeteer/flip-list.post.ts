@@ -5,7 +5,7 @@ import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
-	const { CRON_API_KEY, CHROME_EXECUTABLE_PATH } = useRuntimeConfig().private;
+	const { CRON_API_KEY, SERVER_FUNCTIONS_API_KEY } = useRuntimeConfig().private;
 
 	const user_id = event.context.auth.user?.id || null;
 
@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
 	let error: any = null;
 
 	try {
-		console.log('starting puppeteer');
 		const browser = await playwright.launchChromium({
 			headless: true,
 		});
@@ -189,12 +188,10 @@ export default defineEventHandler(async (event) => {
 		let textedProperties: string[] = [];
 		// if there are any properties that are available and have not been texted then we will want to text them
 		if (availableProperties.length > 0) {
-			console.log('There are new properties available', availableProperties);
-			// instead of doing the forEach loop above can we do the same thing in a for loop and use await to wait for the text to be sent before moving on to the next property
 			for (let i = 0; i < availableProperties.length; i++) {
-				console.log('sending text');
 				try {
-					let msg = `There is a new property available at ${availableProperties[i].address}\nLink: ${availableProperties[i].link}\nDetails:\nPrice - ${availableProperties[i].price} ${availableProperties[i].arv}\nStatus: ${availableProperties[i].status}\n${availableProperties[i].bed}\n${availableProperties[i].bath}\n${availableProperties[i].sqft}`;
+					const property = availableProperties[i];
+					const msg = createMessage(property);
 					const res = await twilioClient.messages.create({
 						body: msg,
 						from: twilioNumber,
@@ -225,6 +222,34 @@ export default defineEventHandler(async (event) => {
 					}
 				}
 			}
+
+			// now we want to create an emails array of the properties that were texted and also send out emails as well
+
+			const emails = availableProperties.map((property) => {
+				const subject = `New Property Available at ${property.address}`;
+				const message = createMessage(property);
+
+				return {
+					email_to: ['lukelong0421@gmail.com', 'chad@highestcashbuyer.com'],
+					subject,
+					message,
+				};
+			});
+
+			// send the emails to the server endpoint
+			const { error: emailError } = await $fetch(
+				'/api/email/notification/send',
+				{
+					method: 'POST',
+					body: {
+						apiKey: SERVER_FUNCTIONS_API_KEY,
+						emails,
+					},
+				}
+			);
+
+			if (emailError) console.error(emailError);
+
 			return {
 				data: textedProperties.length ? textedProperties : 'None Texted',
 				error,
@@ -245,3 +270,8 @@ export default defineEventHandler(async (event) => {
 		};
 	}
 });
+
+const createMessage = (property: Property) => {
+	const msg = `There is a new property available at ${property.address}\nLink: ${property.link}\nDetails:\nPrice - ${property.price} ${property.arv}\nStatus: ${property.status}\n${property.bed}\n${property.bath}\n${property.sqft}`;
+	return msg;
+};

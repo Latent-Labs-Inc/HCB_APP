@@ -140,8 +140,8 @@ const handleFile = (file: File) => {
 
 const handleEmail = async () => {
 	if (type.value === 'attorney') {
-		const emailObjects = await formatEmailObjects('attorney', type.value);
-
+		const emailObjects = formatEmailObjects('attorney', type.value);
+		// here we can choose to pass only the emails that are not in the database or we can pass all the emails
 		let filteredEmailObjects = await filterEmailsFromTable(
 			emailObjects!,
 			'attorney_emails'
