@@ -5,14 +5,12 @@ import { Database } from '~~/types/supabase';
 
 export default defineEventHandler(async (event) => {
 	const { apiKey } = (await readBody(event)) as { apiKey: string };
-	const { CRON_API_KEY, SERVER_FUNCTIONS_API_KEY } = useRuntimeConfig().private;
+	const { CRON_API_KEY } = useRuntimeConfig().private;
 
 	const user_id = event.context.auth.user?.id || null;
 
 	if (apiKey !== CRON_API_KEY && !user_id)
 		return { error: 'Unauthorized', data: null };
-
-	const { twilioClient, twilioNumber } = useTwilio();
 
 	let error: any = null;
 
@@ -183,7 +181,11 @@ export default defineEventHandler(async (event) => {
 				const message = createMessage(property);
 				return {
 					id: property.address as string,
-					email_to: ['lukelongo0421@gmail.com', 'chad@highestcashbuyer.com'],
+					email_to: [
+						'lukelongo0421@gmail.com',
+						'chad@highestcashbuyer.com',
+						'investfloridanow@gmail.com',
+					],
 					subject,
 					message,
 				};
