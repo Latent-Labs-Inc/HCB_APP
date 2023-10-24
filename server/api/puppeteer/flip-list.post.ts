@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 						status:
 							property.querySelector('a > div > span.badge')?.textContent ||
 							'available',
-						texted: false,
+						emailed: false,
 						created_at: new Date().toISOString(),
 						modified_at: new Date().toISOString(),
 					};
@@ -115,10 +115,7 @@ export default defineEventHandler(async (event) => {
 			);
 		}
 
-		// declare newProperties to track which are new
 		let newProperties: Property[];
-		// will want to check to see if the properties are already in the database
-		// if they are not in the database then we will want to insert them into the database
 		try {
 			const { data: dbProperties, error: dbError } = await client
 				.from('flip_list')
@@ -128,9 +125,7 @@ export default defineEventHandler(async (event) => {
 					properties.map((property) => property.address)
 				);
 			if (error) throw error;
-			// update the properties in the properties array to have the texted property from the one in the database
 			if (dbProperties) {
-				// set newProperties to the properties that are not in the database
 				newProperties = properties.filter(
 					(property) =>
 						!dbProperties.find(
@@ -142,18 +137,14 @@ export default defineEventHandler(async (event) => {
 						(dbProperty) => dbProperty.address === property.address
 					);
 					if (dbProperty) {
-						// we will leave the status from the website listing but change the texted property to the one from the database
 						return {
 							...property,
-							texted: dbProperty.texted,
+							emailed: dbProperty.emailed,
 						};
 					}
 
-					// if the property is not in the database then we will just return the property
 					return property;
 				});
-				// after the above we will have updated all the properties in the properties array to have the texted property from the database
-				// insert the properties that are not in the database
 				try {
 					const { data, error } = await client
 						.from('flip_list')
@@ -182,76 +173,60 @@ export default defineEventHandler(async (event) => {
 
 		// filter out all properties that are pending status and texted is false
 		let availableProperties = properties.filter(
-			(property) => property.status === 'available' && !property.texted
+			(property) => property.status === 'available' && !property.emailed
 		);
 
-		let textedProperties: string[] = [];
-		// if there are any properties that are available and have not been texted then we will want to text them
+		let emailedProperties: string[] = [];
 		if (availableProperties.length > 0) {
-			for (let i = 0; i < availableProperties.length; i++) {
-				try {
-					const property = availableProperties[i];
-					const msg = createMessage(property);
-					const res = await twilioClient.messages.create({
-						body: msg,
-						from: twilioNumber,
-						to: '+18134750728',
-					});
-					if (res.errorMessage) throw res.errorMessage;
-					const res2 = await twilioClient.messages.create({
-						body: msg,
-						from: twilioNumber,
-						to: '+18134084221',
-					});
-					if (res2.errorMessage) throw res2.errorMessage;
-				} catch (e) {
-					console.log(e);
-					error = e;
-				} finally {
-					try {
-						textedProperties.push(availableProperties[i].address);
-						// update the database to have the texted property set to true
-						const { error } = await client
-							.from('flip_list')
-							.update({ texted: true })
-							.eq('address', availableProperties[i].address);
-						if (error) throw error;
-					} catch (e) {
-						console.log(e);
-						error = e;
-					}
-				}
-			}
-
-			// now we want to create an emails array of the properties that were texted and also send out emails as well
-
 			const emails = availableProperties.map((property) => {
 				const subject = `New Property Available at ${property.address}`;
 				const message = createMessage(property);
-
 				return {
+					id: property.address as string,
 					email_to: ['lukelong0421@gmail.com', 'chad@highestcashbuyer.com'],
 					subject,
 					message,
 				};
 			});
 
-			// send the emails to the server endpoint
-			const { error: emailError } = await $fetch(
-				'/api/email/notification/send',
-				{
-					method: 'POST',
-					body: {
-						apiKey: SERVER_FUNCTIONS_API_KEY,
-						emails,
-					},
-				}
+			emailedProperties = availableProperties.map(
+				(property) => property.address
 			);
 
-			if (emailError) console.error(emailError);
+			// now we need to send the emails, create a promise for each one and then use Promise.all to wait for all of them to finish
+			const promises = emails.map((email) => useSendEmailNotification(email));
+
+			const results = await Promise.all(promises);
+
+			console.log('Sent all emails via promise');
+			results.forEach(async (result, index) => {
+				const { error } = result;
+				if (error) {
+					console.error(`Error at index ${index} - ${error}`);
+					try {
+						const { error: updateError } = await client
+							.from('flip_list')
+							.update({ emailed: false })
+							.eq('address', emailedProperties[index]);
+						if (updateError) throw updateError;
+					} catch (e) {
+						console.error(e);
+					}
+				} else {
+					try {
+						const { error: updateError } = await client
+							.from('flip_list')
+							.update({ emailed: true })
+							.eq('address', emailedProperties[index]);
+						if (updateError) throw updateError;
+					} catch (e) {
+						console.error(e);
+					}
+				}
+			});
 
 			return {
-				data: textedProperties.length ? textedProperties : 'None Texted',
+				data: emailedProperties.length ? emailedProperties : 'None Emailed',
 				error,
 			};
 		}
@@ -259,7 +234,7 @@ export default defineEventHandler(async (event) => {
 		await browser.close();
 
 		return {
-			data: 'None Texted',
+			data: 'None Emailed',
 			error,
 		};
 	} catch (e) {
